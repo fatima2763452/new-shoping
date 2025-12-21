@@ -291,7 +291,7 @@ function InvestReceipt() {
             <div style={{ width: 120, height: 140 }}>
               {
                 (() => {
-                  const fallbackPhoto = photo || BASE64_PLACEHOLDER;
+                  const fallbackPhoto = photo;
                   return (
                     <img src={fallbackPhoto} alt="Customer" style={{ width: 120, height: 120, objectFit: "cover" }} />
                   );
