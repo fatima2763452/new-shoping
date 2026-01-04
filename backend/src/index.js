@@ -15,8 +15,8 @@ const FormModel = require("./Model/FormModel");   // ✅ सही import
 
 const allowedOrigins = [
   // "https://amazone-shopping-front.onrender.com",
-  // "https://new-shop-g5i2.onrender.com",
-  "http://localhost:3000"
+  "https://new-shop-g5i2.onrender.com",
+  // "http://localhost:3000"
 ];
 
 app.use(cors({
