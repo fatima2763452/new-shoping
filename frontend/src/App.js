@@ -356,7 +356,7 @@ function App() {
             <Route path="/investReceipt" element={<Admin6InvestReceipt />} />
           </>
         )}
-        {/* {token === '307040' && (
+        {token === '307040' && (
           <>
             <Route path="/holdings" element={<Admin7Holdings />} />
             <Route path="/pavti/:idCode" element={<Admin7Pavti />} />
@@ -369,7 +369,7 @@ function App() {
             <Route path="/investForm" element={<Admin7InvestForm />} />
             <Route path="/investReceipt" element={<Admin7InvestReceipt />} />
           </>
-        )} */}
+        )}
 
         {token === '778899' && (
           <>

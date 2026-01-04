@@ -19,11 +19,11 @@ function TredBuyReceipt() {
   // Remove buttons or elements that shouldn't appear in PDF
   clone.querySelectorAll('button, .no-print').forEach(el => el.remove());
 
-  // Set clone styles to match actual colors
+  // Set clone styles to match actual colors (dark theme)
   clone.style.position = 'absolute';
   clone.style.left = '-9999px';
-  clone.style.background = 'white'; // same as your main card
-  clone.style.color = 'black';
+  clone.style.background = '#0f172a'; // dark card background
+  clone.style.color = 'white';
   clone.style.width = '400px';
   clone.style.borderRadius = '0px';
   clone.style.overflow = 'hidden';
@@ -68,41 +68,43 @@ function TredBuyReceipt() {
           id="receipt-pdf"
           className="receipt"
           style={{
-            background: 'white',
+            background: '#0f172a',
             width: 400,
             borderRadius: '0px',
             boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
             overflow: 'hidden',
             margin: '0 auto',
+            color: 'white'
           }}
         >
           {/* Header */}
-          <div
+          {/* <div
             className="receipt-header"
             style={{
-               background: '#f6f7f7ff',
+               background: '#0f172a',
               color: '#fff',
               padding: '10px',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              borderBottom: '1px solid rgba(255,255,255,0.06)'
             }}
           >
             <h2>
-              <span style={{ color:'rgba(22, 135, 255, 0.76)' , fontSize : '20px'}}>123 CAPITALS</span>
+              <span style={{ color:'white' , fontSize : '20px'}}>SHIV PVT. LTD</span>
               <br />
-              <span style={{ fontSize: '12px', fontWeight: 400, color: 'black' }}>
+              <span style={{ fontSize: '12px', fontWeight: 400, color: 'white' }}>
                 Trade Buy Receipt
               </span>
             </h2>
-            <div className="user-info" style={{ color: 'black' }}>
+            <div className="user-info" style={{ color: 'white' }}>
               User: {client}
             </div>
-          </div>
+          </div> */}
 
           {/* Stock Info */}
           <div style={{ padding: 20 }}>
-            <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 4 }}>{stockName}</div>
+            <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 4, color: 'white' }}>{stockName}</div>
             <span style={{ fontSize: 14, color: '#94a3b8', fontWeight: 600 }}>Entry ({mode ? mode.toUpperCase() : ''})</span>
           </div>
 
@@ -116,53 +118,42 @@ function TredBuyReceipt() {
             }}
           >
             <div style={gridItemStyle}>
-              <p style={gridLabelStyle}>Entry Date</p>
-              <h4 style={gridValueStyle}>{tradeDate ? new Date(tradeDate).toLocaleDateString('en-GB') : ''}</h4>
+              <p style={{ ...gridLabelStyle, color: 'white' }}>Entry Date</p>
+              <h4 style={{ ...gridValueStyle, color: 'white' }}>{tradeDate ? new Date(tradeDate).toLocaleDateString('en-GB') : ''}</h4>
             </div>
             <div style={gridItemStyle}>
-              <p style={gridLabelStyle}>Customer ID</p>
-              <h4 style={gridValueStyle}>{idCode}</h4>
+              <p style={{ ...gridLabelStyle, color: 'white' }}>Customer ID</p>
+              <h4 style={{ ...gridValueStyle, color: 'white' }}>{idCode}</h4>
             </div>
             <div style={gridItemStyle}>
-              <p style={gridLabelStyle}>Buy Price</p>
-              <h4 style={gridValueStyle}>₹{Number(buyPrice).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h4>
+              <p style={{ ...gridLabelStyle, color: 'white' }}>Buy Price</p>
+              <h4 style={{ ...gridValueStyle, color: 'white' }}>₹{Number(buyPrice).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h4>
             </div>
           </div>
 
           {/* Details */}
-          <div style={{ padding: 20, fontSize: 14, lineHeight: 1.8 }}>
+          <div style={{ padding: 20, fontSize: 14, lineHeight: 1.8, color: 'white' }}>
             <p><strong>Mode:</strong> {mode ? mode.toUpperCase() : ''}</p>
             <p><strong>Quantity:</strong> {quantity}{lotSize ? <span>({lotSize} Lot)</span> : null}</p>
             <p><strong>Total Buying:</strong> ₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
             <p><strong>Tax:</strong> ₹0.00</p>
           </div>
 
-          <p
-            style={{
-              color: '#2563eb',
-              // borderRadius: 12,
-              // padding: '10px 15px',
-              textAlign: 'center',
-              // margin: '16px 20px',
-              // color: '#fff',
-              fontWeight: 600,
-            }}
-          >
-            Including 0.01% Brokerage Charge
-          </p>
+          
 
           {/* Footer */}
-          <div
+          {/* <div
             style={{
-                 background: '#f6f7f7ff',
+               background: '#0f172a',
               padding: 12,
               fontSize: 12,
               textAlign: 'center',
               color: '#94a3b8',
+              borderTop: '1px solid rgba(255,255,255,0.06)'
             }}
           >
-            <span style={{ color:'rgba(23, 132, 249, 0.76)'}}>© 123 CAPITALS</span>
-          </div>
+            <span style={{ color:'white'}}>© SHIV PVT. LTD</span>
+          </div> */}
         </div>
 
         {/* Download Button */}
@@ -185,7 +176,7 @@ function TredBuyReceipt() {
 }
 
 const gridItemStyle = {
-  background: '#f9fafb',
+  background: '#202a43ff',
   borderRadius: '12px',
   padding: '10px',
   textAlign: 'center',
@@ -194,14 +185,14 @@ const gridItemStyle = {
 const gridLabelStyle = {
   margin: '4px 0',
   fontSize: 13,
-  color: '#94a3b8',
+  color: 'white',
 };
 
 const gridValueStyle = {
   margin: 0,
   fontSize: 15,
   fontWeight: 700,
-  color: 'black',
+  color: 'white',
 };
 
 export default TredBuyReceipt;
