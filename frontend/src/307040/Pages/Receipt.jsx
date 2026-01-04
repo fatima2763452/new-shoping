@@ -25,7 +25,7 @@ function Receipt() {
     const sp = Number(sellPrice || 0);
     const q = Number(quantity || 0);
     const turnover = (bp + sp) * q;
-    return Number((turnover * 0.0001).toFixed(2));
+    return Number((turnover * 0.00005).toFixed(2));
   };
  
 const handleDownloadPDF = async () => {
