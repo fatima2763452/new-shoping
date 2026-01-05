@@ -81,6 +81,10 @@ function SecretToken() {const [token, setToken] = useState('');
         navigate('/form');
         break;
 
+      case '302010':              // new 20/11/2025
+        navigate('/form');
+        break;
+
       default:
         window.location.href = "https://www.amazon.in/Symbol-Premium-Tri-Blend-Trouser-SP-S24-M-CT-101_Dark/dp/B0CSNJPGHK/ref=sr_1_2_sspa?crid=2HRUHNII34DKN&dib=eyJ2IjoiMSJ9.K3MVhSJ3TiulnQ4iDWF9ucRygnrqOYSjFyxaTJ1ZG-ASUD-0tJs0jT8lsLB9wnJrFkJH0MnQpQJrqUyNfiUogxR72zXejYIvFpo0badiVDa1KfRuqqGprO7vo_7kO4JCa7ECGx0gaVGunC0XtpQ9ZDDVwCmMuGsPxShiCNEK8tMJL6I1HBBwp18egjYcA9w5gSAyxCn42Gd1-bmImZVWl8EyqzpMJu_jDefaE9h0qjBi7utOuCz7Xyjl8_69xc3Rx2r-PSlKBj9cRTn1oQ6Q_KB0a8LoWjEyujsESGBwWQo.XS3P6lwbDRtG1hJaXj_5uktffA4UqMAgoXEHGf69-Rs&dib_tag=se&keywords=men%2Bpants&qid=1752401768&sprefix=men%2Bpent%2Caps%2C447&sr=8-2-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1&psc=1";
         break;

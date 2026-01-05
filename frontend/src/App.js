@@ -223,6 +223,18 @@ import Admin19AverageCalce from './441906/Pages/AverageCalce';
 import Admin19InvestForm from './441906/Pages/InvestForm';
 import Admin19InvestReceipt from './441906/Pages/InvestReceipt';
 
+
+import Admin20Holdings from './302010/Pages/Holdings';
+import Admin20Pavti from './302010/Pages/Pavti';
+import Admin20Receipt from './302010/Pages/Receipt';
+import Admin20PavtiForm from './302010/Pages/PavtiForm';
+import Admin20Form from './302010/Pages/Form';
+import Admin20FormTwo from './302010/Pages/FormTwo';
+import Admin20TredBuyReceipt from './302010/Pages/TredBuyReceipt';
+import Admin20AverageCalce from './302010/Pages/AverageCalce';
+import Admin20InvestForm from './302010/Pages/InvestForm';
+import Admin20InvestReceipt from './302010/Pages/InvestReceipt'
+
 function App() {
   const token = localStorage.getItem('authToken'); // Token to identify admin
 
@@ -538,6 +550,23 @@ function App() {
             <Route path="/averageCalce" element={<Admin19AverageCalce />} />
             <Route path="/investForm" element={<Admin19InvestForm />} />
             <Route path="/investReceipt" element={<Admin19InvestReceipt />} />
+            {/* <Route path="/SMSForm" element={<Admin8SMSSystem/>} /> */}
+          </>
+        )}
+
+        {token === '302010' && (
+          <>
+     
+           <Route path="/holdings" element={<Admin20Holdings />} />
+            <Route path="/pavti/:idCode" element={<Admin20Pavti />} />
+            <Route path="/receipt/:uniquckId" element={<Admin20Receipt />} />
+            <Route path="/pavti" element={<Admin20PavtiForm />} />
+            <Route path="/form" element={<Admin20Form />} />
+            <Route path="/formTwo" element={<Admin20FormTwo />} />
+            <Route path="/tredBuyReceipt" element={<Admin20TredBuyReceipt />} />
+            <Route path="/averageCalce" element={<Admin20AverageCalce />} />
+            <Route path="/investForm" element={<Admin20InvestForm />} />
+            <Route path="/investReceipt" element={<Admin20InvestReceipt />} />
             {/* <Route path="/SMSForm" element={<Admin8SMSSystem/>} /> */}
           </>
         )}
