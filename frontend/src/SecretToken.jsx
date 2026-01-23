@@ -27,9 +27,9 @@ function SecretToken() {const [token, setToken] = useState('');
       case '440066': 
         navigate('/form');
         break;
-      case '000111': // pending
-        navigate('/form');
-        break;
+      // case '000111': // pending
+      //   navigate('/form');
+      //   break;
       case '208030':
         navigate('/form');
         break;
