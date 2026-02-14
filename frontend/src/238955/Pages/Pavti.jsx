@@ -81,7 +81,7 @@ function Pavti() {
     if (!input) return;
 
     const clone = input.cloneNode(true);
-    clone.style.width = '794px';
+    clone.style.width = '1200px';
     clone.style.padding = '20px';
     clone.style.backgroundColor = 'white';
     clone.style.position = 'absolute';
@@ -91,46 +91,46 @@ function Pavti() {
 
     // --- HEADER FLEX FIX FOR PDF ---
 
-// --- HEADER FLEX FIX FOR PDF ---
-// --- HEADER FLEX FIX FOR PDF ---
-const headerRow = clone.querySelector('.d-flex.flex-column.align-items-center.mb-2');
-if (headerRow) {
-  headerRow.style.display = 'flex';
-  headerRow.style.flexDirection = 'row';
-  headerRow.style.alignItems = 'center';
-  headerRow.style.justifyContent = 'space-between'; // space between for left + center
-  headerRow.style.marginTop = '20px';
-  headerRow.style.marginBottom = '10px';
+    // --- HEADER FLEX FIX FOR PDF ---
+    // --- HEADER FLEX FIX FOR PDF ---
+    const headerRow = clone.querySelector('.d-flex.flex-column.align-items-center.mb-2');
+    if (headerRow) {
+      headerRow.style.display = 'flex';
+      headerRow.style.flexDirection = 'row';
+      headerRow.style.alignItems = 'center';
+      headerRow.style.justifyContent = 'space-between'; // space between for left + center
+      headerRow.style.marginTop = '20px';
+      headerRow.style.marginBottom = '10px';
 
-  // // Left: Name logo
-  // const nameLogoImg = headerRow.querySelector('img[alt="DEVAKI"]');
-  // if (nameLogoImg) {
-  //   nameLogoImg.style.position = 'static';
-  //   nameLogoImg.style.width = '160px';
-  //   nameLogoImg.style.height = 'auto';
-  //   nameLogoImg.style.marginLeft = '10px';
-  //   nameLogoImg.style.marginRight = 'auto'; // push org name center
-  //   nameLogoImg.style.marginBottom = '0';
-  //   nameLogoImg.style.maxWidth = '40vw';
-  //   nameLogoImg.style.minWidth = '80px';
-  // }
+      // // Left: Name logo
+      // const nameLogoImg = headerRow.querySelector('img[alt="DEVAKI"]');
+      // if (nameLogoImg) {
+      //   nameLogoImg.style.position = 'static';
+      //   nameLogoImg.style.width = '160px';
+      //   nameLogoImg.style.height = 'auto';
+      //   nameLogoImg.style.marginLeft = '10px';
+      //   nameLogoImg.style.marginRight = 'auto'; // push org name center
+      //   nameLogoImg.style.marginBottom = '0';
+      //   nameLogoImg.style.maxWidth = '40vw';
+      //   nameLogoImg.style.minWidth = '80px';
+      // }
 
-  // Center: Org name
-  const orgDiv = headerRow.querySelector('div');
-  if (orgDiv) {
-    orgDiv.style.flex = '1';                // take full space
-    orgDiv.style.textAlign = 'center';      // center text
-    orgDiv.style.fontSize = '1.2em';
-    orgDiv.style.letterSpacing = '2px';
-    orgDiv.style.fontWeight = '500';
-    orgDiv.style.wordBreak = 'break-word';
-    orgDiv.style.maxWidth = '220px';
-    orgDiv.style.margin = '0 auto';
-    orgDiv.style.display = 'block';
-    orgDiv.style.position = 'relative'; 
-    orgDiv.style.bottom = '50px'; // space from right edge
-  }
-}
+      // Center: Org name
+      const orgDiv = headerRow.querySelector('div');
+      if (orgDiv) {
+        orgDiv.style.flex = '1';                // take full space
+        orgDiv.style.textAlign = 'center';      // center text
+        orgDiv.style.fontSize = '1.2em';
+        orgDiv.style.letterSpacing = '2px';
+        orgDiv.style.fontWeight = '500';
+        orgDiv.style.wordBreak = 'break-word';
+        orgDiv.style.maxWidth = '220px';
+        orgDiv.style.margin = '0 auto';
+        orgDiv.style.display = 'block';
+        orgDiv.style.position = 'relative';
+        orgDiv.style.bottom = '50px'; // space from right edge
+      }
+    }
 
 
     // --- END HEADER FLEX FIX ---
@@ -332,7 +332,7 @@ if (headerRow) {
                   />
                 </div>
 
-               <div className="p-3 d-flex flex-column flex-sm-row justify-content-between align-items-center" style={{ backgroundColor: '#e7e0d6' }}>
+                <div className="p-3 d-flex flex-column flex-sm-row justify-content-between align-items-center" style={{ backgroundColor: '#e7e0d6' }}>
                   <h6 className="fw-bold" style={{ fontSize: "20px" }}>TOTAL</h6>
                   <div className="text-end">
                     {/* <p className="mb-1 text-success" style={{ fontWeight: 600 }}>Seven thousand six hundred eighty-five</p> */}
