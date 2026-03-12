@@ -159,8 +159,8 @@ const handleDownload = async () => {
           ) : (
             <>
               <div ref={invoiceRef} style={{ backgroundColor: 'white', color: 'black', position: 'relative' }}>
-                {/* DEVAKI logo for token 220088 */}
-                {token === "220088" && (
+                {/* DEVAKI logo for token 000000 */}
+                {token === "000000" && (
                   <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20, marginBottom: 10 }}>
                     <img
                       src={logoImg}

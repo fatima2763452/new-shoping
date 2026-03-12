@@ -1,16 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { data, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import NavBar from '../Components/NavBar';
 import axios from "axios"
-import { imgAndSign } from "./data.js";
+// import { imgAndSign } from "./data.js";
+import signature from '../img/signature.png';
+import logo from '../img/logo.png';
+
+
 
 
 function Pavti() {
   const invoiceRef = useRef();
   const { idCode } = useParams();
   const token = localStorage.getItem('authToken');
+  const location = useLocation();
+  const navState = location?.state || {};
+  const { toDate: navToDate, fromDate: navFromDate } = navState;
   const [pavtiData, setPavtiData] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [totalProfit, setTotalProfit] = useState(0);
@@ -22,17 +29,37 @@ function Pavti() {
       const token = localStorage.getItem('authToken');
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/forms/getStocks/${token}/${idCode}`);
-        setPavtiData(res.data);
+        const original = Array.isArray(res.data) ? res.data : [];
 
-        if (res.data.length) {
-          const { clientName, address, margin, mobileNumber, orgnization } = res.data[0];
+        // apply nav date filter if both dates provided
+        let fetched = original;
+        if (navFromDate && navToDate) {
+          let from = new Date(navFromDate);
+          from.setHours(0,0,0,0);
+          let to = new Date(navToDate);
+          to.setHours(23,59,59,999);
+          // swap if user provided dates in reverse
+          if (from > to) {
+            const tmp = from; from = to; to = tmp;
+          }
+          fetched = original.filter(t => {
+            const td = new Date(t.tradeDate);
+            return td >= from && td <= to;
+          });
+        }
+
+        setPavtiData(fetched);
+
+        if (original.length) {
+          const { clientName, address, margin, mobileNumber, orgnization } = original[0];
           setUserInfo({ clientName, address, margin, mobileNumber, orgnization });
 
           let grossProfit = 0;
           let grossLoss = 0;
           let totalBrokerage = 0;
 
-          res.data.forEach(t => {
+          // calculate totals based on the fetched (possibly filtered) set
+          fetched.forEach(t => {
             const brk = calculateBrokerage(t);
             totalBrokerage += brk;
 
@@ -72,76 +99,124 @@ function Pavti() {
   const calculateBrokerage = ({ buyPrice, sellPrice, quantity }) => {
     // 0.01% of turnover
     const turnover = (buyPrice + sellPrice) * quantity;
-    return Number((turnover * 0.0001).toFixed(2));
+    return Number((turnover *  0.0001).toFixed(2));
   };
 
 
-const handleDownload = async () => {
-  const input = invoiceRef.current;
-  if (!input) return;
+  const handleDownload = async () => {
+    const input = invoiceRef.current;
+    if (!input) return;
 
-  // Clone the original node for layout safety
-  const clone = input.cloneNode(true);
-  clone.style.width = '794px'; // A4 width in px at 96 DPI
-  clone.style.padding = '20px';
-  clone.style.backgroundColor = 'white';
-  clone.style.position = 'absolute';
-  clone.style.top = '-9999px';
-  clone.style.left = '0';
-  clone.style.zIndex = '-1';
+    const clone = input.cloneNode(true);
+    clone.style.width = '794px';
+    clone.style.padding = '20px';
+    clone.style.backgroundColor = 'white';
+    clone.style.position = 'absolute';
+    clone.style.top = '-9999px';
+    clone.style.left = '0';
+    clone.style.zIndex = '-1';
 
-  const totalBlock = clone.querySelector('div.p-3');
-  if (totalBlock) {
-    totalBlock.classList.remove('flex-column', 'flex-sm-row');
-    totalBlock.style.display = 'flex';
-    totalBlock.style.flexDirection = 'row';
-    totalBlock.style.justifyContent = 'space-between';
-    totalBlock.style.alignItems = 'center';
-    totalBlock.style.height = 'auto'; // <-- Fix: height auto
-    totalBlock.style.padding = '0 20px';
-    totalBlock.style.gap = '0';
+    // --- HEADER FLEX FIX FOR PDF ---
 
-    const allChildren = totalBlock.children;
-    for (let i = 0; i < allChildren.length; i++) {
-      allChildren[i].style.margin = '0';
-      allChildren[i].style.whiteSpace = 'nowrap';
-      allChildren[i].style.textAlign = i === 0 ? 'left' : 'right';
-      allChildren[i].style.flex = 'unset';
-      allChildren[i].style.width = 'auto';
-    }
+// --- HEADER FLEX FIX FOR PDF ---
+// --- HEADER FLEX FIX FOR PDF ---
+const headerRow = clone.querySelector('.d-flex.flex-column.align-items-center.mb-2');
+if (headerRow) {
+  headerRow.style.display = 'flex';
+  headerRow.style.flexDirection = 'row';
+  headerRow.style.alignItems = 'center';
+  headerRow.style.justifyContent = 'space-between'; // space between for left + center
+  headerRow.style.marginTop = '20px';
+  headerRow.style.marginBottom = '10px';
+
+  // Left: Name logo
+  const nameLogoImg = headerRow.querySelector('img[alt="DEVAKI"]');
+  // if (nameLogoImg) {
+  //   nameLogoImg.style.position = 'static';
+  //   nameLogoImg.style.width = '160px';
+  //   nameLogoImg.style.height = 'auto';
+  //   nameLogoImg.style.marginLeft = '10px';
+  //   nameLogoImg.style.marginRight = 'auto'; // push org name center
+  //   nameLogoImg.style.marginBottom = '0';
+  //   nameLogoImg.style.maxWidth = '40vw';
+  //   nameLogoImg.style.minWidth = '80px';
+  // }
+
+  // Center: Org name
+  const orgDiv = headerRow.querySelector('div');
+  if (orgDiv) {
+    orgDiv.style.flex = '1';                // take full space
+    orgDiv.style.textAlign = 'center';      // center text
+    orgDiv.style.fontSize = '1.2em';
+    orgDiv.style.letterSpacing = '2px';
+    orgDiv.style.fontWeight = '500';
+    orgDiv.style.wordBreak = 'break-word';
+    orgDiv.style.maxWidth = '220px';
+    orgDiv.style.margin = '0 auto';
+    orgDiv.style.marginTop = '29px';
+
+    orgDiv.style.display = 'block';
+    orgDiv.style.position = 'relative'; 
+    orgDiv.style.bottom = '50px'; // space from right edge
   }
+}
 
-  document.body.appendChild(clone);
 
-  await new Promise(resolve => setTimeout(resolve, 200));
+    // --- END HEADER FLEX FIX ---
 
-  const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
+    // Fix total block as before
+    const totalBlock = clone.querySelector('div.p-3');
+    if (totalBlock) {
+      totalBlock.classList.remove('flex-column', 'flex-sm-row');
+      totalBlock.style.display = 'flex';
+      totalBlock.style.flexDirection = 'row';
+      totalBlock.style.justifyContent = 'space-between';
+      totalBlock.style.alignItems = 'center';
+      totalBlock.style.height = 'auto';
+      totalBlock.style.padding = '0 20px';
+      totalBlock.style.gap = '0';
 
-  const imgData = canvas.toDataURL('image/png');
-  const pdf = new jsPDF('p', 'pt', 'a4');
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const pageWidth = pdf.internal.pageSize.getWidth();
+      const allChildren = totalBlock.children;
+      for (let i = 0; i < allChildren.length; i++) {
+        allChildren[i].style.margin = '0';
+        allChildren[i].style.whiteSpace = 'nowrap';
+        allChildren[i].style.textAlign = i === 0 ? 'left' : 'right';
+        allChildren[i].style.flex = 'unset';
+        allChildren[i].style.width = 'auto';
+      }
+    }
 
-  const imgWidth = pageWidth;
-  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    document.body.appendChild(clone);
 
-  let heightLeft = imgHeight;
-  let position = 0;
+    await new Promise(resolve => setTimeout(resolve, 200));
 
-  // First page
-  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-  heightLeft -= pageHeight;                                       
+    const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
 
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'pt', 'a4');
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const pageWidth = pdf.internal.pageSize.getWidth();
+
+    const imgWidth = pageWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    // First page
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
-  }
 
-  pdf.save('invoice.pdf');
-  document.body.removeChild(clone);
-};
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    pdf.save('invoice.pdf');
+    document.body.removeChild(clone);
+  };
 
 
 
@@ -159,11 +234,11 @@ const handleDownload = async () => {
           ) : (
             <>
               <div ref={invoiceRef} style={{ backgroundColor: 'white', color: 'black', position: 'relative' }}>
-                {/* DEVAKI logo for token 220088 */}
-                {token === "220088" && (
-                  <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20, marginBottom: 10 }}>
+
+
+                {/* <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20, marginBottom: 10 }}>
                     <img
-                      src={`${process.env.PUBLIC_URL}/media/devaki-logo.png`}
+                      src={`${process.env.PUBLIC_URL}/${imgAndSign[token].nameLogo}`}
                       alt="DEVAKI"
                       style={{
                         width: '120px',
@@ -172,29 +247,41 @@ const handleDownload = async () => {
                         marginLeft: 10,
                       }}
                     />
-                  </div>
-                )}
+                  </div> */}
+
                 {/* Header */}
-                <div className="row g-0">
-                  <div className="col-12 d-flex flex-column align-items-center mb-2">
-                    <img
-                      src={`${process.env.PUBLIC_URL}/${imgAndSign[token].img}`}
-                      alt="logo"
-                      className="img-fluid mb-2"
-                      style={{ maxWidth: '90px', objectFit: 'contain', display: 'block', margin: '0 auto' }}
-                    />
-                    <div
-                      style={{
-                        fontSize: '1.2em',
-                        textAlign: 'center',
-                        letterSpacing: 2,
-                        fontWeight: 500,
-                      }}
-                    >
-                      <b>{pavtiData[0]?.orgnization}</b>
-                    </div>
+                <div
+                  className="d-flex flex-column align-items-center mb-2"
+                  style={{ marginTop: 20, marginBottom: 10 }}
+                >
+                  {/* Top: Name Logo */}
+                  <img
+                    src={logo}
+                    alt="DEVAKI"
+                    style={{
+                      width: '150px',
+                      height: 'auto',
+                      background: 'transparent',
+                      marginBottom: 8,
+                      minWidth: 80,
+                      maxWidth: '40vw',
+                    }}
+                  />
+                  {/* Bottom: Organization Name */}
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      fontSize: '1.2em',
+                      letterSpacing: 2,
+                      fontWeight: 500,
+                      wordBreak: 'break-word',
+                      maxWidth: 220,
+                    }}
+                  >
+                    <b>{pavtiData[0]?.orgnization}</b>
                   </div>
                 </div>
+
                 {/*user info */}
                 <p className="text-end mb-2" >
                   <strong>Invoice no. :</strong> In##00{Math.floor(10000 + Math.random() * 90000)}
@@ -235,7 +322,7 @@ const handleDownload = async () => {
                     <tbody>
                       {pavtiData.map((t, idx) => {
                         const brk = calculateBrokerage(t);
-                        const pl = t.mode === 'buy'? ((t.sellPrice - t.buyPrice) * t.quantity) - brk : ((t.buyPrice - t.sellPrice) * t.quantity) - brk;
+                        const pl = t.mode === 'buy' ? ((t.sellPrice - t.buyPrice) * t.quantity) - brk : ((t.buyPrice - t.sellPrice) * t.quantity) - brk;
                         const plColor = pl >= 0 ? 'green' : 'red';
                         return (
                           <tr key={idx} className="align-middle text-muted">
@@ -267,7 +354,7 @@ const handleDownload = async () => {
                 <div className="mb-3 row">
                   <p className="fw-bold col-6"><b>Term & Condition</b> <br></br> Note Detailed bill that records all transactions Done by broker on behalf of His client during a trading day</p>
                   <img
-                    src={`${process.env.PUBLIC_URL}/${imgAndSign[token].signature}`}
+                    src={signature}
                     alt="signature"
                     className="img-fluid mb-2 col-6"
                     style={{ maxWidth: '15em', objectFit: 'contain', display: 'block', margin: '0 auto' }}
@@ -275,11 +362,20 @@ const handleDownload = async () => {
                 </div>
 
                 <div className="p-3 d-flex flex-column flex-sm-row justify-content-between align-items-center" style={{ backgroundColor: '#e7e0d6' }}>
-                  <h6 className="fw-bold" style={{ fontSize : "20px" }}>TOTAL</h6>
+                  <h6 className="fw-bold" style={{ fontSize: "20px" }}>TOTAL</h6>
                   <div className="text-end">
                     {/* <p className="mb-1 text-success" style={{ fontWeight: 600 }}>Seven thousand six hundred eighty-five</p> */}
-                    <p className="mb-0" style={{ color: totalProfit >= 0 ? 'green' : 'red', fontWeight: 'bold' }}>
-                      &#8377; {totalProfit.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    <p
+                      className="mb-0"
+                      style={{ color: totalProfit >= 0 ? 'green' : 'red', fontWeight: 'bold' }}
+                    >
+                      ₹
+                      {
+                        (totalProfit >= 0
+                          ? totalProfit + userInfo.margin
+                          : totalProfit + userInfo.margin
+                        ).toLocaleString('en-IN', { minimumFractionDigits: 2 })
+                      }
                     </p>
                   </div>
                 </div>

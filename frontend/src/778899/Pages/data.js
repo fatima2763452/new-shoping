@@ -3,7 +3,7 @@ export const imgAndSign = {
     img: 'media/cropped-img1.jpg',
     signature: 'media/s1.jpg'
   },
-  '220088': {
+  '000000': {
     img: 'media/cropped-img2.jpg',
     signature: 'media/s2.jpg'
   },

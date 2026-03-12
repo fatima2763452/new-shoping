@@ -4,16 +4,16 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import SecretToken from './SecretToken';
 
 
-import Admin2Holdings from './220088/Pages/Holdings';
-import Admin2Pavti from './220088/Pages/Pavti';
-import Admin2Receipt from './220088/Pages/Receipt';
-import Admin2PavtiForm from './220088/Pages/PavtiForm';
-import Admin2Form from './220088/Pages/Form';
-import Admin2FormTwo from './220088/Pages/FormTwo';
-import Admin2TredBuyReceipt from './220088/Pages/TredBuyReceipt';
-import Admin2AverageCalce from './220088/Pages/AverageCalce';
-import Admin2InvestForm from './220088/Pages/InvestForm';
-import Admin2InvestReceipt from './220088/Pages/InvestReceipt';
+import Admin2Holdings from './000000/Pages/Holdings';
+import Admin2Pavti from './000000/Pages/Pavti';
+import Admin2Receipt from './000000/Pages/Receipt';
+import Admin2PavtiForm from './000000/Pages/PavtiForm';
+import Admin2Form from './000000/Pages/Form';
+import Admin2FormTwo from './000000/Pages/FormTwo';
+import Admin2TredBuyReceipt from './000000/Pages/TredBuyReceipt';
+import Admin2AverageCalce from './000000/Pages/AverageCalce';
+import Admin2InvestForm from './000000/Pages/InvestForm';
+import Admin2InvestReceipt from './000000/Pages/InvestReceipt';
 
 import Admin3Holdings from './330077/Pages/Holdings';
 import Admin3Pavti from './330077/Pages/Pavti';
@@ -235,6 +235,18 @@ import Admin20AverageCalce from './302010/Pages/AverageCalce';
 import Admin20InvestForm from './302010/Pages/InvestForm';
 import Admin20InvestReceipt from './302010/Pages/InvestReceipt'
 
+import Admin21Holdings from './505050/Pages/Holdings';
+import Admin21Pavti from './505050/Pages/Pavti';
+import Admin21Receipt from './505050/Pages/Receipt';
+import Admin21PavtiForm from './505050/Pages/PavtiForm';
+import Admin21Form from './505050/Pages/Form';
+import Admin21FormTwo from './505050/Pages/FormTwo';
+import Admin21TredBuyReceipt from './505050/Pages/TredBuyReceipt';
+import Admin21AverageCalce from './505050/Pages/AverageCalce';
+import Admin21InvestForm from './505050/Pages/InvestForm';
+import Admin21InvestReceipt from './505050/Pages/InvestReceipt';
+
+
 function App() {
   const token = localStorage.getItem('authToken'); // Token to identify admin
 
@@ -279,7 +291,7 @@ function App() {
         )}
         
 
-        {token === '220088' && (
+        {token === '000000' && (
           <>
   
             <Route path="/holdings" element={<Admin2Holdings />} />
@@ -568,6 +580,22 @@ function App() {
             <Route path="/investForm" element={<Admin20InvestForm />} />
             <Route path="/investReceipt" element={<Admin20InvestReceipt />} />
             {/* <Route path="/SMSForm" element={<Admin8SMSSystem/>} /> */}
+          </>
+        )}
+
+        {token === '505050' && (
+          <>
+     
+           <Route path="/holdings" element={<Admin21Holdings />} />
+            <Route path="/pavti/:idCode" element={<Admin21Pavti />} />
+            <Route path="/receipt/:uniquckId" element={<Admin21Receipt />} />
+            <Route path="/pavti" element={<Admin21PavtiForm />} />
+            <Route path="/form" element={<Admin21Form />} />
+            <Route path="/formTwo" element={<Admin21FormTwo />} />
+            <Route path="/tredBuyReceipt" element={<Admin21TredBuyReceipt />} />
+            <Route path="/averageCalce" element={<Admin21AverageCalce />} />
+            <Route path="/investForm" element={<Admin21InvestForm />} />
+            <Route path="/investReceipt" element={<Admin21InvestReceipt />} />
           </>
         )}
 
