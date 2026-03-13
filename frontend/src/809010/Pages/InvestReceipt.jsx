@@ -262,9 +262,9 @@ function InvestReceipt() {
             <div style={{ fontWeight: 600, fontSize: "1.3em", color: "#007bff" }}>
               {companyName || "INVESTMENT Pvt. Ltd."}
             </div>
-            <div style={{ fontSize: "1em", marginBottom: 10 }}>
+            {/* <div style={{ fontSize: "1em", marginBottom: 10 }}>
               We are registered with SEBI as a Stock Broker.
-            </div>
+            </div> */}
           </div>
 
           <hr />
