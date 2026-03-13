@@ -20,6 +20,7 @@ function InvestForm() {
     mobileNumber: "",
     email: "",
     aadhaar: "",
+    panNumber: "",
     address: "",
     initialDeposit: "",
     applicationDate: "",
@@ -77,7 +78,7 @@ function InvestForm() {
           <Box className="col-md-6 mb-4" sx={{ width: '100%' }}>
             <TextField
               fullWidth
-              label="Customer iD"
+              label="Customer ID"
               name="customerId"
               value={info.customerId}
               onChange={handleChange}
@@ -156,6 +157,17 @@ function InvestForm() {
               label="Aadhaar Number"
               name="aadhaar"
               value={info.aadhaar}
+              onChange={handleChange}
+              variant="outlined"
+              size="medium"
+            />
+          </Box>
+          <Box className="col-md-6 mb-4" sx={{ width: '100%' }}>
+            <TextField
+              fullWidth
+              label="PAN Card Number"
+              name="panNumber"
+              value={info.panNumber}
               onChange={handleChange}
               variant="outlined"
               size="medium"

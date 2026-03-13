@@ -20,12 +20,14 @@ function InvestReceipt() {
   const {
     companyName,
     customerName = "",
+    customerId,
     fatherName,
     dob,
     gender,
     mobileNumber,
     email,
     aadhaar,
+    panNumber,
     address,
     initialDeposit,
     applicationDate,
@@ -277,12 +279,14 @@ function InvestReceipt() {
 
               <div><b>First Name:</b> {firstName}</div>
               <div><b>Last Name:</b> {lastName}</div>
+              <div><b>Customer ID:</b> {customerId}</div>
               <div><b>Father's Name:</b> {fatherName}</div>
               <div><b>Date of Birth:</b> {dob ? new Date(dob).toLocaleDateString("en-GB") : ""}</div>
               <div><b>Gender:</b> {gender}</div>
               <div><b>Mobile Number:</b> {mobileNumber}</div>
               <div><b>Email ID:</b> {email}</div>
               <div><b>Aadhaar Number:</b> {aadhaar}</div>
+              <div><b>PAN Card Number:</b> {panNumber}</div>
               <div><b>Address:</b> {address}</div>
               <div><b>Initial Deposit:</b> {initialDeposit ? `INR ${Number(initialDeposit).toLocaleString("en-IN")}` : ""}</div>
               <div><b>Date of Application:</b> {applicationDate ? new Date(applicationDate).toLocaleDateString("en-GB") : ""}</div>
