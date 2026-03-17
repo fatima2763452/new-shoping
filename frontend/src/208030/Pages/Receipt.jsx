@@ -211,24 +211,24 @@ function Receipt() {
                 minimumFractionDigits: 2,
               })}
             </p>
-            <p style={gridLabelStyle}>
+            {/* <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Total Buying:</strong> ₹
               {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
                 minimumFractionDigits: 2,
               })}
-            </p>
+            </p> */}
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Sell Price:</strong> ₹
               {Number(receiptData.sellPrice).toLocaleString('en-IN', {
                 minimumFractionDigits: 2,
               })}
             </p>
-            <p style={gridLabelStyle}>
+            {/* <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Total Selling:</strong> ₹
               {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
                 minimumFractionDigits: 2,
               })}
-            </p>
+            </p> */}
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Brokerage:</strong> ₹
               {brokerage.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
