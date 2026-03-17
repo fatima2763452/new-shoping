@@ -20,10 +20,10 @@ function Receipt() {
   }, [uniquckId]);
 
   // Intraday brokerage at 0.005% of turnover (buy+sell)*quantity
-  const calculateBrokerage = ({ buyPrice, sellPrice, quantity }) => {
+  const calculateBrokerage = ({ buyPrice, sellPrice, quantity, lotSize }) => {
     const bp = Number(buyPrice || 0);
     const sp = Number(sellPrice || 0);
-    const q = Number(quantity || 0);
+    const q = Number(lotSize || quantity || 0);
     const turnover = (bp + sp) * q;
     return Number((turnover * 0.00005).toFixed(2));
   };
@@ -108,13 +108,14 @@ const handleDownloadPDF = async () => {
     ? calculateBrokerage(receiptData)
     : Number(receiptData.formBrokerage);
   
-  const { buyPrice, sellPrice, quantity, mode } = receiptData;
+  const { buyPrice, sellPrice, quantity, mode, lotSize } = receiptData;
+  const effectiveQty = lotSize || quantity;
 
   let netAmount = 0;
   if (mode === 'buy') {
-    netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
+    netAmount = sellPrice * effectiveQty - buyPrice * effectiveQty - brokerage;
   } else if (mode === 'sell') {
-    netAmount = buyPrice * quantity - sellPrice * quantity - brokerage;
+    netAmount = buyPrice * effectiveQty - sellPrice * effectiveQty - brokerage;
   }
 
 
@@ -204,8 +205,8 @@ const handleDownloadPDF = async () => {
               {receiptData.mode ? receiptData.mode.toUpperCase() : ''}
             </p>
             <p style={gridLabelStyle}>
-              <strong style={gridValueStyle}>Quantity:</strong> {receiptData.quantity}{' '}
-              {receiptData.lotSize && <span>({receiptData.lotSize} Lot)</span>}
+              <strong style={gridValueStyle}>{receiptData.lotSize ? 'Lot Size:' : 'Quantity:'}</strong>{' '}
+              {receiptData.lotSize ? <>{receiptData.lotSize} Lot</> : receiptData.quantity}
             </p>
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Buy Price:</strong> ₹
@@ -215,7 +216,7 @@ const handleDownloadPDF = async () => {
             </p>
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Total Buying:</strong> ₹
-              {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
+              {(receiptData.buyPrice * effectiveQty).toLocaleString('en-IN', {
                 minimumFractionDigits: 2,
               })}
             </p>
@@ -227,7 +228,7 @@ const handleDownloadPDF = async () => {
             </p>
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Total Selling:</strong> ₹
-              {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
+              {(receiptData.sellPrice * effectiveQty).toLocaleString('en-IN', {
                 minimumFractionDigits: 2,
               })}
             </p>

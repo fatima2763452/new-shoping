@@ -17,6 +17,8 @@ function Form() {
     sellPrice:"", 
     tradeDate:"",
     lotSize: "",
+    brokerage: "",
+    mode: "",
   });
 
   const handleChanges = (event) => {
@@ -34,6 +36,11 @@ function Form() {
     const token = localStorage.getItem('authToken');
 
     try {
+      const defaultRate = 0.00005;
+      const formBrokerageValue = brokerage === "" || brokerage === null || typeof brokerage === 'undefined'
+        ? defaultRate
+        : Number(brokerage);
+
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/forms/createForm`, {
         clientName,
         stockName,
@@ -43,7 +50,7 @@ function Form() {
         buyPrice: Number(buyPrice),
         sellPrice: Number(sellPrice),
         tradeDate,
-        brokerage: Number(brokerage),
+        formBrokerage: formBrokerageValue,
         mode,
         token // Add token to payload
       });
@@ -133,6 +140,19 @@ function Form() {
             onChange={handleChanges}
             className="form-control text-muted"
             placeholder="Enter your Lot Size"
+          />
+        </div>
+
+        <div className="col-md-12 mb-3">
+          <label htmlFor="brokerage" className="form-label text-muted">Brokerage</label>
+          <input
+            type="number"
+            id="brokerage"
+            name="brokerage"
+            value={formData.brokerage}
+            onChange={handleChanges}
+            className="form-control text-muted"
+            placeholder="Enter brokerage"
           />
         </div>
 

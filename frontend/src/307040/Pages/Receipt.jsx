@@ -101,10 +101,12 @@ function Receipt() {
       </div>
     );
   }
-  const parsedBrokerage = Number(receiptData.formBrokerage);
-  const brokerage = (Number.isNaN(parsedBrokerage) || parsedBrokerage === 0.00005)
+  const brokerage = (
+ 
+    Number(receiptData.formBrokerage) === 0.0001
+  )
     ? calculateBrokerage(receiptData)
-    : parsedBrokerage;
+    : Number(receiptData.formBrokerage);
 
   const { buyPrice, sellPrice, quantity, mode } = receiptData;
 
