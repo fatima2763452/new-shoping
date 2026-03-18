@@ -20,10 +20,10 @@ function Receipt() {
   }, [uniquckId]);
 
   // Intraday brokerage at 0.005% of turnover (buy+sell)*quantity
-  const calculateBrokerage = ({ buyPrice, sellPrice, quantity, lotSize }) => {
+  const calculateBrokerage = ({ buyPrice, sellPrice, quantity }) => {
     const bp = Number(buyPrice || 0);
     const sp = Number(sellPrice || 0);
-    const q = Number(lotSize || quantity || 0);
+    const q = Number(quantity || 0);
     const turnover = (bp + sp) * q;
     return Number((turnover * 0.00005).toFixed(2));
   };
@@ -109,13 +109,12 @@ const handleDownloadPDF = async () => {
     : Number(receiptData.formBrokerage);
   
   const { buyPrice, sellPrice, quantity, mode, lotSize } = receiptData;
-  const effectiveQty = lotSize || quantity;
 
   let netAmount = 0;
   if (mode === 'buy') {
-    netAmount = sellPrice * effectiveQty - buyPrice * effectiveQty - brokerage;
+    netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
   } else if (mode === 'sell') {
-    netAmount = buyPrice * effectiveQty - sellPrice * effectiveQty - brokerage;
+    netAmount = buyPrice * quantity - sellPrice * quantity - brokerage;
   }
 
 
@@ -216,7 +215,7 @@ const handleDownloadPDF = async () => {
             </p>
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Total Buying:</strong> ₹
-              {(receiptData.buyPrice * effectiveQty).toLocaleString('en-IN', {
+              {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
                 minimumFractionDigits: 2,
               })}
             </p>
@@ -228,7 +227,7 @@ const handleDownloadPDF = async () => {
             </p>
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Total Selling:</strong> ₹
-              {(receiptData.sellPrice * effectiveQty).toLocaleString('en-IN', {
+              {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
                 minimumFractionDigits: 2,
               })}
             </p>

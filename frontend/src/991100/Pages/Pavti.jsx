@@ -77,12 +77,11 @@ function Pavti() {
             totalBrokerage += brk;
 
             // profit/loss depends on mode
-            const eQty = t.lotSize || t.quantity;
             let pl = 0;
             if (t.mode === 'buy') {
-              pl = (t.sellPrice - t.buyPrice) * eQty - brk;
+              pl = (t.sellPrice - t.buyPrice) * t.quantity - brk;
             } else if (t.mode === 'sell') {
-              pl = (t.buyPrice - t.sellPrice) * eQty - brk;
+              pl = (t.buyPrice - t.sellPrice) * t.quantity - brk;
             }
 
             if (pl >= 0) grossProfit += pl;
@@ -110,11 +109,11 @@ function Pavti() {
     return numStr.substring(0, 1) + '***' + numStr.substring(numStr.length - 4);
   };
 
-  const calculateBrokerage = ({ buyPrice, sellPrice, quantity, lotSize, formBrokerage }) => {
+  const calculateBrokerage = ({ buyPrice, sellPrice, quantity, formBrokerage }) => {
     // Use provided formBrokerage when it's a rate (<1). Otherwise fall back to default rate.
     const bp = Number(buyPrice || 0);
     const sp = Number(sellPrice || 0);
-    const q = Number(lotSize || quantity || 0);
+    const q = Number(quantity || 0);
     const turnover = (bp + sp) * q;
     const defaultRate = 0.00005;
     const fb = typeof formBrokerage !== 'undefined' && formBrokerage !== null ? Number(formBrokerage) : undefined;
@@ -345,8 +344,7 @@ if (headerRow) {
                         const brk = (fb === undefined || fb === null || Number(fb) === 0.00005)
                           ? calculateBrokerage(t)
                           : (Number(fb) < 1 ? calculateBrokerage({ ...t, formBrokerage: Number(fb) }) : Number(fb));
-                        const eQty = t.lotSize || t.quantity;
-                        const pl = t.mode === 'buy' ? ((t.sellPrice - t.buyPrice) * eQty) - brk : ((t.buyPrice - t.sellPrice) * eQty) - brk;
+                        const pl = t.mode === 'buy' ? ((t.sellPrice - t.buyPrice) * t.quantity) - brk : ((t.buyPrice - t.sellPrice) * t.quantity) - brk;
                         const plColor = pl >= 0 ? 'green' : 'red';
                         return (
                           <tr key={idx} className="align-middle text-muted">

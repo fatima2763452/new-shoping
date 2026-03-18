@@ -58,8 +58,7 @@ function TredBuyReceipt() {
 };
 
 
-  const effectiveQty = lotSize || quantity;
-  const totalAmount = buyPrice * effectiveQty;
+  const totalAmount = buyPrice * quantity;
 
   return (
     <>

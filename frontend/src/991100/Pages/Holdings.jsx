@@ -41,9 +41,8 @@ function Holdings() {
     let totalProfit = 0;
 
     stocks.forEach(stock => {
-      const eQty = stock.lotSize || stock.quantity;
-      const buyTotal = stock.buyPrice * eQty;
-      const sellTotal = stock.sellPrice * eQty;
+      const buyTotal = stock.buyPrice * stock.quantity;
+      const sellTotal = stock.sellPrice * stock.quantity;
       const brokerage = 0;
 
       let pl = 0;
@@ -153,14 +152,13 @@ function Holdings() {
                   </tr>
                 </thead>
                 <tbody>
-                    {stocks.map((stock, index) => {
-                    const eQty = stock.lotSize || stock.quantity;
-                    const buyTotal = stock.buyPrice * eQty;
-                    const sellTotal = stock.sellPrice * eQty;
+                  {stocks.map((stock, index) => {
+                    const buyTotal = stock.buyPrice * stock.quantity;
+                    const sellTotal = stock.sellPrice * stock.quantity;
                     const pl = parseFloat(calculateProfitLoss(
                       stock.buyPrice,
                       stock.sellPrice,
-                      eQty,
+                      stock.quantity,
                       stock.mode
                     ));
                     const isProfit = pl >= 0;
