@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 
 import { useNavigate } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
+import PaymentNoticePopup from '../../utils/PaymentNoticePopup';
 function Form() {
   const navigate = useNavigate();
   const [showAlert, setShowAlert] = useState(false);
@@ -64,6 +65,7 @@ function Form() {
 
   return (
     <>
+   <PaymentNoticePopup />
    <NavBar></NavBar>
     
     <div className="container py-4">

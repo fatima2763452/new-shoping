@@ -264,7 +264,7 @@ const handleDownloadPDF = async () => {
 
           </div>
         </div>
-      </div>
+      </div>  
     </>
   );
 }

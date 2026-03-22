@@ -1,0 +1,97 @@
+.payment-notice-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.payment-notice-popup {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.payment-notice-header {
+  background: linear-gradient(135deg, #d32f2f, #f44336);
+  color: #fff;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.payment-notice-header .warning-icon {
+  font-size: 26px;
+}
+
+.payment-notice-body {
+  padding: 24px;
+}
+
+.payment-notice-body p {
+  margin: 0 0 16px 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.payment-notice-body p:last-of-type {
+  margin-bottom: 0;
+}
+
+.payment-notice-body .highlight-text {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.payment-notice-footer {
+  padding: 16px 24px 24px;
+  text-align: center;
+}
+
+.payment-notice-btn {
+  background: linear-gradient(135deg, #d32f2f, #f44336);
+  color: #fff;
+  border: none;
+  padding: 12px 36px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.payment-notice-btn:hover {
+  background: linear-gradient(135deg, #b71c1c, #d32f2f);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+}
+
+.payment-notice-btn:active {
+  transform: translateY(0);
+}
