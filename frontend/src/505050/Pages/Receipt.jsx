@@ -21,7 +21,10 @@ function Receipt() {
 
   // Intraday brokerage at 0.01% of turnover (buy+sell)*quantity
   const calculateBrokerage = ({ buyPrice, sellPrice, quantity }) => {
-    const turnover = (buyPrice + sellPrice) * quantity;
+    const bp = Number(buyPrice || 0);
+    const sp = Number(sellPrice || 0);
+    const q = Number(quantity || 0);
+    const turnover = (bp + sp) * q;
     return Number((turnover * 0.0001).toFixed(2));
   };
 
@@ -99,7 +102,11 @@ const handleDownloadPDF = async () => {
     );
   }
 
-  const brokerage = calculateBrokerage(receiptData);
+  const brokerage = (
+    Number(receiptData.formBrokerage) === 0.0001
+  )
+    ? calculateBrokerage(receiptData)
+    : Number(receiptData.formBrokerage);
   const { buyPrice, sellPrice, quantity, mode } = receiptData;
 
   let netAmount = 0;

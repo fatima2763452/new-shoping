@@ -17,6 +17,8 @@ function Form() {
     buyPrice: "",
     sellPrice:"", 
     tradeDate:"",
+    brokerage: "",
+    mode:"",
   });
 
   const handleChanges = (event) => {
@@ -30,10 +32,19 @@ function Form() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { clientName, stockName, idCode, quantity,lotSize, buyPrice, sellPrice, tradeDate, brokerage, mode } = formData;
+   
     // Get token from localStorage
     const token = localStorage.getItem('authToken');
 
     try {
+      // If user left brokerage empty, use default rate 0.0001
+      const defaultRate = 0.0001;
+      const formBrokerageValue = brokerage === "" || brokerage === null || typeof brokerage === 'undefined'
+        ? defaultRate
+        : Number(brokerage);
+
+      console.log("Submitting form with brokerage:", formBrokerageValue);
+
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/forms/createForm`, {
         clientName,
         stockName,
@@ -43,7 +54,7 @@ function Form() {
         buyPrice: Number(buyPrice),
         sellPrice: Number(sellPrice),
         tradeDate,
-        brokerage: Number(brokerage),
+        formBrokerage: formBrokerageValue,
         mode,
         token // Add token to payload
       });
@@ -123,7 +134,19 @@ function Form() {
           />
         </div>
 
-        
+        <div className="col-md-12 mb-3">
+          <label htmlFor="brokerage" className="form-label text-muted">Brokerage</label>
+          <input
+            type="number"
+            id="brokerage"
+            name="brokerage"
+            value={formData.brokerage}
+            onChange={handleChanges}
+            className="form-control text-muted"
+            placeholder="Enter brokerage (default: 0.0001)"
+          />
+        </div>
+
         <div className="col-md-12 mb-3">
           <label htmlFor="lotSize" className="form-label text-muted">Lot Size</label>
           <input
