@@ -5,8 +5,8 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import NavBar from '../Components/NavBar';
 import axios from "axios"
 // import { imgAndSign } from "./data.js";
-import signature from '../img/signature.png';
-import logo from '../img/logo.png';
+import signature from '../img/signature.jpg';
+import logo from '../img/logo.jpg';
 
 
 
@@ -28,7 +28,9 @@ function Pavti() {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       try {
+       
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/forms/getStocks/${token}/${idCode}`);
+        
         const original = Array.isArray(res.data) ? res.data : [];
 
         // apply nav date filter if both dates provided
@@ -48,6 +50,8 @@ function Pavti() {
           });
         }
 
+        console.log(fetched)
+
         setPavtiData(fetched);
 
         if (original.length) {
@@ -60,7 +64,16 @@ function Pavti() {
 
           // calculate totals based on the fetched (possibly filtered) set
           fetched.forEach(t => {
-            const brk = calculateBrokerage(t);
+            let brk = 0;
+            const fb = t.formBrokerage;
+            // If formBrokerage is missing or equals the default rate, calculate from turnover
+            if (fb === undefined || fb === null || Number(fb) === 0.00005) {
+              brk = calculateBrokerage(t);
+            } else {
+              // If formBrokerage < 1 treat as rate, otherwise treat as absolute amount
+              const nb = Number(fb);
+              brk = nb < 1 ? calculateBrokerage({ ...t, formBrokerage: nb }) : nb;
+            }
             totalBrokerage += brk;
 
             // profit/loss depends on mode
@@ -75,7 +88,7 @@ function Pavti() {
             else grossLoss += Math.abs(pl);
           });
 
-          // netProfit = grossProfit - grossLoss (loss as positive) - totalBrokerage
+          // netProfit = grossProfit - grossLoss (loss as positive)
           const netProfit = grossProfit - grossLoss;
           setTotalProfit(netProfit);
         }
@@ -97,12 +110,15 @@ function Pavti() {
   };
 
   const calculateBrokerage = ({ buyPrice, sellPrice, quantity, formBrokerage }) => {
-    if (formBrokerage !== undefined && formBrokerage !== null && Number(formBrokerage) !== 0.0001) {
-      return Number(formBrokerage);
-    }
-    // 0.01% of turnover
-    const turnover = (Number(buyPrice) + Number(sellPrice)) * Number(quantity);
-    return Number((turnover *  0.0001).toFixed(2));
+    // Use provided formBrokerage when it's a rate (<1). Otherwise fall back to default rate.
+    const bp = Number(buyPrice || 0);
+    const sp = Number(sellPrice || 0);
+    const q = Number(quantity || 0);
+    const turnover = (bp + sp) * q;
+    const defaultRate = 0.00005;
+    const fb = typeof formBrokerage !== 'undefined' && formBrokerage !== null ? Number(formBrokerage) : undefined;
+    const rate = fb !== undefined && fb < 1 ? fb : defaultRate;
+    return Number((turnover * rate).toFixed(2));
   };
 
 
@@ -324,7 +340,10 @@ if (headerRow) {
 
                     <tbody>
                       {pavtiData.map((t, idx) => {
-                        const brk = calculateBrokerage(t);
+                        const fb = t.formBrokerage;
+                        const brk = (fb === undefined || fb === null || Number(fb) === 0.00005)
+                          ? calculateBrokerage(t)
+                          : (Number(fb) < 1 ? calculateBrokerage({ ...t, formBrokerage: Number(fb) }) : Number(fb));
                         const pl = t.mode === 'buy' ? ((t.sellPrice - t.buyPrice) * t.quantity) - brk : ((t.buyPrice - t.sellPrice) * t.quantity) - brk;
                         const plColor = pl >= 0 ? 'green' : 'red';
                         return (
@@ -334,7 +353,7 @@ if (headerRow) {
                             <td>{t.stockName} ({t.mode})</td>
                             <td className="text-center">&#8377;{t.buyPrice}</td>
                             <td className="text-center">&#8377;{t.sellPrice}</td>
-                            <td className="text-center">{t.quantity}</td>
+                            <td className="text-center">{t.lotSize ? <>{t.lotSize} Lot</> : t.quantity}</td>
                             <td className="text-center">&#8377;{brk}</td>
                             <td className="text-end" style={{ color: plColor }}>
                               &#8377;{pl.toLocaleString('en-IN', { minimumFractionDigits: 2 })}

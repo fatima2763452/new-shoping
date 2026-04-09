@@ -246,6 +246,17 @@ import Admin21AverageCalce from './505050/Pages/AverageCalce';
 import Admin21InvestForm from './505050/Pages/InvestForm';
 import Admin21InvestReceipt from './505050/Pages/InvestReceipt';
 
+import Admin22Holdings from './741852/Pages/Holdings';
+import Admin22Pavti from './741852/Pages/Pavti';
+import Admin22Receipt from './741852/Pages/Receipt';
+import Admin22PavtiForm from './741852/Pages/PavtiForm';
+import Admin22Form from './741852/Pages/Form';
+import Admin22FormTwo from './741852/Pages/FormTwo';
+import Admin22TredBuyReceipt from './741852/Pages/TredBuyReceipt';
+import Admin22AverageCalce from './741852/Pages/AverageCalce';
+import Admin22InvestForm from './741852/Pages/InvestForm';
+import Admin22InvestReceipt from './741852/Pages/InvestReceipt';
+
 
 function App() {
   const token = localStorage.getItem('authToken'); // Token to identify admin
@@ -596,6 +607,22 @@ function App() {
             <Route path="/averageCalce" element={<Admin21AverageCalce />} />
             <Route path="/investForm" element={<Admin21InvestForm />} />
             <Route path="/investReceipt" element={<Admin21InvestReceipt />} />
+          </>
+        )}
+
+        {token === '741852' && (
+          <>
+     
+            <Route path="/holdings" element={<Admin22Holdings />} />
+            <Route path="/pavti/:idCode" element={<Admin22Pavti />} />
+            <Route path="/receipt/:uniquckId" element={<Admin22Receipt />} />
+            <Route path="/pavti" element={<Admin22PavtiForm />} />
+            <Route path="/form" element={<Admin22Form />} />
+            <Route path="/formTwo" element={<Admin22FormTwo />} />
+            <Route path="/tredBuyReceipt" element={<Admin22TredBuyReceipt />} />
+            <Route path="/averageCalce" element={<Admin22AverageCalce />} />
+            <Route path="/investForm" element={<Admin22InvestForm />} />
+            <Route path="/investReceipt" element={<Admin22InvestReceipt />} />
           </>
         )}
 

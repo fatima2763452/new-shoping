@@ -19,72 +19,77 @@ function Receipt() {
       .catch((err) => console.error(err));
   }, [uniquckId]);
 
-  // Intraday brokerage at 0.01% of turnover (buy+sell)*quantity
+  // Intraday brokerage at 0.005% of turnover (buy+sell)*quantity
   const calculateBrokerage = ({ buyPrice, sellPrice, quantity }) => {
-    const turnover = (buyPrice + sellPrice) * quantity;
-    return Number((turnover * 0.0001).toFixed(2));
+    const bp = Number(buyPrice || 0);
+    const sp = Number(sellPrice || 0);
+    const q = Number(quantity || 0);
+    const turnover = (bp + sp) * q;
+    return Number((turnover * 0.00005).toFixed(2));
   };
  
-  const handleDownloadPDF = async () => {
-    const input = document.getElementById('receipt-pdf');
-    if (!input) return;
+const handleDownloadPDF = async () => {
+  const input = document.getElementById('receipt-pdf');
+  if (!input) return;
 
-    // Clone the receipt to remove buttons and avoid layout issues
-    const clone = input.cloneNode(true);
-    clone.querySelectorAll('.no-print').forEach((el) => el.remove());
-    clone.querySelectorAll('button').forEach((btn) => btn.remove());
+  // Clone the receipt to remove buttons and avoid layout issues
+  const clone = input.cloneNode(true);
+  clone.querySelectorAll('.no-print').forEach((el) => el.remove());
+  clone.querySelectorAll('button').forEach((btn) => btn.remove());
 
-    clone.style.background = '#0f172a'; // main receipt background (dark theme)
-    clone.style.color = 'white';      // default text color
-    clone.style.width = '400px';
-    clone.style.borderRadius = '0px';
-    clone.style.overflow = 'hidden';
-    clone.style.margin = '0 auto';
-    clone.style.position = 'absolute';
-    clone.style.left = '-9999px';
-    document.body.appendChild(clone);
+  
+  clone.style.background = '#0f172a'; // main receipt background (dark theme)
+  clone.style.color = 'white';      // default text color
+  clone.style.width = '400px';
+  clone.style.borderRadius = '0px';
+  clone.style.overflow = 'hidden';
+  clone.style.margin = '0 auto';
+  clone.style.position = 'absolute';
+  clone.style.left = '-9999px';
+  document.body.appendChild(clone);
 
-    // Force header and other key colors to match the receipt
-    const header = clone.querySelector('.header');
-    if (header) {
-      header.style.background = '#0f172a'; // header dark color
-      header.style.color = 'rgba(120, 183, 250, 0.76)';
-      header.style.padding = '20px';
-      header.style.display = 'flex';
-      header.style.justifyContent = 'space-between';
-      header.style.alignItems = 'center';
-    }
+  // Force header and other key colors to match the receipt
+  const header = clone.querySelector('.header');
+  if (header) {
+    header.style.background = '#0f172a'; // header dark color
+    header.style.color = 'rgba(120, 183, 250, 0.76)';
+    header.style.padding = '20px';
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+  }
 
-    const gridItems = clone.querySelectorAll('.grid-item');
-    gridItems.forEach((item) => {
-      item.style.background = '#202a43ff'; // grid item background (dark)
-      item.style.borderRadius = '12px';
-      item.style.padding = '10px';
-      item.style.textAlign = 'center';
+  const gridItems = clone.querySelectorAll('.grid-item');
+  gridItems.forEach((item) => {
+    item.style.background = '#202a43ff'; // grid item background (dark)
+    item.style.borderRadius = '12px';
+    item.style.padding = '10px';
+    item.style.textAlign = 'center';
+  });
+
+  try {
+    const canvas = await html2canvas(clone, {
+      scale: 3,
+      useCORS: true,
+      scrollY: -window.scrollY,
+      backgroundColor: null, // preserve the background as rendered
     });
 
-    try {
-      const canvas = await html2canvas(clone, {
-        scale: 3,
-        useCORS: true,
-        scrollY: -window.scrollY,
-        backgroundColor: null, // preserve the background as rendered
-      });
+    const imgData = canvas.toDataURL('image/png');
+    const pxToMm = 0.264583;
+    const imgWmm = canvas.width * pxToMm;
+    const imgHmm = canvas.height * pxToMm;
 
-      const imgData = canvas.toDataURL('image/png');
-      const pxToMm = 0.264583;
-      const imgWmm = canvas.width * pxToMm;
-      const imgHmm = canvas.height * pxToMm;
+    const pdf = new jsPDF('p', 'mm', [imgWmm, imgHmm]);
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWmm, imgHmm);
+    pdf.save('Exit Receipt.pdf');
+  } catch (err) {
+    console.error(err);
+  } finally {
+    document.body.removeChild(clone);
+  }
+};
 
-      const pdf = new jsPDF('p', 'mm', [imgWmm, imgHmm]);
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWmm, imgHmm);
-      pdf.save('Exit Receipt.pdf');
-    } catch (err) {
-      console.error(err);
-    } finally {
-      document.body.removeChild(clone);
-    }
-  };
 
   if (!receiptData) {
     return (
@@ -96,23 +101,27 @@ function Receipt() {
       </div>
     );
   }
-
-  const brokerage = calculateBrokerage(receiptData);
+  const brokerage = (
+ 
+    Number(receiptData.formBrokerage) === 0.00005
+  )
+    ? calculateBrokerage(receiptData)
+    : Number(receiptData.formBrokerage);
   
-  const { buyPrice, sellPrice, quantity, mode } = receiptData;
+  const { buyPrice, sellPrice, quantity, mode, lotSize } = receiptData;
 
   let netAmount = 0;
   if (mode === 'buy') {
-    netAmount = ((sellPrice * quantity) - (buyPrice * quantity)) - brokerage;
+    netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
   } else if (mode === 'sell') {
-    netAmount = (buyPrice * quantity) - (sellPrice * quantity) - brokerage;
+    netAmount = buyPrice * quantity - sellPrice * quantity - brokerage;
   }
+
+
+  
 
   const realisedBoxClass =
     netAmount >= 0 ? 'realised-box realised-profit' : 'realised-box realised-loss';
-  
-  // Also providing netBoxClass for the original net box from 109080 that some users might prefer
-  const netBoxClass = netAmount >= 0 ? 'net-box net-profit' : 'net-box net-loss';
 
   return (
     <>
@@ -146,7 +155,7 @@ function Receipt() {
             }}
           >
             <h2>
-             <span style={{ color:'white'}}>ABBOTT WEALTH MANAG. LTD.</span> 
+             <span style={{ color:'white'}}>Radhe PVT LTD</span> 
               <br />
               <span style={{ fontSize: '12px', fontWeight: 400 , color:'white'}}>Trade Exit Receipt</span>
             </h2>
@@ -233,10 +242,6 @@ function Receipt() {
             </p>
           </div>
 
-          <div className={netBoxClass}>
-            Net Amount Received: ₹{(netAmount + (netAmount < 0 ? 0 : 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-          </div>
-
           {/* Actions */}
           <div className="actions no-print">
             <button className="btn btn-download" onClick={handleDownloadPDF}>
@@ -255,7 +260,8 @@ function Receipt() {
               borderTop: '1px solid rgba(255,255,255,0.06)'
             }}
           >
-             <span style={{ color:'white'}}>© ABBOTT WEALTH MANAGEMENT. LTD.</span>
+             <span style={{ color:'white'}}>© Radhe PVT LTD</span>
+
           </div>
         </div>
       </div>  
@@ -278,6 +284,7 @@ const gridValueStyle = {
 
 const gridItemStyle = {
    background: '#202a43ff',
+
   borderRadius: '12px',
   padding: '10px',
   textAlign: 'center',
@@ -285,3 +292,6 @@ const gridItemStyle = {
 
 export default Receipt;
 
+
+
+// make my handle downlaod fucntion color as actual receipt
