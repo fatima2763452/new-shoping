@@ -152,16 +152,16 @@ import Admin13AverageCalce from './995622/Pages/AverageCalce';
 import Admin13InvestForm from './995622/Pages/InvestForm';
 import Admin13InvestReceipt from './995622/Pages/InvestReceipt';
 
-import Admin14Holdings from './238955/Pages/Holdings';
-import Admin14Pavti from './238955/Pages/Pavti';
-import Admin14Receipt from './238955/Pages/Receipt';
-import Admin14PavtiForm from './238955/Pages/PavtiForm';
-import Admin14Form from './238955/Pages/Form';
-import Admin14FormTwo from './238955/Pages/FormTwo';
-import Admin14TredBuyReceipt from './238955/Pages/TredBuyReceipt';
-import Admin14AverageCalce from './238955/Pages/AverageCalce';
-import Admin14InvestForm from './238955/Pages/InvestForm';
-import Admin14InvestReceipt from './238955/Pages/InvestReceipt';
+import Admin14Holdings from './700615/Pages/Holdings';
+import Admin14Pavti from './700615/Pages/Pavti';
+import Admin14Receipt from './700615/Pages/Receipt';
+import Admin14PavtiForm from './700615/Pages/PavtiForm';
+import Admin14Form from './700615/Pages/Form';
+import Admin14FormTwo from './700615/Pages/FormTwo';
+import Admin14TredBuyReceipt from './700615/Pages/TredBuyReceipt';
+import Admin14AverageCalce from './700615/Pages/AverageCalce';
+import Admin14InvestForm from './700615/Pages/InvestForm';
+import Admin14InvestReceipt from './700615/Pages/InvestReceipt';
 
 import Admin15Holdings from './338011/Pages/Holdings';
 import Admin15Pavti from './338011/Pages/Pavti';
@@ -256,6 +256,17 @@ import Admin22TredBuyReceipt from './741852/Pages/TredBuyReceipt';
 import Admin22AverageCalce from './741852/Pages/AverageCalce';
 import Admin22InvestForm from './741852/Pages/InvestForm';
 import Admin22InvestReceipt from './741852/Pages/InvestReceipt';
+
+import Admin23Holdings from './738479/Pages/Holdings';
+import Admin23Pavti from './738479/Pages/Pavti';
+import Admin23Receipt from './738479/Pages/Receipt';
+import Admin23PavtiForm from './738479/Pages/PavtiForm';
+import Admin23Form from './738479/Pages/Form';
+import Admin23FormTwo from './738479/Pages/FormTwo';
+import Admin23TredBuyReceipt from './738479/Pages/TredBuyReceipt';
+import Admin23AverageCalce from './738479/Pages/AverageCalce';
+import Admin23InvestForm from './738479/Pages/InvestForm';
+import Admin23InvestReceipt from './738479/Pages/InvestReceipt';
 
 
 function App() {
@@ -472,7 +483,7 @@ function App() {
           </>
         )}
 
-        {token === '238955' && (
+        {token === '700615' && (
           <>
      
             <Route path="/holdings" element={<Admin14Holdings />} />
@@ -623,6 +634,21 @@ function App() {
             <Route path="/averageCalce" element={<Admin22AverageCalce />} />
             <Route path="/investForm" element={<Admin22InvestForm />} />
             <Route path="/investReceipt" element={<Admin22InvestReceipt />} />
+          </>
+        )}
+
+        {token === '738479' && (
+          <>
+            <Route path="/holdings" element={<Admin23Holdings />} />
+            <Route path="/pavti/:idCode" element={<Admin23Pavti />} />
+            <Route path="/receipt/:uniquckId" element={<Admin23Receipt />} />
+            <Route path="/pavti" element={<Admin23PavtiForm />} />
+            <Route path="/form" element={<Admin23Form />} />
+            <Route path="/formTwo" element={<Admin23FormTwo />} />
+            <Route path="/tredBuyReceipt" element={<Admin23TredBuyReceipt />} />
+            <Route path="/averageCalce" element={<Admin23AverageCalce />} />
+            <Route path="/investForm" element={<Admin23InvestForm />} />
+            <Route path="/investReceipt" element={<Admin23InvestReceipt />} />
           </>
         )}
 

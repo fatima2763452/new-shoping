@@ -17,8 +17,8 @@ async function updateDb() {
       console.log("Checking collection:", collection.collectionName);
       
       const result = await collection.updateMany(
-         { token: '220088' },
-         { $set: { token: '000000' } }
+         { token: '238955' },
+         { $set: { token: '700615' } }
       );
       if (result.matchedCount > 0) {
         console.log(`Updated ${result.modifiedCount} documents in ${collection.collectionName}`);

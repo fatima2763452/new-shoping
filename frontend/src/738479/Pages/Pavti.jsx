@@ -278,11 +278,11 @@ if (headerRow) {
                     src={logo}
                     alt="DEVAKI"
                     style={{
-                      width: '160px',
+                      width: '150px',
                       height: 'auto',
                       background: 'transparent',
                       marginBottom: 8,
-                      minWidth: 90,
+                      minWidth: 80,
                       maxWidth: '40vw',
                     }}
                   />
