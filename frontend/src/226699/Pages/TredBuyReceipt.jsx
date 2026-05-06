@@ -91,7 +91,7 @@ function TredBuyReceipt() {
             }}
           >
             <h2>
-              <span style={{ color:'white' , fontSize : '20px'}}>SHIV PVT. LTD</span>
+              <span style={{ color:'white' , fontSize : '20px'}}>SHIVALIKA PVT. LTD</span>
               <br />
               <span style={{ fontSize: '12px', fontWeight: 400, color: 'white' }}>
                 Trade Buy Receipt
@@ -152,7 +152,7 @@ function TredBuyReceipt() {
               borderTop: '1px solid rgba(255,255,255,0.06)'
             }}
           >
-            <span style={{ color:'white'}}>© SHIV PVT. LTD</span>
+            <span style={{ color:'white'}}>© SHIVALIKA PVT. LTD</span>
           </div>
         </div>
 
