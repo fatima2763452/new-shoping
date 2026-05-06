@@ -86,7 +86,7 @@ function SecretToken() {const [token, setToken] = useState('');
         break;
 
      // case '505050':              
-      // navigate('/form');
+      //navigate('/form');
       // break;
 
       case '741852':              // new Radhe PVT LTD token
@@ -94,6 +94,10 @@ function SecretToken() {const [token, setToken] = useState('');
         break;
 
       case '738479':              // new 
+        navigate('/form');
+        break;
+
+      case '226699':              // new copy of 991100
         navigate('/form');
         break;
 
