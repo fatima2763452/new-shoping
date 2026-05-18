@@ -107,12 +107,24 @@ function Pavti() {
   const handleDownload = async () => {
     try {
       const element = invoiceRef.current;
+      
+      // Temporarily force desktop width to prevent squished layouts on mobile devices
+      const originalWidth = element.style.width;
+      const originalMaxWidth = element.style.maxWidth;
+      element.style.width = '1000px';
+      element.style.maxWidth = '1000px';
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: "#ffffff"
+        backgroundColor: "#ffffff",
+        windowWidth: 1000
       });
+
+      // Restore original styles immediately after capture
+      element.style.width = originalWidth;
+      element.style.maxWidth = originalMaxWidth;
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'pt', 'a4');
