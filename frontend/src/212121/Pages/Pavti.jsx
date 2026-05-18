@@ -9,6 +9,7 @@ import logo from '../img/logo.jpg';
 
 function Pavti() {
   const invoiceRef = useRef();
+  const footerRef = useRef();
   
   const { idCode } = useParams();
   const location = useLocation();
@@ -114,6 +115,57 @@ function Pavti() {
       element.style.width = '1000px';
       element.style.maxWidth = '1000px';
 
+      // Wait a moment for layout recalculation
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const pxPageHeight = 1000 * (841.89 / 595.28); // A4 ratio
+      const elementRectTop = element.getBoundingClientRect().top;
+      const getRelativePos = (elm) => elm.getBoundingClientRect().top - elementRectTop;
+
+      const dummyElements = [];
+
+      // 1. Prevent table rows from cutting
+      const rows = element.querySelectorAll('tbody tr');
+      rows.forEach(row => {
+        const top = getRelativePos(row);
+        const height = row.offsetHeight;
+        const sPage = Math.floor(top / pxPageHeight);
+        const ePage = Math.floor((top + height) / pxPageHeight);
+        
+        if (sPage !== ePage) {
+          const pushAmount = ((sPage + 1) * pxPageHeight) - top + 15;
+          const dummyRow = document.createElement('tr');
+          dummyRow.style.height = `${pushAmount}px`;
+          dummyRow.style.border = 'none';
+          dummyRow.style.backgroundColor = 'transparent';
+          const dummyCell = document.createElement('td');
+          dummyCell.colSpan = 8;
+          dummyCell.style.border = 'none';
+          dummyRow.appendChild(dummyCell);
+          row.parentNode.insertBefore(dummyRow, row);
+          dummyElements.push(dummyRow);
+        }
+      });
+
+      // 2. Prevent the footer/signature section from cutting
+      const footer = footerRef.current;
+      if (footer) {
+        const footerTop = getRelativePos(footer);
+        const footerHeight = footer.offsetHeight;
+        const fStartPage = Math.floor(footerTop / pxPageHeight);
+        const fEndPage = Math.floor((footerTop + footerHeight) / pxPageHeight);
+        
+        if (fStartPage !== fEndPage) {
+          const pushAmount = ((fStartPage + 1) * pxPageHeight) - footerTop + 20;
+          const originalMarginTop = footer.style.marginTop;
+          footer.style.marginTop = `${parseFloat(originalMarginTop || 0) + pushAmount}px`;
+          dummyElements.push({ el: footer, prop: 'marginTop', orig: originalMarginTop });
+        }
+      }
+
+      // Wait for dummy elements to affect layout
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -122,9 +174,16 @@ function Pavti() {
         windowWidth: 1000
       });
 
-      // Restore original styles immediately after capture
+      // Restore original styles and remove dummy elements immediately
       element.style.width = originalWidth;
       element.style.maxWidth = originalMaxWidth;
+      dummyElements.forEach(item => {
+        if (item.nodeType) {
+          item.remove();
+        } else if (item.el) {
+          item.el.style[item.prop] = item.orig;
+        }
+      });
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'pt', 'a4');
@@ -246,6 +305,7 @@ function Pavti() {
                 </table>
               </div>
 
+              <div ref={footerRef}>
                 <div className="p-1 mb-3" style={{ backgroundColor: '#e7e0d6', height: "2em" }}>
                   <p><strong>Margin :</strong> &#8377; {userInfo?.margin || '0.00'}</p>
                 </div>
@@ -281,6 +341,7 @@ function Pavti() {
                   <p className="mb-0">2. PAY LOSS AT EVERY SATURDAY AND SUNDAY .</p>
                   <p className="mb-0">3. THIS PLATEFORM IS A LEGAL TO ABLE WITH GOVERMENT APPROVAL .</p>
                 </div>
+              </div>
             </div>
 
             <div className="text-center mt-4 pb-5">
