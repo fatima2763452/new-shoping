@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import NavBar from '../Components/NavBar';
 import axios from "axios"
@@ -8,11 +9,12 @@ import axios from "axios"
 import signature from '../img/signature.jpg';
 import logo from '../img/logo.jpg';
 
-
-
-
 function Pavti() {
   const invoiceRef = useRef();
+  const headerRef = useRef();
+  const footerRef = useRef();
+  const tableRef = useRef();
+  
   const { idCode } = useParams();
   const token = localStorage.getItem('authToken');
   const location = useLocation();
@@ -28,9 +30,7 @@ function Pavti() {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       try {
-       
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/forms/getStocks/${token}/${idCode}`);
-        
         const original = Array.isArray(res.data) ? res.data : [];
 
         // apply nav date filter if both dates provided
@@ -49,8 +49,6 @@ function Pavti() {
             return td >= from && td <= to;
           });
         }
-
-        console.log(fetched)
 
         setPavtiData(fetched);
 
@@ -102,7 +100,6 @@ function Pavti() {
     fetchData();
   }, [idCode]);
 
-
   const maskMobile = (number) => {
     const numStr = String(number); // convert number to string
     if (numStr.length < 5) return numStr;
@@ -121,123 +118,78 @@ function Pavti() {
     return Number((turnover * rate).toFixed(2));
   };
 
-
   const handleDownload = async () => {
-    const input = invoiceRef.current;
-    if (!input) return;
-
-    const clone = input.cloneNode(true);
-    clone.style.width = '794px';
-    clone.style.padding = '20px';
-    clone.style.backgroundColor = 'white';
-    clone.style.position = 'absolute';
-    clone.style.top = '-9999px';
-    clone.style.left = '0';
-    clone.style.zIndex = '-1';
-
-    // --- HEADER FLEX FIX FOR PDF ---
-
-// --- HEADER FLEX FIX FOR PDF ---
-// --- HEADER FLEX FIX FOR PDF ---
-const headerRow = clone.querySelector('.d-flex.flex-column.align-items-center.mb-2');
-if (headerRow) {
-  headerRow.style.display = 'flex';
-  headerRow.style.flexDirection = 'row';
-  headerRow.style.alignItems = 'center';
-  headerRow.style.justifyContent = 'space-between'; // space between for left + center
-  headerRow.style.marginTop = '20px';
-  headerRow.style.marginBottom = '10px';
-
-  // Left: Name logo
-  const nameLogoImg = headerRow.querySelector('img[alt="DEVAKI"]');
-  // if (nameLogoImg) {
-  //   nameLogoImg.style.position = 'static';
-  //   nameLogoImg.style.width = '160px';
-  //   nameLogoImg.style.height = 'auto';
-  //   nameLogoImg.style.marginLeft = '10px';
-  //   nameLogoImg.style.marginRight = 'auto'; // push org name center
-  //   nameLogoImg.style.marginBottom = '0';
-  //   nameLogoImg.style.maxWidth = '40vw';
-  //   nameLogoImg.style.minWidth = '80px';
-  // }
-
-  // Center: Org name
-  const orgDiv = headerRow.querySelector('div');
-  if (orgDiv) {
-    orgDiv.style.flex = '1';                // take full space
-    orgDiv.style.textAlign = 'center';      // center text
-    orgDiv.style.fontSize = '1.2em';
-    orgDiv.style.letterSpacing = '2px';
-    orgDiv.style.fontWeight = '500';
-    orgDiv.style.wordBreak = 'break-word';
-    orgDiv.style.maxWidth = '220px';
-    orgDiv.style.margin = '0 auto';
-    orgDiv.style.marginTop = '29px';
-
-    orgDiv.style.display = 'block';
-    orgDiv.style.position = 'relative'; 
-    orgDiv.style.bottom = '50px'; // space from right edge
-  }
-}
-
-
-    // --- END HEADER FLEX FIX ---
-
-    // Fix total block as before
-    const totalBlock = clone.querySelector('div.p-3');
-    if (totalBlock) {
-      totalBlock.classList.remove('flex-column', 'flex-sm-row');
-      totalBlock.style.display = 'flex';
-      totalBlock.style.flexDirection = 'row';
-      totalBlock.style.justifyContent = 'space-between';
-      totalBlock.style.alignItems = 'center';
-      totalBlock.style.height = 'auto';
-      totalBlock.style.padding = '0 20px';
-      totalBlock.style.gap = '0';
-
-      const allChildren = totalBlock.children;
-      for (let i = 0; i < allChildren.length; i++) {
-        allChildren[i].style.margin = '0';
-        allChildren[i].style.whiteSpace = 'nowrap';
-        allChildren[i].style.textAlign = i === 0 ? 'left' : 'right';
-        allChildren[i].style.flex = 'unset';
-        allChildren[i].style.width = 'auto';
-      }
-    }
-
-    document.body.appendChild(clone);
-
-    await new Promise(resolve => setTimeout(resolve, 200));
-
-    const canvas = await html2canvas(clone, { scale: 2, useCORS: true });
-
-    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'pt', 'a4');
-    const pageHeight = pdf.internal.pageSize.getHeight();
     const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 20;
 
-    const imgWidth = pageWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    // 1. Capture Header
+    const headerElement = headerRef.current;
+    const headerCanvas = await html2canvas(headerElement, { scale: 2, useCORS: true });
+    const headerImgData = headerCanvas.toDataURL('image/png');
+    const headerImgWidth = pageWidth - (margin * 2);
+    const headerImgHeight = (headerCanvas.height * headerImgWidth) / headerCanvas.width;
+    
+    pdf.addImage(headerImgData, 'PNG', margin, margin, headerImgWidth, headerImgHeight);
+    
+    // 2. Add Table using autoTable
+    const tableHeaders = [["ORDER", "DATE", "STOCK", "BUY", "SELL", "QTY", "BROKERAGE", "P / L"]];
+    const tableData = pavtiData.map((t, idx) => {
+      const fb = t.formBrokerage;
+      const brk = (fb === undefined || fb === null || Number(fb) === 0.00005)
+        ? calculateBrokerage(t)
+        : (Number(fb) < 1 ? calculateBrokerage({ ...t, formBrokerage: Number(fb) }) : Number(fb));
+      const pl = t.mode === 'buy' ? ((t.sellPrice - t.buyPrice) * t.quantity) - brk : ((t.buyPrice - t.sellPrice) * t.quantity) - brk;
+      
+      return [
+        idx + 1,
+        new Date(t.tradeDate).toLocaleDateString('en-GB'),
+        `${t.stockName} (${t.mode})`,
+        `₹${t.buyPrice}`,
+        `₹${t.sellPrice}`,
+        t.lotSize ? `${t.lotSize} Lot` : t.quantity,
+        `₹${brk}`,
+        { content: `₹${pl.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, styles: { textColor: pl >= 0 ? [0, 128, 0] : [255, 0, 0], halign: 'right' } }
+      ];
+    });
 
-    let heightLeft = imgHeight;
-    let position = 0;
+    pdf.autoTable({
+      startY: margin + headerImgHeight + 10,
+      head: tableHeaders,
+      body: tableData,
+      margin: { left: margin, right: margin },
+      theme: 'grid',
+      headStyles: { fillColor: [231, 224, 214], textColor: [0, 0, 0], halign: 'center' },
+      styles: { fontSize: 9, cellPadding: 5 },
+      columnStyles: {
+        0: { halign: 'center' },
+        1: { halign: 'center' },
+        3: { halign: 'center' },
+        4: { halign: 'center' },
+        5: { halign: 'center' },
+        6: { halign: 'center' }
+      }
+    });
 
-    // First page
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
+    // 3. Capture Footer
+    const finalY = pdf.lastAutoTable.finalY + 10;
+    const footerElement = footerRef.current;
+    
+    // Check if footer fits on page, else add new page
+    const footerCanvas = await html2canvas(footerElement, { scale: 2, useCORS: true });
+    const footerImgData = footerCanvas.toDataURL('image/png');
+    const footerImgWidth = pageWidth - (margin * 2);
+    const footerImgHeight = (footerCanvas.height * footerImgWidth) / footerCanvas.width;
+    
+    if (finalY + footerImgHeight > pdf.internal.pageSize.getHeight() - margin) {
       pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      pdf.addImage(footerImgData, 'PNG', margin, margin, footerImgWidth, footerImgHeight);
+    } else {
+      pdf.addImage(footerImgData, 'PNG', margin, finalY, footerImgWidth, footerImgHeight);
     }
 
     pdf.save('invoice.pdf');
-    document.body.removeChild(clone);
   };
-
-
 
   return (
     <>
@@ -252,81 +204,66 @@ if (headerRow) {
             </div>
           ) : (
             <>
-              <div ref={invoiceRef} style={{ backgroundColor: 'white', color: 'black', position: 'relative' }}>
-
-
-                {/* <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20, marginBottom: 10 }}>
+              <div ref={invoiceRef} style={{ backgroundColor: 'white', color: 'black', position: 'relative', padding: '10px' }}>
+                <div ref={headerRef}>
+                  {/* Header */}
+                  <div
+                    className="d-flex flex-column align-items-center mb-2"
+                    style={{ marginTop: 20, marginBottom: 10 }}
+                  >
                     <img
-                      src={`${process.env.PUBLIC_URL}/${imgAndSign[token].nameLogo}`}
+                      src={logo}
                       alt="DEVAKI"
                       style={{
-                        width: '120px',
+                        width: '150px',
                         height: 'auto',
                         background: 'transparent',
-                        marginLeft: 10,
+                        marginBottom: 8,
+                        minWidth: 80,
+                        maxWidth: '40vw',
                       }}
                     />
-                  </div> */}
+                    <div
+                      style={{
+                        textAlign: 'center',
+                        fontSize: '1.2em',
+                        letterSpacing: 2,
+                        fontWeight: 500,
+                        wordBreak: 'break-word',
+                        maxWidth: 220,
+                      }}
+                    >
+                      <b>{pavtiData[0]?.orgnization}</b>
+                    </div>
+                  </div>
 
-                {/* Header */}
-                <div
-                  className="d-flex flex-column align-items-center mb-2"
-                  style={{ marginTop: 20, marginBottom: 10 }}
-                >
-                  {/* Top: Name Logo */}
-                  <img
-                    src={logo}
-                    alt="DEVAKI"
-                    style={{
-                      width: '150px',
-                      height: 'auto',
-                      background: 'transparent',
-                      marginBottom: 8,
-                      minWidth: 80,
-                      maxWidth: '40vw',
-                    }}
-                  />
-                  {/* Bottom: Organization Name */}
-                  <div
-                    style={{
-                      textAlign: 'center',
-                      fontSize: '1.2em',
-                      letterSpacing: 2,
-                      fontWeight: 500,
-                      wordBreak: 'break-word',
-                      maxWidth: 220,
-                    }}
-                  >
-                    <b>{pavtiData[0]?.orgnization}</b>
+                  {/*user info */}
+                  <p className="text-end mb-2" >
+                    <strong>Invoice no. :</strong> In##00{Math.floor(10000 + Math.random() * 90000)}
+                  </p>
+                  <div className="p-1" style={{ backgroundColor: '#e7e0d6', height: "2em" }} >
+                    <p>
+                      <strong>Date :</strong> {new Date().toLocaleDateString('en-GB')}
+                    </p>
+                  </div>
+
+                  <div className="mb-3 mt-3">
+                    {pavtiData[0] && (
+                      <>
+                        <p className="mb-1"><strong>ID CODE :</strong> {pavtiData[0].idCode}</p>
+                        <p className="mb-0"><strong>NAME :</strong> {pavtiData[0].clientName}</p>
+                        <p className="mb-0"><strong>PHONE :</strong> {maskMobile(pavtiData[0].mobileNumber)}</p>
+                        <p className="mb-0"><strong>ADDRESS :</strong> {pavtiData[0].address}</p>
+                      </>
+                    )}
                   </div>
                 </div>
 
-                {/*user info */}
-                <p className="text-end mb-2" >
-                  <strong>Invoice no. :</strong> In##00{Math.floor(10000 + Math.random() * 90000)}
-                </p>
-                <div className="p-1" style={{ backgroundColor: '#e7e0d6', height: "2em" }} >
-                  <p>
-                    <strong>Date :</strong> {new Date().toLocaleDateString('en-GB')}
-                  </p>
-                </div>
-
-                <div className="mb-3 mt-3">
-                  {pavtiData[0] && (
-                    <>
-                      <p className="mb-1"><strong>ID CODE :</strong> {pavtiData[0].idCode}</p>
-                      <p className="mb-0"><strong>NAME :</strong> {pavtiData[0].clientName}</p>
-                      <p className="mb-0"><strong>PHONE :</strong> {maskMobile(pavtiData[0].mobileNumber)}</p>
-                      <p className="mb-0"><strong>ADDRESS :</strong> {pavtiData[0].address}</p>
-                    </>
-                  )}
-                </div>
-
                 {/* Table */}
-                <div className="table-responsive mb-3 mt-3">
+                <div className="table-responsive mb-3 mt-3" ref={tableRef}>
                   <table className="table table-bordered text-sm mb-0">
                     <thead className="table-light">
-                      <tr>
+                      <tr style={{ backgroundColor: '#e7e0d6' }}>
                         <th className="text-center">ORDER</th>
                         <th className="text-center">DATE</th>
                         <th className="text-center">STOCK</th>
@@ -361,50 +298,58 @@ if (headerRow) {
                           </tr>
                         );
                       })}
-
                     </tbody>
-
                   </table>
                 </div>
 
-                <div className="p-1" style={{ backgroundColor: '#e7e0d6', height: "2em" }} >
-                  <p>
-                    <strong>Margin :</strong> &#8377; {userInfo?.margin || '0.00'}
-                  </p>
-                </div>
-
-                <div className="mb-3 row">
-                  <p className="fw-bold col-6"><b>Term & Condition</b> <br></br> Note Detailed bill that records all transactions Done by broker on behalf of His client during a trading day</p>
-                  <img
-                    src={signature}
-                    alt="signature"
-                    className="img-fluid mb-2 col-6"
-                    style={{ maxWidth: '15em', objectFit: 'contain', display: 'block', margin: '0 auto' }}
-                  />
-                </div>
-
-                <div className="p-3 d-flex flex-column flex-sm-row justify-content-between align-items-center" style={{ backgroundColor: '#e7e0d6' }}>
-                  <h6 className="fw-bold" style={{ fontSize: "20px" }}>TOTAL</h6>
-                  <div className="text-end">
-                    {/* <p className="mb-1 text-success" style={{ fontWeight: 600 }}>Seven thousand six hundred eighty-five</p> */}
-                    <p
-                      className="mb-0"
-                      style={{ color: totalProfit >= 0 ? 'green' : 'red', fontWeight: 'bold' }}
-                    >
-                      ₹
-                      {
-                        (totalProfit >= 0
-                          ? totalProfit + userInfo.margin
-                          : totalProfit + userInfo.margin
-                        ).toLocaleString('en-IN', { minimumFractionDigits: 2 })
-                      }
+                <div ref={footerRef}>
+                  <div className="p-1 mb-3" style={{ backgroundColor: '#e7e0d6', height: "2em" }} >
+                    <p>
+                      <strong>Margin :</strong> &#8377; {userInfo?.margin || '0.00'}
                     </p>
+                  </div>
+
+                  <div className="mb-3 row">
+                    <div className="col-6">
+                      <p className="fw-bold mb-1"><b>Term & Condition</b></p>
+                      <p className="small text-muted mb-0">Note: Detailed bill that records all transactions done by broker on behalf of his client during a trading day.</p>
+                    </div>
+                    <div className="col-6 text-center">
+                      <img
+                        src={signature}
+                        alt="signature"
+                        style={{ maxWidth: '150px', maxHeight: '60px', objectFit: 'contain' }}
+                      />
+                      <p className="small mt-1 mb-0 italic">Authorized Signature</p>
+                    </div>
+                  </div>
+
+                  <div className="p-3 d-flex justify-content-between align-items-center mb-4" style={{ backgroundColor: '#e7e0d6' }}>
+                    <h5 className="fw-bold mb-0">TOTAL</h5>
+                    <div className="text-end">
+                      <h5
+                        className="mb-0 fw-bold"
+                        style={{ color: totalProfit >= 0 ? 'green' : 'red' }}
+                      >
+                        ₹
+                        {(totalProfit + (userInfo?.margin || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </h5>
+                    </div>
+                  </div>
+
+                  {/* NOTE Conditions section added here */}
+                  <div style={{ color: 'red', fontSize: '12px', border: '1px solid red', padding: '10px', borderRadius: '5px' }}>
+                    <p className="fw-bold mb-1">NOTE :-</p>
+                    <p className="mb-1">( ACCORDING TO THE RULES AND REGULATION OF THE SEBI TRADING IS NOT SAFE BUT YOU HAVE TO DO TRADE WITH YOUR OWN RISK MANAGEMENT ).</p>
+                    <p className="mb-0">1. NO EXTRA LIMIT IS AVAILABLE TO TRADE FIRST CLEAR THIS DEBT.</p>
+                    <p className="mb-0">2. PAY LOSS AT EVERY SATURDAY AND SUNDAY .</p>
+                    <p className="mb-0">3. THIS PLATEFORM IS A LEGAL TO ABLE WITH GOVERMENT APPROVAL .</p>
                   </div>
                 </div>
               </div>
 
-              <div className="text-center mt-4">
-                <button className="btn btn-primary" onClick={handleDownload}>
+              <div className="text-center mt-4 pb-5">
+                <button className="btn btn-primary no-print" onClick={handleDownload}>
                   Download PDF
                 </button>
               </div>
@@ -416,4 +361,4 @@ if (headerRow) {
   );
 }
 
-export default Pavti;
+export default Pavti;
