@@ -110,6 +110,11 @@ function Pavti() {
   const handleDownload = async () => {
     try {
       const pdf = new jsPDF('p', 'pt', 'a4');
+      // Manually attach autoTable if it's not already attached
+      if (typeof pdf.autoTable !== 'function') {
+        pdf.autoTable = autoTable;
+      }
+      
       const pageWidth = pdf.internal.pageSize.getWidth();
       const margin = 20;
 
@@ -143,7 +148,7 @@ function Pavti() {
         ];
       });
 
-      autoTable(pdf, {
+      pdf.autoTable({
         startY: margin + headerImgHeight + 10,
         head: tableHeaders,
         body: tableData,
@@ -162,7 +167,7 @@ function Pavti() {
       });
 
       // 3. Capture Footer
-      const finalY = pdf.lastAutoTable.finalY + 10;
+      const finalY = (pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (margin + headerImgHeight + 20)) + 10;
       const footerElement = footerRef.current;
       const footerCanvas = await html2canvas(footerElement, { scale: 2, useCORS: true });
       const footerImgData = footerCanvas.toDataURL('image/png');
