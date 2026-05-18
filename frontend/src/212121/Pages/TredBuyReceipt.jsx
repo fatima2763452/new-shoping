@@ -10,52 +10,52 @@ function TredBuyReceipt() {
   const { client, stockName, idCode, quantity, lotSize, buyPrice, tradeDate, mode } = location.state || {};
 
   const handleDownloadPDF = async () => {
-  const input = document.getElementById('receipt-pdf');
-  if (!input) return;
+    const input = document.getElementById('receipt-pdf');
+    if (!input) return;
 
-  // Clone the node
-  const clone = input.cloneNode(true);
+    // Clone the node
+    const clone = input.cloneNode(true);
 
-  // Remove buttons or elements that shouldn't appear in PDF
-  clone.querySelectorAll('button, .no-print').forEach(el => el.remove());
+    // Remove buttons or elements that shouldn't appear in PDF
+    clone.querySelectorAll('button, .no-print').forEach(el => el.remove());
 
-  // Set clone styles to match actual colors (dark theme)
-  clone.style.position = 'absolute';
-  clone.style.left = '-9999px';
-  clone.style.background = '#0f172a'; // dark card background
-  clone.style.color = 'white';
-  clone.style.width = '400px';
-  clone.style.borderRadius = '0px';
-  clone.style.overflow = 'hidden';
-  clone.style.margin = '0 auto';
+    // Set clone styles to match actual colors (dark theme)
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.background = '#0f172a'; // dark card background
+    clone.style.color = 'white';
+    clone.style.width = '400px';
+    clone.style.borderRadius = '0px';
+    clone.style.overflow = 'hidden';
+    clone.style.margin = '0 auto';
 
-  document.body.appendChild(clone);
+    document.body.appendChild(clone);
 
-  try {
-    const canvas = await html2canvas(clone, {
-      scale: 3,
-      useCORS: true,
-      scrollY: -window.scrollY,
-      backgroundColor: null, // preserve transparency/colors
-    });
+    try {
+      const canvas = await html2canvas(clone, {
+        scale: 3,
+        useCORS: true,
+        scrollY: -window.scrollY,
+        backgroundColor: null, // preserve transparency/colors
+      });
 
-    const imgData = canvas.toDataURL('image/png');
-    const pxToMm = 0.264583;
-    const imgWmm = canvas.width * pxToMm;
-    const imgHmm = canvas.height * pxToMm;
+      const imgData = canvas.toDataURL('image/png');
+      const pxToMm = 0.264583;
+      const imgWmm = canvas.width * pxToMm;
+      const imgHmm = canvas.height * pxToMm;
 
-    const pdf = new jsPDF('p', 'mm', [imgWmm, imgHmm]);
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWmm, imgHmm);
-    pdf.save('Buy_Receipt.pdf');
-  } catch (err) {
-    console.error(err);
-  } finally {
-    // Remove clone only if it is still in the body
-    if (document.body.contains(clone)) {
-      document.body.removeChild(clone);
+      const pdf = new jsPDF('p', 'mm', [imgWmm, imgHmm]);
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWmm, imgHmm);
+      pdf.save('Buy_Receipt.pdf');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      // Remove clone only if it is still in the body
+      if (document.body.contains(clone)) {
+        document.body.removeChild(clone);
+      }
     }
-  }
-};
+  };
 
 
   const totalAmount = buyPrice * quantity;
@@ -81,7 +81,7 @@ function TredBuyReceipt() {
           <div
             className="receipt-header"
             style={{
-               background: '#0f172a',
+              background: '#0f172a',
               color: '#fff',
               padding: '10px',
               display: 'flex',
@@ -91,7 +91,7 @@ function TredBuyReceipt() {
             }}
           >
             <h2>
-              <span style={{ color:'white' , fontSize : '20px'}}>J D BROKERAGE</span>
+              <span style={{ color: 'white', fontSize: '20px' }}>J D BROKERAGE</span>
               <br />
               <span style={{ fontSize: '12px', fontWeight: 400, color: 'white' }}>
                 Trade Buy Receipt
@@ -139,12 +139,12 @@ function TredBuyReceipt() {
             <p><strong>Tax:</strong> ₹0.00</p>
           </div>
 
-          
+
 
           {/* Footer */}
           <div
             style={{
-               background: '#0f172a',
+              background: '#0f172a',
               padding: 12,
               fontSize: 12,
               textAlign: 'center',
@@ -152,7 +152,7 @@ function TredBuyReceipt() {
               borderTop: '1px solid rgba(255,255,255,0.06)'
             }}
           >
-            <span style={{ color:'white'}}>© J D BROKERAGE</span>
+            <span style={{ color: 'white' }}>© J D BROKERAGE</span>
           </div>
         </div>
 

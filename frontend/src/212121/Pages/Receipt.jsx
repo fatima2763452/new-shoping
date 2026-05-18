@@ -27,68 +27,68 @@ function Receipt() {
     const turnover = (bp + sp) * q;
     return Number((turnover * 0.00005).toFixed(2));
   };
- 
-const handleDownloadPDF = async () => {
-  const input = document.getElementById('receipt-pdf');
-  if (!input) return;
 
-  // Clone the receipt to remove buttons and avoid layout issues
-  const clone = input.cloneNode(true);
-  clone.querySelectorAll('.no-print').forEach((el) => el.remove());
-  clone.querySelectorAll('button').forEach((btn) => btn.remove());
+  const handleDownloadPDF = async () => {
+    const input = document.getElementById('receipt-pdf');
+    if (!input) return;
 
-  
-  clone.style.background = '#0f172a'; // main receipt background (dark theme)
-  clone.style.color = 'white';      // default text color
-  clone.style.width = '400px';
-  clone.style.borderRadius = '0px';
-  clone.style.overflow = 'hidden';
-  clone.style.margin = '0 auto';
-  clone.style.position = 'absolute';
-  clone.style.left = '-9999px';
-  document.body.appendChild(clone);
+    // Clone the receipt to remove buttons and avoid layout issues
+    const clone = input.cloneNode(true);
+    clone.querySelectorAll('.no-print').forEach((el) => el.remove());
+    clone.querySelectorAll('button').forEach((btn) => btn.remove());
 
-  // Force header and other key colors to match the receipt
-  const header = clone.querySelector('.header');
-  if (header) {
-    header.style.background = '#0f172a'; // header dark color
-    header.style.color = 'rgba(120, 183, 250, 0.76)';
-    header.style.padding = '20px';
-    header.style.display = 'flex';
-    header.style.justifyContent = 'space-between';
-    header.style.alignItems = 'center';
-  }
 
-  const gridItems = clone.querySelectorAll('.grid-item');
-  gridItems.forEach((item) => {
-    item.style.background = '#202a43ff'; // grid item background (dark)
-    item.style.borderRadius = '12px';
-    item.style.padding = '10px';
-    item.style.textAlign = 'center';
-  });
+    clone.style.background = '#0f172a'; // main receipt background (dark theme)
+    clone.style.color = 'white';      // default text color
+    clone.style.width = '400px';
+    clone.style.borderRadius = '0px';
+    clone.style.overflow = 'hidden';
+    clone.style.margin = '0 auto';
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    document.body.appendChild(clone);
 
-  try {
-    const canvas = await html2canvas(clone, {
-      scale: 3,
-      useCORS: true,
-      scrollY: -window.scrollY,
-      backgroundColor: null, // preserve the background as rendered
+    // Force header and other key colors to match the receipt
+    const header = clone.querySelector('.header');
+    if (header) {
+      header.style.background = '#0f172a'; // header dark color
+      header.style.color = 'rgba(120, 183, 250, 0.76)';
+      header.style.padding = '20px';
+      header.style.display = 'flex';
+      header.style.justifyContent = 'space-between';
+      header.style.alignItems = 'center';
+    }
+
+    const gridItems = clone.querySelectorAll('.grid-item');
+    gridItems.forEach((item) => {
+      item.style.background = '#202a43ff'; // grid item background (dark)
+      item.style.borderRadius = '12px';
+      item.style.padding = '10px';
+      item.style.textAlign = 'center';
     });
 
-    const imgData = canvas.toDataURL('image/png');
-    const pxToMm = 0.264583;
-    const imgWmm = canvas.width * pxToMm;
-    const imgHmm = canvas.height * pxToMm;
+    try {
+      const canvas = await html2canvas(clone, {
+        scale: 3,
+        useCORS: true,
+        scrollY: -window.scrollY,
+        backgroundColor: null, // preserve the background as rendered
+      });
 
-    const pdf = new jsPDF('p', 'mm', [imgWmm, imgHmm]);
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWmm, imgHmm);
-    pdf.save('Exit Receipt.pdf');
-  } catch (err) {
-    console.error(err);
-  } finally {
-    document.body.removeChild(clone);
-  }
-};
+      const imgData = canvas.toDataURL('image/png');
+      const pxToMm = 0.264583;
+      const imgWmm = canvas.width * pxToMm;
+      const imgHmm = canvas.height * pxToMm;
+
+      const pdf = new jsPDF('p', 'mm', [imgWmm, imgHmm]);
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWmm, imgHmm);
+      pdf.save('Exit Receipt.pdf');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      document.body.removeChild(clone);
+    }
+  };
 
 
   if (!receiptData) {
@@ -102,12 +102,12 @@ const handleDownloadPDF = async () => {
     );
   }
   const brokerage = (
- 
+
     Number(receiptData.formBrokerage) === 0.00005
   )
     ? calculateBrokerage(receiptData)
     : Number(receiptData.formBrokerage);
-  
+
   const { buyPrice, sellPrice, quantity, mode, lotSize } = receiptData;
 
   let netAmount = 0;
@@ -118,7 +118,7 @@ const handleDownloadPDF = async () => {
   }
 
 
-  
+
 
   const realisedBoxClass =
     netAmount >= 0 ? 'realised-box realised-profit' : 'realised-box realised-loss';
@@ -155,11 +155,11 @@ const handleDownloadPDF = async () => {
             }}
           >
             <h2>
-             <span style={{ color:'white'}}>J D BROKERAGE</span> 
+              <span style={{ color: 'white' }}>J D BROKERAGE</span>
               <br />
-              <span style={{ fontSize: '12px', fontWeight: 400 , color:'white'}}>Trade Exit Receipt</span>
+              <span style={{ fontSize: '12px', fontWeight: 400, color: 'white' }}>Trade Exit Receipt</span>
             </h2>
-            <div className="user-info" style={{ color:'white'}}>
+            <div className="user-info" style={{ color: 'white' }}>
               User: {receiptData.clientName}
             </div>
           </div>
@@ -177,18 +177,18 @@ const handleDownloadPDF = async () => {
           {/* Grid */}
           <div className="grid">
             <div className="grid-item" style={gridItemStyle}>
-              <p style={{color:'white'}}>Exit Date</p>
-              <h4 style={{color:'white'}}>
+              <p style={{ color: 'white' }}>Exit Date</p>
+              <h4 style={{ color: 'white' }}>
                 {new Date(receiptData.tradeDate).toLocaleDateString('en-GB')}
               </h4>
             </div>
             <div className="grid-item" style={gridItemStyle}>
-              <p style={{color:'white'}}>Customer ID</p>
-              <h4 style={{color:'white'}}>{receiptData.idCode || '—'}</h4>
+              <p style={{ color: 'white' }}>Customer ID</p>
+              <h4 style={{ color: 'white' }}>{receiptData.idCode || '—'}</h4>
             </div>
             <div className="grid-item" style={gridItemStyle}>
-              <p style={{color:'white'}}>Executed Price</p>
-              <h4 style={{color:'white'}}>
+              <p style={{ color: 'white' }}>Executed Price</p>
+              <h4 style={{ color: 'white' }}>
                 ₹
                 {Number(receiptData.sellPrice).toLocaleString('en-IN', {
                   minimumFractionDigits: 2,
@@ -260,11 +260,11 @@ const handleDownloadPDF = async () => {
               borderTop: '1px solid rgba(255,255,255,0.06)'
             }}
           >
-             <span style={{ color:'white'}}>© J D BROKERAGE</span>
+            <span style={{ color: 'white' }}>© J D BROKERAGE</span>
 
           </div>
         </div>
-      </div>  
+      </div>
     </>
   );
 }
@@ -283,7 +283,7 @@ const gridValueStyle = {
 };
 
 const gridItemStyle = {
-   background: '#202a43ff',
+  background: '#202a43ff',
 
   borderRadius: '12px',
   padding: '10px',

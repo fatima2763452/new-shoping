@@ -338,8 +338,8 @@ function Pavti() {
                   </div>
 
                   {/* NOTE Conditions section added here */}
-                  <div style={{ color: 'red', fontSize: '12px', border: '1px solid red', padding: '10px', borderRadius: '5px' }}>
-                    <p className="fw-bold mb-1">NOTE :-</p>
+                  <div style={{ color: 'red', fontSize: '11px', marginTop: '20px' }}>
+                    <p className="fw-bold mb-1" style={{ fontSize: '13px' }}>NOTE :-</p>
                     <p className="mb-1">( ACCORDING TO THE RULES AND REGULATION OF THE SEBI TRADING IS NOT SAFE BUT YOU HAVE TO DO TRADE WITH YOUR OWN RISK MANAGEMENT ).</p>
                     <p className="mb-0">1. NO EXTRA LIMIT IS AVAILABLE TO TRADE FIRST CLEAR THIS DEBT.</p>
                     <p className="mb-0">2. PAY LOSS AT EVERY SATURDAY AND SUNDAY .</p>
