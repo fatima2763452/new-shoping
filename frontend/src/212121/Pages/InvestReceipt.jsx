@@ -73,7 +73,7 @@ function InvestReceipt() {
       pdf.setTextColor(0, 102, 204); // professional blue
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(18);
-      pdf.text("KRISHNA ENT. PVT. LTD", margin, y);
+      pdf.text("JAY DEV BROKERAGE PVT. LTD.", margin, y);
       y += 26;
       // reset text color and font for body
       pdf.setTextColor(0, 0, 0);
