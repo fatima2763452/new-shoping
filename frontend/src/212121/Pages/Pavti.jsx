@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import NavBar from '../Components/NavBar';
 import axios from "axios";
@@ -9,9 +8,7 @@ import signature from '../img/signature.jpg';
 import logo from '../img/logo.jpg';
 
 function Pavti() {
-  const headerRef = useRef();
-  const footerRef = useRef();
-  const tableRef = useRef();
+  const invoiceRef = useRef();
   
   const { idCode } = useParams();
   const location = useLocation();
@@ -109,76 +106,36 @@ function Pavti() {
 
   const handleDownload = async () => {
     try {
+      const element = invoiceRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff"
+      });
+
+      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'pt', 'a4');
-      // Manually attach autoTable if it's not already attached
-      if (typeof pdf.autoTable !== 'function') {
-        pdf.autoTable = autoTable;
-      }
       
       const pageWidth = pdf.internal.pageSize.getWidth();
-      const margin = 20;
-
-      // 1. Capture Header
-      const headerElement = headerRef.current;
-      const headerCanvas = await html2canvas(headerElement, { scale: 2, useCORS: true });
-      const headerImgData = headerCanvas.toDataURL('image/png');
-      const headerImgWidth = pageWidth - (margin * 2);
-      const headerImgHeight = (headerCanvas.height * headerImgWidth) / headerCanvas.width;
+      const pageHeight = pdf.internal.pageSize.getHeight();
       
-      pdf.addImage(headerImgData, 'PNG', margin, margin, headerImgWidth, headerImgHeight);
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      // 2. Add Table using autoTable
-      const tableHeaders = [["ORDER", "DATE", "STOCK", "BUY", "SELL", "QTY", "BROKERAGE", "P / L"]];
-      const tableData = pavtiData.map((t, idx) => {
-        const fb = t.formBrokerage;
-        const brk = (fb === undefined || fb === null || Number(fb) === 0.00005)
-          ? calculateBrokerage(t)
-          : (Number(fb) < 1 ? calculateBrokerage({ ...t, formBrokerage: Number(fb) }) : Number(fb));
-        const pl = t.mode === 'buy' ? ((t.sellPrice - t.buyPrice) * t.quantity) - brk : ((t.buyPrice - t.sellPrice) * t.quantity) - brk;
-        
-        return [
-          idx + 1,
-          new Date(t.tradeDate).toLocaleDateString('en-GB'),
-          `${t.stockName} (${t.mode})`,
-          `₹${t.buyPrice}`,
-          `₹${t.sellPrice}`,
-          t.lotSize ? `${t.lotSize} Lot` : t.quantity,
-          `₹${brk}`,
-          { content: `₹${pl.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`, styles: { textColor: pl >= 0 ? [0, 128, 0] : [255, 0, 0], halign: 'right' } }
-        ];
-      });
+      let heightLeft = imgHeight;
+      let position = 0;
 
-      pdf.autoTable({
-        startY: margin + headerImgHeight + 10,
-        head: tableHeaders,
-        body: tableData,
-        margin: { left: margin, right: margin },
-        theme: 'grid',
-        headStyles: { fillColor: [231, 224, 214], textColor: [0, 0, 0], halign: 'center' },
-        styles: { fontSize: 9, cellPadding: 5 },
-        columnStyles: {
-          0: { halign: 'center' },
-          1: { halign: 'center' },
-          3: { halign: 'center' },
-          4: { halign: 'center' },
-          5: { halign: 'center' },
-          6: { halign: 'center' }
-        }
-      });
+      // First page
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
 
-      // 3. Capture Footer
-      const finalY = (pdf.lastAutoTable ? pdf.lastAutoTable.finalY : (margin + headerImgHeight + 20)) + 10;
-      const footerElement = footerRef.current;
-      const footerCanvas = await html2canvas(footerElement, { scale: 2, useCORS: true });
-      const footerImgData = footerCanvas.toDataURL('image/png');
-      const footerImgWidth = pageWidth - (margin * 2);
-      const footerImgHeight = (footerCanvas.height * footerImgWidth) / footerCanvas.width;
-      
-      if (finalY + footerImgHeight > pdf.internal.pageSize.getHeight() - margin) {
+      // Subsequent pages if content overflows
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(footerImgData, 'PNG', margin, margin, footerImgWidth, footerImgHeight);
-      } else {
-        pdf.addImage(footerImgData, 'PNG', margin, finalY, footerImgWidth, footerImgHeight);
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
 
       pdf.save('invoice.pdf');
@@ -200,8 +157,7 @@ function Pavti() {
           </div>
         ) : (
           <>
-            <div style={{ backgroundColor: 'white', color: 'black', position: 'relative', padding: '10px' }}>
-              <div ref={headerRef}>
+            <div ref={invoiceRef} style={{ backgroundColor: 'white', color: 'black', position: 'relative', padding: '20px' }}>
                 <div className="d-flex flex-column align-items-center mb-2" style={{ marginTop: 20, marginBottom: 10 }}>
                   <img
                     src={logo}
@@ -237,9 +193,8 @@ function Pavti() {
                     </>
                   )}
                 </div>
-              </div>
 
-              <div className="table-responsive mb-3 mt-3" ref={tableRef}>
+              <div className="table-responsive mb-3 mt-3">
                 <table className="table table-bordered text-sm mb-0">
                   <thead className="table-light">
                     <tr style={{ backgroundColor: '#e7e0d6' }}>
@@ -279,7 +234,6 @@ function Pavti() {
                 </table>
               </div>
 
-              <div ref={footerRef}>
                 <div className="p-1 mb-3" style={{ backgroundColor: '#e7e0d6', height: "2em" }}>
                   <p><strong>Margin :</strong> &#8377; {userInfo?.margin || '0.00'}</p>
                 </div>
@@ -315,7 +269,6 @@ function Pavti() {
                   <p className="mb-0">2. PAY LOSS AT EVERY SATURDAY AND SUNDAY .</p>
                   <p className="mb-0">3. THIS PLATEFORM IS A LEGAL TO ABLE WITH GOVERMENT APPROVAL .</p>
                 </div>
-              </div>
             </div>
 
             <div className="text-center mt-4 pb-5">
