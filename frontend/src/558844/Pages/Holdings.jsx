@@ -51,7 +51,7 @@ function Holdings() {
         totalInvestment += buyTotal + brokerage;
         totalCurrent += sellTotal;
       } else {
-        pl = (buyTotal - sellTotal) - brokerage;
+        pl = (sellTotal - buyTotal) - brokerage;
         totalInvestment += sellTotal + brokerage;
         totalCurrent += buyTotal;
       }
@@ -78,7 +78,7 @@ function Holdings() {
     if (mode === 'buy') {
       profit = (sellTotal - buyTotal);
     } else if (mode === 'sell') {
-      profit = (buyTotal - sellTotal);
+      profit = (sellTotal - buyTotal);
     }
     return profit.toFixed(2);
   };

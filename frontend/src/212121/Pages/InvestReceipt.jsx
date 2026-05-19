@@ -6,6 +6,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import NavBar from "../Components/NavBar";
 import signatureImg from "../img/signature.jpg";
+import logo from "../img/logo.jpg";
 
 function InvestReceipt() {
   const location = useLocation();
@@ -175,7 +176,6 @@ function InvestReceipt() {
       // Add signature image under the T&C (bottom-right) if available
       try {
         const sigImgEl = new Image();
-        sigImgEl.crossOrigin = "anonymous";
         sigImgEl.src = signatureImg;
         await new Promise((resolve, reject) => {
           sigImgEl.onload = resolve;
@@ -250,7 +250,19 @@ function InvestReceipt() {
             background: "#fff"
           }}
         >
-          <div style={{ textAlign: "center", marginBottom: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 10, textAlign: "center" }}>
+            <img
+              src={logo}
+              alt="Logo"
+              style={{
+                width: '150px',
+                height: 'auto',
+                background: 'transparent',
+                marginBottom: 8,
+                minWidth: 80,
+                maxWidth: '40vw',
+              }}
+            />
             <div style={{ fontWeight: 600, fontSize: "1.3em", color: "#007bff" }}>
               {companyName || "INVESTMENT Pvt. Ltd."}
             </div>
@@ -298,9 +310,9 @@ function InvestReceipt() {
             I hereby declare that all the above information is true to the best of my knowledge.
           </div>
 
-          <div style={{ width: "90%", margin: "0 auto", display: "flex", justifyContent: "space-between" }}>
-            <span style={{ fontStyle: "italic" }}>Signature of Authorized Officer</span>
-            <img src={signatureImg} alt="Signature" style={{ maxWidth: 120 }} />
+          <div style={{ width: "90%", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "30px" }}>
+            <span style={{ fontStyle: "italic", fontSize: "1em" }}>Signature of Authorized Officer</span>
+            <img src={signatureImg} alt="Signature" style={{ maxWidth: 120, height: "auto" }} />
           </div>
 
           <div className="text-center mt-4" style={{ marginBottom: 30 }}>

@@ -68,7 +68,7 @@ function Pavti() {
             if (t.mode === 'buy') {
               pl = (t.sellPrice - t.buyPrice) * t.quantity - brk;
             } else if (t.mode === 'sell') {
-              pl = (t.buyPrice - t.sellPrice) * t.quantity - brk;
+              pl = (t.sellPrice - t.buyPrice) * t.quantity - brk;
             }
 
             if (pl >= 0) grossProfit += pl;
@@ -285,7 +285,7 @@ function Pavti() {
                       const brk = (fb === undefined || fb === null || Number(fb) === 0.00005)
                         ? calculateBrokerage(t)
                         : (Number(fb) < 1 ? calculateBrokerage({ ...t, formBrokerage: Number(fb) }) : Number(fb));
-                      const pl = t.mode === 'buy' ? ((t.sellPrice - t.buyPrice) * t.quantity) - brk : ((t.buyPrice - t.sellPrice) * t.quantity) - brk;
+                      const pl = t.mode === 'buy' ? ((t.sellPrice - t.buyPrice) * t.quantity) - brk : ((t.sellPrice - t.buyPrice) * t.quantity) - brk;
                       return (
                         <tr key={idx} className="align-middle text-muted">
                           <td className="text-center">{idx + 1}</td>
