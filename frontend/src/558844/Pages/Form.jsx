@@ -151,7 +151,7 @@ function Form() {
 
         
         <div className="col-md-12 mb-3">
-          <label htmlFor="lotSize" className="form-label text-muted">Lot Size</label>
+          <label htmlFor="lotSize" className="form-label text-muted">Lot</label>
           <input
             type="number"
             id="lotSize"
