@@ -110,12 +110,7 @@ function Receipt() {
 
   const { buyPrice, sellPrice, quantity, mode, lotSize } = receiptData;
 
-  let netAmount = 0;
-  if (mode === 'buy') {
-    netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
-  } else if (mode === 'sell') {
-    netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
-  }
+  const netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
 
 
 
@@ -190,7 +185,7 @@ function Receipt() {
               <p style={{ color: 'white' }}>Executed Price</p>
               <h4 style={{ color: 'white' }}>
                 ₹
-                {Number(receiptData.mode === 'sell' ? receiptData.buyPrice : receiptData.sellPrice).toLocaleString('en-IN', {
+                {Number(receiptData.sellPrice).toLocaleString('en-IN', {
                   minimumFractionDigits: 2,
                 })}
               </h4>
@@ -207,61 +202,30 @@ function Receipt() {
               <strong style={gridValueStyle}>{receiptData.lotSize ? 'Lot:' : 'Quantity:'}</strong>{' '}
               {receiptData.lotSize ? <>{receiptData.lotSize} Lot</> : receiptData.quantity}
             </p>
-            {receiptData.mode === 'sell' ? (
-              <>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Sell Price:</strong> ₹
-                  {Number(receiptData.sellPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Selling:</strong> ₹
-                  {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Buy Price:</strong> ₹
-                  {Number(receiptData.buyPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Buying:</strong> ₹
-                  {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-              </>
-            ) : (
-              <>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Buy Price:</strong> ₹
-                  {Number(receiptData.buyPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Buying:</strong> ₹
-                  {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Sell Price:</strong> ₹
-                  {Number(receiptData.sellPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Selling:</strong> ₹
-                  {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-              </>
-            )}
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Buy Price:</strong> ₹
+              {Number(receiptData.buyPrice).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Total Buying:</strong> ₹
+              {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Sell Price:</strong> ₹
+              {Number(receiptData.sellPrice).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Total Selling:</strong> ₹
+              {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Brokerage:</strong> ₹
               {brokerage.toLocaleString('en-IN', { minimumFractionDigits: 2 })}

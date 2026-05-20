@@ -46,15 +46,9 @@ function Holdings() {
       const brokerage = 0;
 
       let pl = 0;
-      if (stock.mode === 'buy') {
-        pl = (sellTotal - buyTotal) - brokerage;
-        totalInvestment += buyTotal + brokerage;
-        totalCurrent += sellTotal;
-      } else {
-        pl = (sellTotal - buyTotal) - brokerage;
-        totalInvestment += sellTotal + brokerage;
-        totalCurrent += buyTotal;
-      }
+      pl = (sellTotal - buyTotal) - brokerage;
+      totalInvestment += buyTotal + brokerage;
+      totalCurrent += sellTotal;
 
       totalProfit += pl;
     });
@@ -72,14 +66,9 @@ function Holdings() {
   }, [stocks]);
 
   const calculateProfitLoss = (buy, sell, qty, mode) => {
-    let profit = 0;
     const buyTotal = buy * qty;
     const sellTotal = sell * qty;
-    if (mode === 'buy') {
-      profit = (sellTotal - buyTotal);
-    } else if (mode === 'sell') {
-      profit = (sellTotal - buyTotal);
-    }
+    const profit = (sellTotal - buyTotal);
     return profit.toFixed(2);
   };
 
