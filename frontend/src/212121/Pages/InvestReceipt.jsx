@@ -88,7 +88,7 @@ function InvestReceipt() {
       pdf.setTextColor(0, 102, 204); // professional blue
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(18);
-      pdf.text("JAY DEV BROKERAGE PVT. LTD.", margin, y);
+      pdf.text("J D BROKERAGE PVT. LTD.", margin, y);
       y += 26;
       // reset text color and font for body
       pdf.setTextColor(0, 0, 0);
@@ -171,7 +171,7 @@ function InvestReceipt() {
             `1. Introduction\nThese Terms & Conditions ("Terms") govern all trading, investment, advisory, and related services provided by our Private Brokerage House ("Broker", "We", "Us"). By opening an account or making any trade through us, the client ("You", "Client", "Investor") agrees to abide by these Terms.\n\n` +
             `2. Account Opening & Verification\nThe Client must provide valid KYC documents such as ID proof, address proof, and bank details.\nThe Broker reserves the right to approve or reject any account without specifying a reason.\nAll information provided by the Client must be accurate and updated. Any false information may lead to account suspension.\n\n` +
             `3. Trading Authorization\nBy using our services, the Client authorizes the Broker to execute buy/sell trades on their behalf as instructed.\nThe Broker may refuse or delay any transaction due to technical issues, market volatility, or regulatory reasons.\nMisuse of trading instructions or unauthorized activities can lead to termination of services.\n\n` +
-            `4. GST, STT, exchange fees, and other statutory charges will be applied as per government regulations.\nBrokerage rates may change with prior notice to the Client.\n\n` +
+            `4. Brokerage Charge\nBrokerage rates may change with prior notice to the Client.\n\n`
             `5. Payments, Payouts & Settlements\nThe Client must maintain sufficient balance before placing any order.\nPayouts will be processed only into the verified bank account.\nThe Broker is not responsible for delays caused by banks, payment gateways, or technical issues.\n\n` +
             `6. Risk Disclosure\nTrading in equities, derivatives, and other financial instruments involves market risk.\nThe Client understands that losses may exceed profits and accepts full responsibility for their trading decisions.\nThe Broker does not guarantee profits or returns in any form.\n\n` +
             `7. Advisory Disclaimer\nAny advice, suggestion, or view shared by the Broker is only for informational purposes.\nThe Client must evaluate risks independently before making decisions.\nThe Broker shall not be held liable for any financial loss due to market movements.\n\n` +
@@ -273,9 +273,7 @@ function InvestReceipt() {
             <div style={{ fontWeight: 600, fontSize: "1.3em", color: "#007bff" }}>
               {companyName || ""}
             </div>
-            <div style={{ fontSize: "1em", marginBottom: 10 }}>
-              We are registered with SEBI as a Stock Broker.
-            </div>
+           
           </div>
 
           <hr />
