@@ -204,7 +204,7 @@ const handleDownloadPDF = async () => {
               {receiptData.mode ? receiptData.mode.toUpperCase() : ''}
             </p>
             <p style={gridLabelStyle}>
-              <strong style={gridValueStyle}>{receiptData.lotSize ? 'Lot Size:' : 'Quantity:'}</strong>{' '}
+              <strong style={gridValueStyle}>{receiptData.lotSize ? 'Lot:' : 'Quantity:'}</strong>{' '}
               {receiptData.lotSize ? <>{receiptData.lotSize} Lot</> : receiptData.quantity}
             </p>
             {receiptData.mode === 'sell' ? (

@@ -31,6 +31,20 @@ function InvestReceipt() {
 
   const receiptRef = useRef();
 
+  // Convert imported image URL to base64 via fetch (works reliably with bundled assets)
+  const toBase64 = (url) =>
+    fetch(url)
+      .then((res) => res.blob())
+      .then(
+        (blob) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          })
+      );
+
   const handleDownloadPDF = async () => {
     try {
       const btn = document.querySelector(".no-print");
@@ -173,46 +187,39 @@ function InvestReceipt() {
         writeTermsContent(sec.title, sec.content);
       }
 
-      // Add signature image under the T&C (bottom-right) if available
+      // Add signature image under the T&C (bottom-right) using fetch-based base64
       try {
-        const sigImgEl = new Image();
-        sigImgEl.src = signatureImg;
-        await new Promise((resolve, reject) => {
-          sigImgEl.onload = resolve;
-          sigImgEl.onerror = reject;
-        });
+        const sigDataUrl = await toBase64(signatureImg);
 
         // desired display width in PDF points
-        const desiredW = 120; // points in jsPDF units
+        const desiredW = 130;
+        // Load image to get natural dimensions
+        const sigImgEl = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = sigDataUrl;
+        });
         const desiredH = (sigImgEl.naturalHeight * desiredW) / sigImgEl.naturalWidth;
 
-        // position below the last written y, aligned to right
+        // position below last written content, right-aligned
         let placeY = y + 10;
-        if (placeY + desiredH > pageHeight - margin) {
+        if (placeY + desiredH + 30 > pageHeight - margin) {
           pdf.addPage();
-          placeY = pageHeight - margin - desiredH - 10;
+          placeY = margin;
         }
-
         const placeX = pageWidth - margin - desiredW;
 
-        // Create a higher-resolution temporary canvas (scale by pixelScale) so image is sharp when downsampled into PDF
-        const pixelScale = 3; // increase for better quality
-        const canvasW = Math.max(1, Math.round(sigImgEl.naturalWidth * pixelScale));
-        const canvasH = Math.max(1, Math.round(sigImgEl.naturalHeight * pixelScale));
-        const tmpCanvas = document.createElement("canvas");
-        tmpCanvas.width = canvasW;
-        tmpCanvas.height = canvasH;
-        const ctx = tmpCanvas.getContext("2d");
-        // White background for signature
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvasW, canvasH);
-        // Draw the image scaled up
-        ctx.drawImage(sigImgEl, 0, 0, canvasW, canvasH);
-        const sigDataUrl = tmpCanvas.toDataURL("image/png");
-
-        // Add to PDF at desired display size (jsPDF will downsample the high-res image)
         pdf.addImage(sigDataUrl, "PNG", placeX, placeY, desiredW, desiredH);
-        y = placeY + desiredH + 8;
+
+        // Label under signature
+        pdf.setFont("helvetica", "italic");
+        pdf.setFontSize(9);
+        pdf.setTextColor(80, 80, 80);
+        pdf.text("Signature of Authorized Officer", placeX, placeY + desiredH + 12);
+        pdf.setTextColor(0, 0, 0);
+
+        y = placeY + desiredH + 20;
       } catch (e) {
         console.warn("Could not load signature image for PDF:", e);
       }
@@ -264,7 +271,7 @@ function InvestReceipt() {
               }}
             />
             <div style={{ fontWeight: 600, fontSize: "1.3em", color: "#007bff" }}>
-              {companyName || "INVESTMENT Pvt. Ltd."}
+              {companyName || ""}
             </div>
             <div style={{ fontSize: "1em", marginBottom: 10 }}>
               We are registered with SEBI as a Stock Broker.
