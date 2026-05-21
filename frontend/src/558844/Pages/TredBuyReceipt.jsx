@@ -126,7 +126,7 @@ function TredBuyReceipt() {
               <h4 style={{ ...gridValueStyle, color: 'white' }}>{idCode}</h4>
             </div>
             <div style={gridItemStyle}>
-              <p style={{ ...gridLabelStyle, color: 'white' }}>Buy Price</p>
+              <p style={{ ...gridLabelStyle, color: 'white' }}>{mode?.toUpperCase() === 'SELL' ? 'Sell Price' : 'Buy Price'}</p>
               <h4 style={{ ...gridValueStyle, color: 'white' }}>₹{Number(buyPrice).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</h4>
             </div>
           </div>
@@ -135,7 +135,7 @@ function TredBuyReceipt() {
           <div style={{ padding: 20, fontSize: 14, lineHeight: 1.8, color: 'white' }}>
             <p><strong>Mode:</strong> {mode ? mode.toUpperCase() : ''}</p>
             <p><strong>{lotSize ? 'Lot:' : 'Quantity:'}</strong> {lotSize ? <>{lotSize} Lot</> : quantity}</p>
-            <p><strong>Total Buying:</strong> ₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
+            <p><strong>{mode?.toUpperCase() === 'SELL' ? 'Total Selling:' : 'Total Buying:'}</strong> ₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
             <p><strong>Tax:</strong> ₹0.00</p>
           </div>
 
