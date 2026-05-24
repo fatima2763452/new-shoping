@@ -105,104 +105,117 @@ function Pavti() {
     try {
       const element = invoiceRef.current;
       
-      // Temporarily force desktop width to prevent squished layouts on mobile devices
+      // Force desktop width for consistent rendering
       const originalWidth = element.style.width;
       const originalMaxWidth = element.style.maxWidth;
       element.style.width = '1000px';
       element.style.maxWidth = '1000px';
+      await new Promise(resolve => setTimeout(resolve, 150));
 
-      // Wait a moment for layout recalculation
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Measure every row + footer position relative to element top
+      const elTop = element.getBoundingClientRect().top;
+      const rows = Array.from(element.querySelectorAll('tbody tr'));
+      
+      // Collect ALL blocks that must not be cut: table rows + footer children
+      const blockTops = rows.map(r => r.getBoundingClientRect().top - elTop);
+      const blockBottoms = rows.map(r => r.getBoundingClientRect().bottom - elTop);
 
-      const pxPageHeight = 1000 * (841.89 / 595.28); // A4 ratio
-      const elementRectTop = element.getBoundingClientRect().top;
-      const getRelativePos = (elm) => elm.getBoundingClientRect().top - elementRectTop;
-
-      const dummyElements = [];
-
-      // 1. Prevent table rows from cutting
-      const rows = element.querySelectorAll('tbody tr');
-      rows.forEach(row => {
-        const top = getRelativePos(row);
-        const height = row.offsetHeight;
-        const sPage = Math.floor(top / pxPageHeight);
-        const ePage = Math.floor((top + height) / pxPageHeight);
-        
-        if (sPage !== ePage) {
-          const pushAmount = ((sPage + 1) * pxPageHeight) - top + 15;
-          const dummyRow = document.createElement('tr');
-          dummyRow.style.height = `${pushAmount}px`;
-          dummyRow.style.border = 'none';
-          dummyRow.style.backgroundColor = 'transparent';
-          const dummyCell = document.createElement('td');
-          dummyCell.colSpan = 8;
-          dummyCell.style.border = 'none';
-          dummyRow.appendChild(dummyCell);
-          row.parentNode.insertBefore(dummyRow, row);
-          dummyElements.push(dummyRow);
-        }
-      });
-
-      // 2. Prevent the footer/signature section from cutting
+      // Also add each footer child as a protected block
       const footer = footerRef.current;
       if (footer) {
-        const footerTop = getRelativePos(footer);
-        const footerHeight = footer.offsetHeight;
-        const fStartPage = Math.floor(footerTop / pxPageHeight);
-        const fEndPage = Math.floor((footerTop + footerHeight) / pxPageHeight);
-        
-        if (fStartPage !== fEndPage) {
-          const pushAmount = ((fStartPage + 1) * pxPageHeight) - footerTop + 20;
-          const originalMarginTop = footer.style.marginTop;
-          footer.style.marginTop = `${parseFloat(originalMarginTop || 0) + pushAmount}px`;
-          dummyElements.push({ el: footer, prop: 'marginTop', orig: originalMarginTop });
-        }
+        Array.from(footer.children).forEach(child => {
+          blockTops.push(child.getBoundingClientRect().top - elTop);
+          blockBottoms.push(child.getBoundingClientRect().bottom - elTop);
+        });
       }
 
-      // Wait for dummy elements to affect layout
-      await new Promise(resolve => setTimeout(resolve, 100));
-
+      // Render full element to canvas (NO DOM modifications at all)
+      const canvasScale = 2;
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: canvasScale,
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
         windowWidth: 1000
       });
 
-      // Restore original styles and remove dummy elements immediately
+      // Restore original styles
       element.style.width = originalWidth;
       element.style.maxWidth = originalMaxWidth;
-      dummyElements.forEach(item => {
-        if (item.nodeType) {
-          item.remove();
-        } else if (item.el) {
-          item.el.style[item.prop] = item.orig;
-        }
-      });
 
-      const imgData = canvas.toDataURL('image/png');
+      // PDF setup
       const pdf = new jsPDF('p', 'pt', 'a4');
-      
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      let heightLeft = imgHeight;
-      let position = 0;
+      const pdfPageW = pdf.internal.pageSize.getWidth();   // 595.28
+      const pdfPageH = pdf.internal.pageSize.getHeight();  // 841.89
 
-      // First page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      // CSS pixel height that maps to one A4 page
+      const cssWidth = canvas.width / canvasScale;
+      const cssPageH = cssWidth * (pdfPageH / pdfPageW);
+      const totalCssH = canvas.height / canvasScale;
+      const totalDomH = element.scrollHeight;
 
-      // Subsequent pages if content overflows
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      // CRITICAL FIX: html2canvas renders rows slightly more compactly than the live DOM.
+      // Over 100+ rows, this sub-pixel difference accumulates into a massive offset.
+      // We calculate the exact ratio and scale our DOM measurements to perfectly match the canvas.
+      const renderRatio = totalCssH / totalDomH;
+      const scaledBlockTops = blockTops.map(t => t * renderRatio);
+      const scaledBlockBottoms = blockBottoms.map(b => b * renderRatio);
+
+      // Build safe slice points: walk through the image in A4-sized chunks,
+      // pulling the cut point up if it would split any block (row or footer child).
+      const slices = [];
+      let y = 0;
+      const safeMargin = 30; // buffer to absorb any non-linear rendering variances
+
+      while (y < totalCssH - 1) {
+        let cutAt = Math.min(y + cssPageH, totalCssH);
+
+        if (cutAt < totalCssH) {
+          // Find the last block whose bottom is safely above the cut point
+          let bestCut = cutAt;
+          for (let i = 0; i < scaledBlockTops.length; i++) {
+            if (scaledBlockBottoms[i] <= y) continue; // skip blocks on previous pages
+            
+            if (scaledBlockBottoms[i] + safeMargin > cutAt) {
+              bestCut = scaledBlockTops[i] - 10;
+              break;
+            }
+          }
+          cutAt = bestCut;
+        }
+
+        if (cutAt <= y) cutAt = y + cssPageH;
+
+        slices.push({ start: y, end: Math.min(cutAt, totalCssH) });
+        y = cutAt;
+      }
+
+      // Render each slice as a PDF page
+      for (let s = 0; s < slices.length; s++) {
+        if (s > 0) pdf.addPage();
+
+        const { start, end } = slices[s];
+        const cropH = end - start;
+
+        // Use ceil/floor to avoid including extra pixels from adjacent rows
+        const sy = Math.ceil(start * canvasScale);
+        const sh = Math.floor(cropH * canvasScale);
+
+        // Crop from the big canvas
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = sh;
+        const ctx = tempCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, sh);
+        ctx.drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
+
+        const imgData = tempCanvas.toDataURL('image/png');
+
+        // Place image at top of A4 page, scaled to page width
+        const imgW = pdfPageW;
+        const imgH = (sh / canvas.width) * pdfPageW;
+        pdf.addImage(imgData, 'PNG', 0, 0, imgW, Math.min(imgH, pdfPageH));
       }
 
       pdf.save('invoice.pdf');
