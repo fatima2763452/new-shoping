@@ -10,7 +10,7 @@ import logo from '../img/logo.jpg';
 function Pavti() {
   const invoiceRef = useRef();
   const footerRef = useRef();
-  
+
   const { idCode } = useParams();
   const location = useLocation();
   const navState = location?.state || {};
@@ -31,9 +31,9 @@ function Pavti() {
         let fetched = original;
         if (navFromDate && navToDate) {
           let from = new Date(navFromDate);
-          from.setHours(0,0,0,0);
+          from.setHours(0, 0, 0, 0);
           let to = new Date(navToDate);
-          to.setHours(23,59,59,999);
+          to.setHours(23, 59, 59, 999);
           if (from > to) {
             const tmp = from; from = to; to = tmp;
           }
@@ -105,7 +105,7 @@ function Pavti() {
   const handleDownload = async () => {
     try {
       const element = invoiceRef.current;
-      
+
       // Force desktop width for consistent rendering
       const originalWidth = element.style.width;
       const originalMaxWidth = element.style.maxWidth;
@@ -116,7 +116,7 @@ function Pavti() {
       // Measure every row + footer position relative to element top
       const elTop = element.getBoundingClientRect().top;
       const rows = Array.from(element.querySelectorAll('tbody tr'));
-      
+
       // Collect ALL blocks that must not be cut: table rows + footer children
       const blockTops = rows.map(r => r.getBoundingClientRect().top - elTop);
       const blockBottoms = rows.map(r => r.getBoundingClientRect().bottom - elTop);
@@ -176,7 +176,7 @@ function Pavti() {
           let bestCut = cutAt;
           for (let i = 0; i < scaledBlockTops.length; i++) {
             if (scaledBlockBottoms[i] <= y) continue; // skip blocks on previous pages
-            
+
             if (scaledBlockBottoms[i] + safeMargin > cutAt) {
               bestCut = scaledBlockTops[i] - 10;
               break;
@@ -239,41 +239,41 @@ function Pavti() {
         ) : (
           <>
             <div ref={invoiceRef} style={{ backgroundColor: 'white', color: 'black', position: 'relative', padding: '20px' }}>
-                <div className="d-flex flex-column align-items-center mb-2" style={{ marginTop: 20, marginBottom: 10 }}>
-                  <img
-                    src={logo}
-                    alt="DEVAKI"
-                    style={{
-                      width: '150px',
-                      height: 'auto',
-                      background: 'transparent',
-                      marginBottom: 8,
-                      minWidth: 80,
-                      maxWidth: '40vw',
-                    }}
-                  />
-                  <div style={{ textAlign: 'center', fontSize: '1.2em', letterSpacing: 2, fontWeight: 500, wordBreak: 'break-word', maxWidth: 220 }}>
-                    <b>{pavtiData[0]?.orgnization}</b>
-                  </div>
+              <div className="d-flex flex-column align-items-center mb-2" style={{ marginTop: 20, marginBottom: 10 }}>
+                <img
+                  src={logo}
+                  alt="DEVAKI"
+                  style={{
+                    width: '150px',
+                    height: 'auto',
+                    background: 'transparent',
+                    marginBottom: 8,
+                    minWidth: 80,
+                    maxWidth: '40vw',
+                  }}
+                />
+                <div style={{ textAlign: 'center', fontSize: '1.2em', letterSpacing: 2, fontWeight: 500, wordBreak: 'break-word', maxWidth: 220 }}>
+                  <b>{pavtiData[0]?.orgnization}</b>
                 </div>
+              </div>
 
-                <p className="text-end mb-2">
-                  <strong>Invoice no. :</strong> In##00{Math.floor(10000 + Math.random() * 90000)}
-                </p>
-                <div className="p-1" style={{ backgroundColor: '#e7e0d6', height: "2em" }}>
-                  <p><strong>Date :</strong> {new Date().toLocaleDateString('en-GB')}</p>
-                </div>
+              <p className="text-end mb-2">
+                <strong>Invoice no. :</strong> In##00{Math.floor(10000 + Math.random() * 90000)}
+              </p>
+              <div className="p-1" style={{ backgroundColor: '#e7e0d6', height: "2em" }}>
+                <p><strong>Date :</strong> {new Date().toLocaleDateString('en-GB')}</p>
+              </div>
 
-                <div className="mb-3 mt-3">
-                  {pavtiData[0] && (
-                    <>
-                      <p className="mb-1"><strong>ID CODE :</strong> {pavtiData[0].idCode}</p>
-                      <p className="mb-0"><strong>NAME :</strong> {pavtiData[0].clientName}</p>
-                      <p className="mb-0"><strong>PHONE :</strong> {maskMobile(pavtiData[0].mobileNumber)}</p>
-                      <p className="mb-0"><strong>ADDRESS :</strong> {pavtiData[0].address}</p>
-                    </>
-                  )}
-                </div>
+              <div className="mb-3 mt-3">
+                {pavtiData[0] && (
+                  <>
+                    <p className="mb-1"><strong>ID CODE :</strong> {pavtiData[0].idCode}</p>
+                    <p className="mb-0"><strong>NAME :</strong> {pavtiData[0].clientName}</p>
+                    <p className="mb-0"><strong>PHONE :</strong> {maskMobile(pavtiData[0].mobileNumber)}</p>
+                    <p className="mb-0"><strong>ADDRESS :</strong> {pavtiData[0].address}</p>
+                  </>
+                )}
+              </div>
 
               <div className="table-responsive mb-3 mt-3">
                 <table className="table table-bordered text-sm mb-0">
@@ -367,4 +367,4 @@ function Pavti() {
 }
 
 export default Pavti;
-
+
