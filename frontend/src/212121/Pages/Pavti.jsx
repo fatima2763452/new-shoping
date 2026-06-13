@@ -1,15 +1,32 @@
 import React, { useEffect, useRef, useState } from 'react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import NavBar from '../Components/NavBar';
 import axios from "axios";
 import signature from '../img/signature.jpg';
 import logo from '../img/logo.jpg';
 
+// Helper: convert an image URL to base64 dataURL
+const loadImageAsBase64 = (src) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+};
+
 function Pavti() {
   const invoiceRef = useRef();
-  const footerRef = useRef();
 
   const { idCode } = useParams();
   const location = useLocation();
@@ -102,123 +119,259 @@ function Pavti() {
     return Number((turnover * rate).toFixed(2));
   };
 
+  // ──────────────────────────────────────────────────────────────────────────
+  // INDUSTRY-STANDARD PDF GENERATION using jsPDF + jspdf-autotable
+  // ✅ Vector-based (not screenshot) — crisp at any zoom
+  // ✅ autoTable handles page breaks automatically — NEVER cuts rows
+  // ✅ Works perfectly with 10 rows or 1000+ rows
+  // ──────────────────────────────────────────────────────────────────────────
   const handleDownload = async () => {
     try {
-      const element = invoiceRef.current;
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pageW = pdf.internal.pageSize.getWidth();   // 595.28
+      const pageH = pdf.internal.pageSize.getHeight();  // 841.89
+      const margin = 28; // tighter margins for more table room
+      let cursorY = margin;
 
-      // Force desktop width for consistent rendering
-      const originalWidth = element.style.width;
-      const originalMaxWidth = element.style.maxWidth;
-      element.style.width = '1000px';
-      element.style.maxWidth = '1000px';
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // ── Colors ──
+      const beige = [231, 224, 214];      // #e7e0d6
+      const darkText = [33, 33, 33];
+      const mutedText = [100, 100, 100];
+      const greenColor = [0, 128, 0];
+      const redColor = [220, 38, 38];
+      const contentW = pageW - 2 * margin;
 
-      // Measure every row + footer position relative to element top
-      const elTop = element.getBoundingClientRect().top;
-      const rows = Array.from(element.querySelectorAll('tbody tr'));
+      // ── Load images as base64 ──
+      const [logoBase64, signBase64] = await Promise.all([
+        loadImageAsBase64(logo),
+        loadImageAsBase64(signature),
+      ]);
 
-      // Collect ALL blocks that must not be cut: table rows + footer children
-      const blockTops = rows.map(r => r.getBoundingClientRect().top - elTop);
-      const blockBottoms = rows.map(r => r.getBoundingClientRect().bottom - elTop);
+      // ── LOGO ──
+      if (logoBase64) {
+        const logoW = 100;
+        const logoH = 60;
+        pdf.addImage(logoBase64, 'PNG', (pageW - logoW) / 2, cursorY, logoW, logoH);
+        cursorY += logoH + 8;
+      }
 
-      // Also add each footer child as a protected block
-      const footer = footerRef.current;
-      if (footer) {
-        Array.from(footer.children).forEach(child => {
-          blockTops.push(child.getBoundingClientRect().top - elTop);
-          blockBottoms.push(child.getBoundingClientRect().bottom - elTop);
+      // ── Organization Name ──
+      const orgName = pavtiData[0]?.orgnization || '';
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(14);
+      pdf.setTextColor(...darkText);
+      pdf.text(orgName, pageW / 2, cursorY, { align: 'center' });
+      cursorY += 28;
+
+      // ── Invoice Number (right aligned) ──
+      const invoiceNo = 'In##00' + Math.floor(10000 + Math.random() * 90000);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      pdf.text('Invoice no. : ' + invoiceNo, pageW - margin, cursorY, { align: 'right' });
+      cursorY += 18;
+
+      // ── Date Bar ──
+      pdf.setFillColor(...beige);
+      pdf.rect(margin, cursorY, contentW, 22, 'F');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(...darkText);
+      pdf.text('Date : ' + new Date().toLocaleDateString('en-GB'), margin + 8, cursorY + 15);
+      cursorY += 32;
+
+      // ── Customer Info ──
+      if (pavtiData[0]) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(10);
+        pdf.setTextColor(...darkText);
+
+        const infoLines = [
+          'ID CODE : ' + pavtiData[0].idCode,
+          'NAME : ' + pavtiData[0].clientName,
+          'PHONE : ' + maskMobile(pavtiData[0].mobileNumber),
+          'ADDRESS : ' + (pavtiData[0].address || ''),
+        ];
+        infoLines.forEach(line => {
+          pdf.text(line, margin, cursorY + 12);
+          cursorY += 16;
         });
       }
+      cursorY += 10;
 
-      // Render full element to canvas (NO DOM modifications at all)
-      const canvasScale = 2;
-      const canvas = await html2canvas(element, {
-        scale: canvasScale,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        windowWidth: 1000
+      // ── TABLE via autoTable (handles page breaks perfectly) ──
+      const tableColumns = [
+        { header: 'ORDER', dataKey: 'order' },
+        { header: 'DATE', dataKey: 'date' },
+        { header: 'STOCK', dataKey: 'stock' },
+        { header: 'BUY', dataKey: 'buy' },
+        { header: 'SELL', dataKey: 'sell' },
+        { header: 'QTY', dataKey: 'qty' },
+        { header: 'BROKERAGE', dataKey: 'brokerage' },
+        { header: 'P / L', dataKey: 'pl' },
+      ];
+
+      const tableRows = pavtiData.map((t, idx) => {
+        const fb = t.formBrokerage;
+        const brk = (fb === undefined || fb === null || Number(fb) === 0.00005)
+          ? calculateBrokerage(t)
+          : (Number(fb) < 1 ? calculateBrokerage({ ...t, formBrokerage: Number(fb) }) : Number(fb));
+        const pl = ((t.sellPrice - t.buyPrice) * t.quantity) - brk;
+        return {
+          order: String(idx + 1),
+          date: new Date(t.tradeDate).toLocaleDateString('en-GB'),
+          stock: t.stockName + ' (' + t.mode + ')',
+          buy: 'Rs.' + Number(t.buyPrice).toLocaleString('en-IN'),
+          sell: 'Rs.' + Number(t.sellPrice).toLocaleString('en-IN'),
+          qty: t.lotSize ? t.lotSize + ' Lot' : String(t.quantity),
+          brokerage: 'Rs.' + Number(brk).toLocaleString('en-IN', { minimumFractionDigits: 2 }),
+          pl: 'Rs.' + pl.toLocaleString('en-IN', { minimumFractionDigits: 2 }),
+          _plValue: pl,
+        };
       });
 
-      // Restore original styles
-      element.style.width = originalWidth;
-      element.style.maxWidth = originalMaxWidth;
-
-      // PDF setup
-      const pdf = new jsPDF('p', 'pt', 'a4');
-      const pdfPageW = pdf.internal.pageSize.getWidth();   // 595.28
-      const pdfPageH = pdf.internal.pageSize.getHeight();  // 841.89
-
-      // CSS pixel height that maps to one A4 page
-      const cssWidth = canvas.width / canvasScale;
-      const cssPageH = cssWidth * (pdfPageH / pdfPageW);
-      const totalCssH = canvas.height / canvasScale;
-      const totalDomH = element.scrollHeight;
-
-      // CRITICAL FIX: html2canvas renders rows slightly more compactly than the live DOM.
-      // Over 100+ rows, this sub-pixel difference accumulates into a massive offset.
-      // We calculate the exact ratio and scale our DOM measurements to perfectly match the canvas.
-      const renderRatio = totalCssH / totalDomH;
-      const scaledBlockTops = blockTops.map(t => t * renderRatio);
-      const scaledBlockBottoms = blockBottoms.map(b => b * renderRatio);
-
-      // Build safe slice points: walk through the image in A4-sized chunks,
-      // pulling the cut point up if it would split any block (row or footer child).
-      const slices = [];
-      let y = 0;
-      const safeMargin = 30; // buffer to absorb any non-linear rendering variances
-
-      while (y < totalCssH - 1) {
-        let cutAt = Math.min(y + cssPageH, totalCssH);
-
-        if (cutAt < totalCssH) {
-          // Find the last block whose bottom is safely above the cut point
-          let bestCut = cutAt;
-          for (let i = 0; i < scaledBlockTops.length; i++) {
-            if (scaledBlockBottoms[i] <= y) continue; // skip blocks on previous pages
-
-            if (scaledBlockBottoms[i] + safeMargin > cutAt) {
-              bestCut = scaledBlockTops[i] - 10;
-              break;
+      const tableResult = autoTable(pdf, {
+        startY: cursorY,
+        columns: tableColumns,
+        body: tableRows,
+        margin: { left: margin, right: margin },
+        tableWidth: contentW,
+        theme: 'grid',
+        headStyles: {
+          fillColor: beige,
+          textColor: darkText,
+          fontStyle: 'bold',
+          fontSize: 8,
+          halign: 'center',
+          lineWidth: 0.5,
+          lineColor: [180, 180, 180],
+          cellPadding: 4,
+        },
+        bodyStyles: {
+          fontSize: 7.5,
+          textColor: mutedText,
+          halign: 'center',
+          lineWidth: 0.5,
+          lineColor: [200, 200, 200],
+          cellPadding: 4,
+        },
+        // Explicit column widths to prevent truncation
+        columnStyles: {
+          order: { cellWidth: 35, halign: 'center' },
+          date: { cellWidth: 58, halign: 'center' },
+          stock: { cellWidth: 'auto', halign: 'left' },   // takes remaining space
+          buy: { cellWidth: 62, halign: 'center' },
+          sell: { cellWidth: 62, halign: 'center' },
+          qty: { cellWidth: 42, halign: 'center' },
+          brokerage: { cellWidth: 58, halign: 'center' },
+          pl: { cellWidth: 80, halign: 'right' },
+        },
+        // Color P/L cells green or red
+        didParseCell: (data) => {
+          if (data.section === 'body' && data.column.dataKey === 'pl') {
+            const plVal = tableRows[data.row.index]?._plValue;
+            if (plVal !== undefined) {
+              data.cell.styles.textColor = plVal >= 0 ? greenColor : redColor;
+              data.cell.styles.fontStyle = 'bold';
             }
           }
-          cutAt = bestCut;
+        },
+        // autoTable NEVER splits a row across pages
+        rowPageBreak: 'avoid',
+      });
+
+      cursorY = (tableResult?.finalY ?? pdf.lastAutoTable?.finalY ?? cursorY) + 15;
+
+      // ── Helper: Check if we need a new page for remaining footer content ──
+      const ensureSpace = (neededHeight) => {
+        if (cursorY + neededHeight > pageH - 30) {
+          pdf.addPage();
+          cursorY = margin;
         }
+      };
 
-        if (cutAt <= y) cutAt = y + cssPageH;
+      // ── Margin Bar ──
+      ensureSpace(80);
+      pdf.setFillColor(...beige);
+      pdf.rect(margin, cursorY, contentW, 22, 'F');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(...darkText);
+      pdf.text('Margin : Rs. ' + (userInfo?.margin || '0.00'), margin + 8, cursorY + 15);
+      cursorY += 35;
 
-        slices.push({ start: y, end: Math.min(cutAt, totalCssH) });
-        y = cutAt;
+      // ── Terms & Signature Section ──
+      ensureSpace(100);
+      const halfW = contentW / 2;
+
+      // Left: Terms
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(...darkText);
+      pdf.text('Term & Condition', margin, cursorY);
+      cursorY += 14;
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.setTextColor(...mutedText);
+      const termsText = 'Note: Detailed bill that records all transactions done by broker on behalf of his client during a trading day.';
+      const splitTerms = pdf.splitTextToSize(termsText, halfW - 10);
+      pdf.text(splitTerms, margin, cursorY);
+
+      // Right: Signature
+      if (signBase64) {
+        const sigW = 120;
+        const sigH = 60;
+        const sigX = margin + halfW + (halfW - sigW) / 2;
+        pdf.addImage(signBase64, 'JPEG', sigX, cursorY - 20, sigW, sigH);
+        pdf.setFont('helvetica', 'italic');
+        pdf.setFontSize(8);
+        pdf.setTextColor(...mutedText);
+        pdf.text('Authorized Signature', sigX + sigW / 2, cursorY + sigH - 12, { align: 'center' });
       }
 
-      // Render each slice as a PDF page
-      for (let s = 0; s < slices.length; s++) {
-        if (s > 0) pdf.addPage();
+      cursorY += 60;
 
-        const { start, end } = slices[s];
-        const cropH = end - start;
+      // ── TOTAL Bar ──
+      ensureSpace(50);
+      pdf.setFillColor(...beige);
+      pdf.rect(margin, cursorY, contentW, 30, 'F');
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(13);
+      pdf.setTextColor(...darkText);
+      pdf.text('TOTAL', margin + 12, cursorY + 20);
 
-        // Use ceil/floor to avoid including extra pixels from adjacent rows
-        const sy = Math.ceil(start * canvasScale);
-        const sh = Math.floor(cropH * canvasScale);
+      const totalVal = totalProfit + (userInfo?.margin || 0);
+      pdf.setTextColor(...(totalVal >= 0 ? greenColor : redColor));
+      pdf.text(
+        'Rs.' + totalVal.toLocaleString('en-IN', { minimumFractionDigits: 2 }),
+        pageW - margin - 12,
+        cursorY + 20,
+        { align: 'right' }
+      );
+      cursorY += 45;
 
-        // Crop from the big canvas
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = canvas.width;
-        tempCanvas.height = sh;
-        const ctx = tempCanvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, sh);
-        ctx.drawImage(canvas, 0, sy, canvas.width, sh, 0, 0, canvas.width, sh);
+      // ── NOTES ──
+      ensureSpace(80);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(9);
+      pdf.setTextColor(220, 38, 38);
+      pdf.text('NOTE :-', margin, cursorY);
+      cursorY += 14;
 
-        const imgData = tempCanvas.toDataURL('image/png');
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      const notes = [
+        '( ACCORDING TO THE RULES AND REGULATION OF THE SEBI TRADING IS NOT SAFE BUT YOU HAVE TO DO TRADE WITH YOUR OWN RISK MANAGEMENT ).',
+        '1. NO EXTRA LIMIT IS AVAILABLE TO TRADE FIRST CLEAR THIS DEBT.',
+        '2. PAY LOSS AT EVERY SATURDAY AND SUNDAY .',
+        '3. THIS PLATEFORM IS A LEGAL TO ABLE WITH GOVERMENT APPROVAL .',
+      ];
+      notes.forEach(note => {
+        const lines = pdf.splitTextToSize(note, pageW - 2 * margin);
+        pdf.text(lines, margin, cursorY);
+        cursorY += lines.length * 11;
+      });
 
-        // Place image at top of A4 page, scaled to page width
-        const imgW = pdfPageW;
-        const imgH = (sh / canvas.width) * pdfPageW;
-        pdf.addImage(imgData, 'PNG', 0, 0, imgW, Math.min(imgH, pdfPageH));
-      }
-
+      // ── Save ──
       pdf.save('invoice.pdf');
     } catch (error) {
       console.error("PDF generation failed:", error);
@@ -315,7 +468,7 @@ function Pavti() {
                 </table>
               </div>
 
-              <div ref={footerRef}>
+              <div>
                 <div className="p-1 mb-3" style={{ backgroundColor: '#e7e0d6', height: "2em" }}>
                   <p><strong>Margin :</strong> &#8377; {userInfo?.margin || '0.00'}</p>
                 </div>
