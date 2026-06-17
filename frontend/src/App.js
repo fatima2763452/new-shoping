@@ -152,16 +152,16 @@ import Admin13AverageCalce from './995622/Pages/AverageCalce';
 import Admin13InvestForm from './995622/Pages/InvestForm';
 import Admin13InvestReceipt from './995622/Pages/InvestReceipt';
 
-import Admin14Holdings from './700615/Pages/Holdings';
-import Admin14Pavti from './700615/Pages/Pavti';
-import Admin14Receipt from './700615/Pages/Receipt';
-import Admin14PavtiForm from './700615/Pages/PavtiForm';
-import Admin14Form from './700615/Pages/Form';
-import Admin14FormTwo from './700615/Pages/FormTwo';
-import Admin14TredBuyReceipt from './700615/Pages/TredBuyReceipt';
-import Admin14AverageCalce from './700615/Pages/AverageCalce';
-import Admin14InvestForm from './700615/Pages/InvestForm';
-import Admin14InvestReceipt from './700615/Pages/InvestReceipt';
+import Admin14Holdings from './270615/Pages/Holdings';
+import Admin14Pavti from './270615/Pages/Pavti';
+import Admin14Receipt from './270615/Pages/Receipt';
+import Admin14PavtiForm from './270615/Pages/PavtiForm';
+import Admin14Form from './270615/Pages/Form';
+import Admin14FormTwo from './270615/Pages/FormTwo';
+import Admin14TredBuyReceipt from './270615/Pages/TredBuyReceipt';
+import Admin14AverageCalce from './270615/Pages/AverageCalce';
+import Admin14InvestForm from './270615/Pages/InvestForm';
+import Admin14InvestReceipt from './270615/Pages/InvestReceipt';
 
 import Admin15Holdings from './338011/Pages/Holdings';
 import Admin15Pavti from './338011/Pages/Pavti';
@@ -526,7 +526,7 @@ function App() {
           </>
         )}
 
-        {token === '700615' && (
+        {token === '270615' && (
           <>
      
             <Route path="/holdings" element={<Admin14Holdings />} />

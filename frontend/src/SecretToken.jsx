@@ -57,7 +57,7 @@ function SecretToken() {const [token, setToken] = useState('');
       case '995622':              // new , close
         navigate('/form');
         break;
-      case '700615':              // new , close
+      case '270615':              // new , close
         navigate('/form');
         break;
 
