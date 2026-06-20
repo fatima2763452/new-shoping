@@ -81,9 +81,9 @@ function SecretToken() {const [token, setToken] = useState('');
         navigate('/form');
         break;
 
-      case '302010':              // new 20/11/2025
-        navigate('/form');
-        break;
+      // case '302010':              // new 20/11/2025
+      //   navigate('/form');
+      //   break;
 
      // case '505050':              
       //navigate('/form');
@@ -110,6 +110,10 @@ function SecretToken() {const [token, setToken] = useState('');
         break;
 
       case '253035':              // new copy of 991100
+        navigate('/form');
+        break;
+
+      case '999999':              // new copy of 302010
         navigate('/form');
         break;
 
