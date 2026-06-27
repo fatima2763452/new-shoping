@@ -114,7 +114,7 @@ const handleDownloadPDF = async () => {
   if (mode === 'buy') {
     netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
   } else if (mode === 'sell') {
-    netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
+    netAmount = buyPrice * quantity - sellPrice * quantity - brokerage;
   }
 
 
@@ -155,7 +155,7 @@ const handleDownloadPDF = async () => {
             }}
           >
             <h2>
-             <span style={{ color:'white'}}>SWATHIKA PVT. LTD</span> 
+             <span style={{ color:'white'}}>SHIV PVT. LTD</span> 
               <br />
               <span style={{ fontSize: '12px', fontWeight: 400 , color:'white'}}>Trade Exit Receipt</span>
             </h2>
@@ -190,7 +190,7 @@ const handleDownloadPDF = async () => {
               <p style={{color:'white'}}>Executed Price</p>
               <h4 style={{color:'white'}}>
                 ₹
-                {Number(receiptData.mode === 'sell' ? receiptData.buyPrice : receiptData.sellPrice).toLocaleString('en-IN', {
+                {Number(receiptData.sellPrice).toLocaleString('en-IN', {
                   minimumFractionDigits: 2,
                 })}
               </h4>
@@ -204,64 +204,33 @@ const handleDownloadPDF = async () => {
               {receiptData.mode ? receiptData.mode.toUpperCase() : ''}
             </p>
             <p style={gridLabelStyle}>
-              <strong style={gridValueStyle}>{receiptData.lotSize ? 'Lot:' : 'Quantity:'}</strong>{' '}
+              <strong style={gridValueStyle}>{receiptData.lotSize ? 'Lot Size:' : 'Quantity:'}</strong>{' '}
               {receiptData.lotSize ? <>{receiptData.lotSize} Lot</> : receiptData.quantity}
             </p>
-            {receiptData.mode === 'sell' ? (
-              <>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Sell Price:</strong> ₹
-                  {Number(receiptData.sellPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Selling:</strong> ₹
-                  {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Buy Price:</strong> ₹
-                  {Number(receiptData.buyPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Buying:</strong> ₹
-                  {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-              </>
-            ) : (
-              <>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Buy Price:</strong> ₹
-                  {Number(receiptData.buyPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Buying:</strong> ₹
-                  {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Sell Price:</strong> ₹
-                  {Number(receiptData.sellPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Selling:</strong> ₹
-                  {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-              </>
-            )}
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Buy Price:</strong> ₹
+              {Number(receiptData.buyPrice).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Total Buying:</strong> ₹
+              {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Sell Price:</strong> ₹
+              {Number(receiptData.sellPrice).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Total Selling:</strong> ₹
+              {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Brokerage:</strong> ₹
               {brokerage.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -291,7 +260,7 @@ const handleDownloadPDF = async () => {
               borderTop: '1px solid rgba(255,255,255,0.06)'
             }}
           >
-             <span style={{ color:'white'}}>© SWATHIKA PVT. LTD</span>
+             <span style={{ color:'white'}}>© SHIV PVT. LTD</span>
 
           </div>
         </div>

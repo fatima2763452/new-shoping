@@ -19,15 +19,12 @@ function Receipt() {
       .catch((err) => console.error(err));
   }, [uniquckId]);
 
-  // Intraday brokerage at 0.005% of turnover (buy+sell)*quantity
+  // Intraday brokerage at 0.01% of turnover (buy+sell)*quantity
   const calculateBrokerage = ({ buyPrice, sellPrice, quantity }) => {
-    const bp = Number(buyPrice || 0);
-    const sp = Number(sellPrice || 0);
-    const q = Number(quantity || 0);
-    const turnover = (bp + sp) * q;
-    return Number((turnover * 0.00005).toFixed(2));
+    const turnover = (buyPrice + sellPrice) * quantity;
+    return Number((turnover * 0.0001).toFixed(2));
   };
- 
+
 const handleDownloadPDF = async () => {
   const input = document.getElementById('receipt-pdf');
   if (!input) return;
@@ -38,8 +35,8 @@ const handleDownloadPDF = async () => {
   clone.querySelectorAll('button').forEach((btn) => btn.remove());
 
   
-  clone.style.background = '#0f172a'; // main receipt background (dark theme)
-  clone.style.color = 'white';      // default text color
+  clone.style.background = '#0f172a'; // main receipt background
+  clone.style.color = 'black';      // default text color
   clone.style.width = '400px';
   clone.style.borderRadius = '0px';
   clone.style.overflow = 'hidden';
@@ -61,7 +58,7 @@ const handleDownloadPDF = async () => {
 
   const gridItems = clone.querySelectorAll('.grid-item');
   gridItems.forEach((item) => {
-    item.style.background = '#202a43ff'; // grid item background (dark)
+    item.style.background = '#202a43ff'; // grid item backgroundbackground: '#202a43ff',
     item.style.borderRadius = '12px';
     item.style.padding = '10px';
     item.style.textAlign = 'center';
@@ -101,20 +98,15 @@ const handleDownloadPDF = async () => {
       </div>
     );
   }
-  const brokerage = (
- 
-    Number(receiptData.formBrokerage) === 0.00005
-  )
-    ? calculateBrokerage(receiptData)
-    : Number(receiptData.formBrokerage);
-  
-  const { buyPrice, sellPrice, quantity, mode, lotSize } = receiptData;
+
+  const brokerage = calculateBrokerage(receiptData);
+  const { buyPrice, sellPrice, quantity, mode } = receiptData;
 
   let netAmount = 0;
   if (mode === 'buy') {
     netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
   } else if (mode === 'sell') {
-    netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
+    netAmount = buyPrice * quantity - sellPrice * quantity - brokerage;
   }
 
 
@@ -131,13 +123,12 @@ const handleDownloadPDF = async () => {
           id="receipt-pdf"
           className="receipt"
           style={{
-            background: '#0f172a',
+             background: '#0f172a',
             width: '400px',
             borderRadius: '0px',
             boxShadow: '0 8px 20px rgba(0,0,0,0.1)',
             overflow: 'hidden',
             margin: '0 auto',
-            color: 'white'
           }}
         >
           {/* Header */}
@@ -145,17 +136,17 @@ const handleDownloadPDF = async () => {
             className="header"
             style={{
               borderRadius: 0,
-              background: '#0f172a',
+             background: '#0f172a',
               color: '#fff',
               padding: '20px',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              borderBottom: '1px solid rgba(255,255,255,0.06)'
+              borderBottom: '1px solid #e2e8f0',
             }}
           >
             <h2>
-             <span style={{ color:'white'}}>SWATHIKA PVT. LTD</span> 
+             <span style={{ color:'rgba(255, 255, 255, 1)'}}>SWASTHIKA BROCKERAGE PVT.</span> 
               <br />
               <span style={{ fontSize: '12px', fontWeight: 400 , color:'white'}}>Trade Exit Receipt</span>
             </h2>
@@ -177,20 +168,20 @@ const handleDownloadPDF = async () => {
           {/* Grid */}
           <div className="grid">
             <div className="grid-item" style={gridItemStyle}>
-              <p style={{color:'white'}}>Exit Date</p>
-              <h4 style={{color:'white'}}>
+              <p style={gridLabelStyle}>Exit Date</p>
+              <h4 style={gridValueStyle}>
                 {new Date(receiptData.tradeDate).toLocaleDateString('en-GB')}
               </h4>
             </div>
             <div className="grid-item" style={gridItemStyle}>
-              <p style={{color:'white'}}>Customer ID</p>
-              <h4 style={{color:'white'}}>{receiptData.idCode || '—'}</h4>
+              <p style={gridLabelStyle}>Customer ID</p>
+              <h4 style={gridValueStyle}>{receiptData.idCode || '—'}</h4>
             </div>
             <div className="grid-item" style={gridItemStyle}>
-              <p style={{color:'white'}}>Executed Price</p>
-              <h4 style={{color:'white'}}>
+              <p style={gridLabelStyle}>Executed Price</p>
+              <h4 style={gridValueStyle}>
                 ₹
-                {Number(receiptData.mode === 'sell' ? receiptData.buyPrice : receiptData.sellPrice).toLocaleString('en-IN', {
+                {Number(receiptData.sellPrice).toLocaleString('en-IN', {
                   minimumFractionDigits: 2,
                 })}
               </h4>
@@ -204,64 +195,33 @@ const handleDownloadPDF = async () => {
               {receiptData.mode ? receiptData.mode.toUpperCase() : ''}
             </p>
             <p style={gridLabelStyle}>
-              <strong style={gridValueStyle}>{receiptData.lotSize ? 'Lot:' : 'Quantity:'}</strong>{' '}
-              {receiptData.lotSize ? <>{receiptData.lotSize} Lot</> : receiptData.quantity}
+              <strong style={gridValueStyle}>Quantity:</strong> {receiptData.quantity}{' '}
+              {receiptData.lotSize && <span>({receiptData.lotSize} Lot)</span>}
             </p>
-            {receiptData.mode === 'sell' ? (
-              <>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Sell Price:</strong> ₹
-                  {Number(receiptData.sellPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Selling:</strong> ₹
-                  {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Buy Price:</strong> ₹
-                  {Number(receiptData.buyPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Buying:</strong> ₹
-                  {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-              </>
-            ) : (
-              <>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Buy Price:</strong> ₹
-                  {Number(receiptData.buyPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Buying:</strong> ₹
-                  {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Sell Price:</strong> ₹
-                  {Number(receiptData.sellPrice).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-                <p style={gridLabelStyle}>
-                  <strong style={gridValueStyle}>Total Selling:</strong> ₹
-                  {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </p>
-              </>
-            )}
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Buy Price:</strong> ₹
+              {Number(receiptData.buyPrice).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Total Buying:</strong> ₹
+              {(receiptData.buyPrice * receiptData.quantity).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Sell Price:</strong> ₹
+              {Number(receiptData.sellPrice).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
+            <p style={gridLabelStyle}>
+              <strong style={gridValueStyle}>Total Selling:</strong> ₹
+              {(receiptData.sellPrice * receiptData.quantity).toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </p>
             <p style={gridLabelStyle}>
               <strong style={gridValueStyle}>Brokerage:</strong> ₹
               {brokerage.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -283,19 +243,22 @@ const handleDownloadPDF = async () => {
           {/* Footer */}
           <div
             style={{
-              background: '#0f172a',
+              // background: '#1e293b',
+                //  background: '#576270ff',
+               background: '#0f172a',
               padding: '12px',
               fontSize: '12px',
               textAlign: 'center',
               color: '#94a3b8',
-              borderTop: '1px solid rgba(255,255,255,0.06)'
+              borderTop: '1px solid #e2e8f0',
             }}
           >
-             <span style={{ color:'white'}}>© SWATHIKA PVT. LTD</span>
+             {/* KRISHNA ENT. PVT. LTD */}
+             <span style={{ color:'rgba(120, 183, 250, 0.76)'}}>SWASTHIKA BROCKERAGE PVT.</span> 
 
           </div>
         </div>
-      </div>  
+      </div>
     </>
   );
 }
@@ -314,8 +277,7 @@ const gridValueStyle = {
 };
 
 const gridItemStyle = {
-   background: '#202a43ff',
-
+  background: '#202a43ff',
   borderRadius: '12px',
   padding: '10px',
   textAlign: 'center',

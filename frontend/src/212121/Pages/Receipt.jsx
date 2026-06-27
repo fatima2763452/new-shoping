@@ -110,7 +110,12 @@ function Receipt() {
 
   const { buyPrice, sellPrice, quantity, mode, lotSize } = receiptData;
 
-  const netAmount = sellPrice * quantity - buyPrice * quantity - brokerage;
+  // For BUY trades:  profit = Sell - Buy (sold higher than bought)
+  // For SELL trades: profit = Buy - Sell (covered lower than shorted)
+  const isSellMode = (mode || '').toUpperCase() === 'SELL';
+  const netAmount = isSellMode
+    ? buyPrice * quantity - sellPrice * quantity - brokerage
+    : sellPrice * quantity - buyPrice * quantity - brokerage;
 
 
 

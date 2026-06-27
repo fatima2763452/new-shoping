@@ -39,9 +39,9 @@ function SecretToken() {const [token, setToken] = useState('');
       case '809010':
         navigate('/form');
         break;
-      case '109080':               //new
-        navigate('/form');
-        break;
+      // case '109080':               //new
+      //   navigate('/form');
+      //   break;
       case '778899': //close
         navigate('/form');
         break;
@@ -57,7 +57,7 @@ function SecretToken() {const [token, setToken] = useState('');
       case '995622':              // new , close
         navigate('/form');
         break;
-      case '700615':              // new , close
+      case '270615':              // new , close
         navigate('/form');
         break;
 
@@ -81,9 +81,9 @@ function SecretToken() {const [token, setToken] = useState('');
         navigate('/form');
         break;
 
-      case '302010':              // new 20/11/2025
-        navigate('/form');
-        break;
+      // case '302010':              // new 20/11/2025
+      //   navigate('/form');
+      //   break;
 
      case '505050':              
       navigate('/form');
@@ -106,6 +106,14 @@ function SecretToken() {const [token, setToken] = useState('');
         break;
 
       case '212121':              // new copy of 558844
+        navigate('/form');
+        break;
+
+      case '253035':              // new copy of 991100
+        navigate('/form');
+        break;
+
+      case '999999':              // new copy of 302010
         navigate('/form');
         break;
 

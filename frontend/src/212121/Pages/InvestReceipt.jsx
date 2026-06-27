@@ -31,6 +31,20 @@ function InvestReceipt() {
 
   const receiptRef = useRef();
 
+  // Convert imported image URL to base64 via fetch (works reliably with bundled assets)
+  const toBase64 = (url) =>
+    fetch(url)
+      .then((res) => res.blob())
+      .then(
+        (blob) =>
+          new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          })
+      );
+
   const handleDownloadPDF = async () => {
     try {
       const btn = document.querySelector(".no-print");
@@ -74,7 +88,7 @@ function InvestReceipt() {
       pdf.setTextColor(0, 102, 204); // professional blue
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(18);
-      pdf.text("JAY DEV BROKERAGE PVT. LTD.", margin, y);
+      pdf.text("J D BROKERAGE PVT. LTD.", margin, y);
       y += 26;
       // reset text color and font for body
       pdf.setTextColor(0, 0, 0);
@@ -157,7 +171,7 @@ function InvestReceipt() {
             `1. Introduction\nThese Terms & Conditions ("Terms") govern all trading, investment, advisory, and related services provided by our Private Brokerage House ("Broker", "We", "Us"). By opening an account or making any trade through us, the client ("You", "Client", "Investor") agrees to abide by these Terms.\n\n` +
             `2. Account Opening & Verification\nThe Client must provide valid KYC documents such as ID proof, address proof, and bank details.\nThe Broker reserves the right to approve or reject any account without specifying a reason.\nAll information provided by the Client must be accurate and updated. Any false information may lead to account suspension.\n\n` +
             `3. Trading Authorization\nBy using our services, the Client authorizes the Broker to execute buy/sell trades on their behalf as instructed.\nThe Broker may refuse or delay any transaction due to technical issues, market volatility, or regulatory reasons.\nMisuse of trading instructions or unauthorized activities can lead to termination of services.\n\n` +
-            `4. GST, STT, exchange fees, and other statutory charges will be applied as per government regulations.\nBrokerage rates may change with prior notice to the Client.\n\n` +
+            `4. Brokerage Charge\nBrokerage rates may change with prior notice to the Client.\n\n` +
             `5. Payments, Payouts & Settlements\nThe Client must maintain sufficient balance before placing any order.\nPayouts will be processed only into the verified bank account.\nThe Broker is not responsible for delays caused by banks, payment gateways, or technical issues.\n\n` +
             `6. Risk Disclosure\nTrading in equities, derivatives, and other financial instruments involves market risk.\nThe Client understands that losses may exceed profits and accepts full responsibility for their trading decisions.\nThe Broker does not guarantee profits or returns in any form.\n\n` +
             `7. Advisory Disclaimer\nAny advice, suggestion, or view shared by the Broker is only for informational purposes.\nThe Client must evaluate risks independently before making decisions.\nThe Broker shall not be held liable for any financial loss due to market movements.\n\n` +
@@ -173,46 +187,39 @@ function InvestReceipt() {
         writeTermsContent(sec.title, sec.content);
       }
 
-      // Add signature image under the T&C (bottom-right) if available
+      // Add signature image under the T&C (bottom-right) using fetch-based base64
       try {
-        const sigImgEl = new Image();
-        sigImgEl.src = signatureImg;
-        await new Promise((resolve, reject) => {
-          sigImgEl.onload = resolve;
-          sigImgEl.onerror = reject;
-        });
+        const sigDataUrl = await toBase64(signatureImg);
 
         // desired display width in PDF points
-        const desiredW = 120; // points in jsPDF units
+        const desiredW = 130;
+        // Load image to get natural dimensions
+        const sigImgEl = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = sigDataUrl;
+        });
         const desiredH = (sigImgEl.naturalHeight * desiredW) / sigImgEl.naturalWidth;
 
-        // position below the last written y, aligned to right
+        // position below last written content, right-aligned
         let placeY = y + 10;
-        if (placeY + desiredH > pageHeight - margin) {
+        if (placeY + desiredH + 30 > pageHeight - margin) {
           pdf.addPage();
-          placeY = pageHeight - margin - desiredH - 10;
+          placeY = margin;
         }
-
         const placeX = pageWidth - margin - desiredW;
 
-        // Create a higher-resolution temporary canvas (scale by pixelScale) so image is sharp when downsampled into PDF
-        const pixelScale = 3; // increase for better quality
-        const canvasW = Math.max(1, Math.round(sigImgEl.naturalWidth * pixelScale));
-        const canvasH = Math.max(1, Math.round(sigImgEl.naturalHeight * pixelScale));
-        const tmpCanvas = document.createElement("canvas");
-        tmpCanvas.width = canvasW;
-        tmpCanvas.height = canvasH;
-        const ctx = tmpCanvas.getContext("2d");
-        // White background for signature
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvasW, canvasH);
-        // Draw the image scaled up
-        ctx.drawImage(sigImgEl, 0, 0, canvasW, canvasH);
-        const sigDataUrl = tmpCanvas.toDataURL("image/png");
-
-        // Add to PDF at desired display size (jsPDF will downsample the high-res image)
         pdf.addImage(sigDataUrl, "PNG", placeX, placeY, desiredW, desiredH);
-        y = placeY + desiredH + 8;
+
+        // Label under signature
+        pdf.setFont("helvetica", "italic");
+        pdf.setFontSize(9);
+        pdf.setTextColor(80, 80, 80);
+        pdf.text("Signature of Authorized Officer", placeX, placeY + desiredH + 12);
+        pdf.setTextColor(0, 0, 0);
+
+        y = placeY + desiredH + 20;
       } catch (e) {
         console.warn("Could not load signature image for PDF:", e);
       }
@@ -264,11 +271,9 @@ function InvestReceipt() {
               }}
             />
             <div style={{ fontWeight: 600, fontSize: "1.3em", color: "#007bff" }}>
-              {companyName || "INVESTMENT Pvt. Ltd."}
+              {companyName || ""}
             </div>
-            <div style={{ fontSize: "1em", marginBottom: 10 }}>
-              We are registered with SEBI as a Stock Broker.
-            </div>
+           
           </div>
 
           <hr />

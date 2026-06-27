@@ -152,16 +152,16 @@ import Admin13AverageCalce from './995622/Pages/AverageCalce';
 import Admin13InvestForm from './995622/Pages/InvestForm';
 import Admin13InvestReceipt from './995622/Pages/InvestReceipt';
 
-import Admin14Holdings from './700615/Pages/Holdings';
-import Admin14Pavti from './700615/Pages/Pavti';
-import Admin14Receipt from './700615/Pages/Receipt';
-import Admin14PavtiForm from './700615/Pages/PavtiForm';
-import Admin14Form from './700615/Pages/Form';
-import Admin14FormTwo from './700615/Pages/FormTwo';
-import Admin14TredBuyReceipt from './700615/Pages/TredBuyReceipt';
-import Admin14AverageCalce from './700615/Pages/AverageCalce';
-import Admin14InvestForm from './700615/Pages/InvestForm';
-import Admin14InvestReceipt from './700615/Pages/InvestReceipt';
+import Admin14Holdings from './270615/Pages/Holdings';
+import Admin14Pavti from './270615/Pages/Pavti';
+import Admin14Receipt from './270615/Pages/Receipt';
+import Admin14PavtiForm from './270615/Pages/PavtiForm';
+import Admin14Form from './270615/Pages/Form';
+import Admin14FormTwo from './270615/Pages/FormTwo';
+import Admin14TredBuyReceipt from './270615/Pages/TredBuyReceipt';
+import Admin14AverageCalce from './270615/Pages/AverageCalce';
+import Admin14InvestForm from './270615/Pages/InvestForm';
+import Admin14InvestReceipt from './270615/Pages/InvestReceipt';
 
 import Admin15Holdings from './338011/Pages/Holdings';
 import Admin15Pavti from './338011/Pages/Pavti';
@@ -301,6 +301,27 @@ import Admin26AverageCalce from './212121/Pages/AverageCalce';
 import Admin26InvestForm from './212121/Pages/InvestForm';
 import Admin26InvestReceipt from './212121/Pages/InvestReceipt';
 
+import Admin27Holdings from './253035/Pages/Holdings';
+import Admin27Pavti from './253035/Pages/Pavti';
+import Admin27Receipt from './253035/Pages/Receipt';
+import Admin27PavtiForm from './253035/Pages/PavtiForm';
+import Admin27Form from './253035/Pages/Form';
+import Admin27FormTwo from './253035/Pages/FormTwo';
+import Admin27TredBuyReceipt from './253035/Pages/TredBuyReceipt';
+import Admin27AverageCalce from './253035/Pages/AverageCalce';
+import Admin27InvestForm from './253035/Pages/InvestForm';
+import Admin27InvestReceipt from './253035/Pages/InvestReceipt';
+
+import Admin28Holdings from './999999/Pages/Holdings';
+import Admin28Pavti from './999999/Pages/Pavti';
+import Admin28Receipt from './999999/Pages/Receipt';
+import Admin28PavtiForm from './999999/Pages/PavtiForm';
+import Admin28Form from './999999/Pages/Form';
+import Admin28FormTwo from './999999/Pages/FormTwo';
+import Admin28TredBuyReceipt from './999999/Pages/TredBuyReceipt';
+import Admin28AverageCalce from './999999/Pages/AverageCalce';
+import Admin28InvestForm from './999999/Pages/InvestForm';
+import Admin28InvestReceipt from './999999/Pages/InvestReceipt';
 
 function App() {
   const token = localStorage.getItem('authToken'); // Token to identify admin
@@ -516,7 +537,7 @@ function App() {
           </>
         )}
 
-        {token === '700615' && (
+        {token === '270615' && (
           <>
      
             <Route path="/holdings" element={<Admin14Holdings />} />
@@ -730,6 +751,38 @@ function App() {
             <Route path="/averageCalce" element={<Admin26AverageCalce />} />
             <Route path="/investForm" element={<Admin26InvestForm />} />
             <Route path="/investReceipt" element={<Admin26InvestReceipt />} />
+          </>
+        )}
+
+        {token === '253035' && (
+          <>
+     
+            <Route path="/holdings" element={<Admin27Holdings />} />
+            <Route path="/pavti/:idCode" element={<Admin27Pavti />} />
+            <Route path="/receipt/:uniquckId" element={<Admin27Receipt />} />
+            <Route path="/pavti" element={<Admin27PavtiForm />} />
+            <Route path="/form" element={<Admin27Form />} />
+            <Route path="/formTwo" element={<Admin27FormTwo />} />
+            <Route path="/tredBuyReceipt" element={<Admin27TredBuyReceipt />} />
+            <Route path="/averageCalce" element={<Admin27AverageCalce />} />
+            <Route path="/investForm" element={<Admin27InvestForm />} />
+            <Route path="/investReceipt" element={<Admin27InvestReceipt />} />
+          </>
+        )}
+
+        {token === '999999' && (
+          <>
+     
+            <Route path="/holdings" element={<Admin28Holdings />} />
+            <Route path="/pavti/:idCode" element={<Admin28Pavti />} />
+            <Route path="/receipt/:uniquckId" element={<Admin28Receipt />} />
+            <Route path="/pavti" element={<Admin28PavtiForm />} />
+            <Route path="/form" element={<Admin28Form />} />
+            <Route path="/formTwo" element={<Admin28FormTwo />} />
+            <Route path="/tredBuyReceipt" element={<Admin28TredBuyReceipt />} />
+            <Route path="/averageCalce" element={<Admin28AverageCalce />} />
+            <Route path="/investForm" element={<Admin28InvestForm />} />
+            <Route path="/investReceipt" element={<Admin28InvestReceipt />} />
           </>
         )}
 
