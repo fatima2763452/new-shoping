@@ -146,7 +146,7 @@ const handleDownloadPDF = async () => {
             }}
           >
             <h2>
-             <span style={{ color:'rgba(255, 255, 255, 1)'}}>SWASTHIKA BROCKERAGE PVT.</span> 
+             <span style={{ color:'rgba(255, 255, 255, 1)'}}>LAXMI TRADER PVT. LTD.</span> 
               <br />
               <span style={{ fontSize: '12px', fontWeight: 400 , color:'white'}}>Trade Exit Receipt</span>
             </h2>
@@ -254,7 +254,7 @@ const handleDownloadPDF = async () => {
             }}
           >
              {/* KRISHNA ENT. PVT. LTD */}
-             <span style={{ color:'rgba(120, 183, 250, 0.76)'}}>SWASTHIKA BROCKERAGE PVT.</span> 
+             <span style={{ color:'rgba(120, 183, 250, 0.76)'}}>LAXMI TRADER PVT. LTD.</span> 
 
           </div>
         </div>

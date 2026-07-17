@@ -90,7 +90,7 @@ function TredBuyReceipt() {
             }}
           >
             <h2>
-              <span style={{ color:'white' , fontSize : '20px'}}>SWASTHIKA BROKERAGE PVT. LTD</span>
+              <span style={{ color:'white' , fontSize : '20px'}}>LAXMI TRADER PVT. LTD.</span>
               <br />
               <span style={{ fontSize: '12px', fontWeight: 400, color: 'white' }}>
                 Trade Buy Receipt
@@ -166,7 +166,7 @@ function TredBuyReceipt() {
 
             }}
           >
-            <span style={{ color:'white'}}>© SWASTHIKA BROCKERAGE PVT. LTD</span>
+            <span style={{ color:'white'}}>© LAXMI TRADER PVT. LTD.</span>
           </div>
         </div>
 
