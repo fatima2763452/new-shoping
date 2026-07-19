@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import SecretToken from './SecretToken';
 
 
@@ -334,9 +334,63 @@ import Admin29AverageCalce from './222222/Pages/AverageCalce';
 import Admin29InvestForm from './222222/Pages/InvestForm';
 import Admin29InvestReceipt from './222222/Pages/InvestReceipt';
 
+import Token101010Wrapper from './101010/components/TokenWrapper';
+import Token101010Login from './101010/pages/Login';
+import Token101010Dashboard from './101010/pages/Dashboard';
+import Token101010CustomerDetail from './101010/pages/CustomerDetail';
+import Token101010Invoice from './101010/components/customer/Invoice';
+import Token101010AccountOpeningForm from './101010/pages/AccountOpeningForm';
+import Token101010SecretAdmin from './101010/pages/SecretAdmin';
+import Token101010RecycleBin from './101010/pages/RecycleBin';
+
+const ProtectedRoute_101010 = ({ children }) => {
+  const innerToken = localStorage.getItem('token');
+  if (!innerToken) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 
 function App() {
-  const token = localStorage.getItem('authToken'); // Token to identify admin
+  const token = localStorage.getItem('authToken') || localStorage.getItem('token'); // Token to identify admin
+
+  React.useEffect(() => {
+    if (token !== '101010') {
+      // Load Bootstrap CSS
+      let bootstrapCSS = document.getElementById('bootstrap-css-cdn');
+      if (!bootstrapCSS) {
+        bootstrapCSS = document.createElement('link');
+        bootstrapCSS.id = 'bootstrap-css-cdn';
+        bootstrapCSS.rel = 'stylesheet';
+        bootstrapCSS.href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css';
+        bootstrapCSS.integrity = 'sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT';
+        bootstrapCSS.crossOrigin = 'anonymous';
+        document.head.appendChild(bootstrapCSS);
+      }
+
+      // Load Bootstrap JS
+      let bootstrapJS = document.getElementById('bootstrap-js-cdn');
+      if (!bootstrapJS) {
+        bootstrapJS = document.createElement('script');
+        bootstrapJS.id = 'bootstrap-js-cdn';
+        bootstrapJS.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js';
+        bootstrapJS.integrity = 'sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO';
+        bootstrapJS.crossOrigin = 'anonymous';
+        document.body.appendChild(bootstrapJS);
+      }
+    } else {
+      // Remove Bootstrap elements to completely isolate 101010 styling
+      const bootstrapCSS = document.getElementById('bootstrap-css-cdn');
+      if (bootstrapCSS) {
+        bootstrapCSS.remove();
+      }
+      const bootstrapJS = document.getElementById('bootstrap-js-cdn');
+      if (bootstrapJS) {
+        bootstrapJS.remove();
+      }
+    }
+  }, [token]);
 
   return (
     <BrowserRouter>
@@ -811,6 +865,59 @@ function App() {
             <Route path="/averageCalce" element={<Admin29AverageCalce />} />
             <Route path="/investForm" element={<Admin29InvestForm />} />
             <Route path="/investReceipt" element={<Admin29InvestReceipt />} />
+          </>
+        )}
+
+        {token === '101010' && (
+          <>
+            <Route 
+              path="/form" 
+              element={
+                <Token101010Wrapper>
+                  <Token101010Dashboard />
+                </Token101010Wrapper>
+              } 
+            />
+            <Route 
+              path="/recycle-bin" 
+              element={
+                <Token101010Wrapper>
+                  <Token101010RecycleBin />
+                </Token101010Wrapper>
+              } 
+            />
+            <Route 
+              path="/account-opening" 
+              element={
+                <Token101010Wrapper>
+                  <Token101010AccountOpeningForm />
+                </Token101010Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id" 
+              element={
+                <Token101010Wrapper>
+                  <Token101010CustomerDetail />
+                </Token101010Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id/invoice" 
+              element={
+                <Token101010Wrapper>
+                  <Token101010Invoice />
+                </Token101010Wrapper>
+              } 
+            />
+            <Route 
+              path="/secret-admin" 
+              element={
+                <Token101010Wrapper>
+                  <Token101010SecretAdmin />
+                </Token101010Wrapper>
+              } 
+            />
           </>
         )}
 

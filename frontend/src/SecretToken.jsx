@@ -18,6 +18,17 @@ function SecretToken() {const [token, setToken] = useState('');
       case '110099': // close
         navigate('/form');
         break;
+      case '101010': // Trading Billing System token
+        const mockOwner = {
+          _id: 'owner_id',
+          username: '9574074927',
+          role: 'owner',
+          token: 'mock-owner-token-12345'
+        };
+        localStorage.setItem('userInfo', JSON.stringify(mockOwner));
+        localStorage.setItem('token', mockOwner.token);
+        navigate('/form');
+        break;
       case '000000': // close
         navigate('/form');
         break;

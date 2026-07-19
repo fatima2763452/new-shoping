@@ -13,10 +13,18 @@ const formTwoRoute = require("./Routes/FormTwoRoute");
 const SMSSender = require("./Routes/SMSRoute");
 const FormModel = require("./Model/FormModel");   // ✅ सही import
 
+// Scoped routes for token 101010 (Trading Billing System)
+const authRoutes_101010 = require("./101010/routes/authRoutes");
+const customerRoutes_101010 = require("./101010/routes/customerRoutes");
+const tradeRoutes_101010 = require("./101010/routes/tradeRoutes");
+
+
 const allowedOrigins = [
   // "https://amazone-shopping-front.onrender.com",
   "https://new-shop-g5i2.onrender.com",
-  "http://localhost:3000"
+  "http://localhost:3000",
+  "http://localhost:4000",
+  "http://localhost:5173"
 ];
 
 app.use(cors({
@@ -29,6 +37,12 @@ app.use(cors({
 app.use('/api/forms', formRoute);
 app.use('/api/formTwo', formTwoRoute);
 app.use('/api/sms', SMSSender);
+
+// Scoped routes for token 101010 (Trading Billing System)
+app.use('/api/101010/auth', authRoutes_101010);
+app.use('/api/101010/customers', customerRoutes_101010);
+app.use('/api/101010/trades', tradeRoutes_101010);
+
 
 // DB connect + default update
 mongoose.connect(MONGO_URL)
