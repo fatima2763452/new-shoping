@@ -42,8 +42,8 @@ const EntryForm = ({ formatCurrency, customer, editingTradeData, setEditingTrade
   const priceNum = parseFloat(price) || 0;
   const estimatedTotal = qtyNum * priceNum;
   
-  // Brokerage: blank = default 0.01% of total, input = flat ₹ amount
-  const brokerageFee = brokerage === '' ? (estimatedTotal * 0.01) / 100 : (parseFloat(brokerage) || 0);
+  // Brokerage: blank or input = flat ₹ amount (default to 0)
+  const brokerageFee = parseFloat(brokerage) || 0;
   const activeBrokeragePct = estimatedTotal > 0 ? (brokerageFee / estimatedTotal) * 100 : 0;
 
   const showToast = (message, type = 'success') => {
@@ -304,17 +304,17 @@ const EntryForm = ({ formatCurrency, customer, editingTradeData, setEditingTrade
           </div>
         </div>
         <div className="flex-[0.8]">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Brockerage {brokerage === '' ? '(Default 0.01%)' : '(₹)'}</label>
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Brockerage (₹)</label>
           <div className="relative">
             <input 
               type="number" 
               step="0.01"
               value={brokerage}
               onChange={e => setBrokerage(e.target.value)}
-              placeholder="Default 0.01%"
+              placeholder="0.00"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-4 pr-8 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-blue-500 outline-none transition-all"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-sm">{brokerage === '' ? '%' : '₹'}</span>
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-sm">₹</span>
           </div>
         </div>
       </div>

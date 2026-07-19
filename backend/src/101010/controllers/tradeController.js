@@ -13,7 +13,8 @@ const createTrade = async (req, res) => {
     const priceNum = parseFloat(price) || 0;
     const estimatedTotal = qtyNum * priceNum;
     
-    let activeBrokeragePct = parseFloat(brokeragePct) || 0.01;
+    let activeBrokeragePct = parseFloat(brokeragePct);
+    if (isNaN(activeBrokeragePct)) activeBrokeragePct = 0;
     let brokerageFee = (estimatedTotal * activeBrokeragePct) / 100;
 
     const tradeData = {
@@ -284,7 +285,8 @@ const editTrade = async (req, res) => {
     const priceNum = parseFloat(price) || 0;
     const estimatedTotal = qtyNum * priceNum;
     
-    let activeBrokeragePct = parseFloat(brokeragePct) || 0.01;
+    let activeBrokeragePct = parseFloat(brokeragePct);
+    if (isNaN(activeBrokeragePct)) activeBrokeragePct = 0;
     let brokerageFee = (estimatedTotal * activeBrokeragePct) / 100;
 
     const tradeData = {
