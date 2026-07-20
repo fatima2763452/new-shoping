@@ -8,7 +8,7 @@
 }
 
 /* Fix Tailwind CSS v4 calc(infinity * 1px) rounded-full bug on elements like buttons and avatars */
-.rounded-full {
+#token-101010-root .rounded-full {
   border-radius: 9999px !important;
 }
 
@@ -113,7 +113,7 @@
   box-shadow: none !important;
 }
 
-.material-symbols-outlined {
+#token-101010-root .material-symbols-outlined {
   font-family: 'Material Symbols Outlined' !important;
   font-weight: normal;
   font-style: normal;
@@ -185,19 +185,15 @@
   --color-secondary-fixed: #dce2f7;
 }
 
-:root {
+#token-101010-root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-}
-
-body {
-  margin: 0;
   min-width: 320px;
   min-height: 100vh;
 }
 
-.glass-panel {
+#token-101010-root .glass-panel {
     background: rgba(17, 24, 39, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -205,23 +201,23 @@ body {
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
-.stock-bg {
+#token-101010-root .stock-bg {
     background-image: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
                       linear-gradient(to bottom, rgba(5, 20, 36, 0.9), rgba(5, 20, 36, 1));
 }
 
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active{
+#token-101010-root input:-webkit-autofill,
+#token-101010-root input:-webkit-autofill:hover, 
+#token-101010-root input:-webkit-autofill:focus, 
+#token-101010-root input:-webkit-autofill:active{
     -webkit-box-shadow: 0 0 0 30px #030712 inset !important;
     -webkit-text-fill-color: #d4e4fa !important;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
+#token-101010-root .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
-.scrollbar-hide {
+#token-101010-root .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
