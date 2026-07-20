@@ -1,0 +1,256 @@
+.token-333333 .form-label{
+    font-weight: 500;
+    font-size: 15px;
+}
+.token-333333 .container{
+  overflow-x: auto;
+}
+
+.token-333333 .title {
+  font-size: 1.3rem;
+  font-weight: 300;
+  color: rgb(71, 71, 71);
+  margin-bottom: 2%;
+  padding-left: 2em;
+}
+
+.token-333333 .order-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.token-333333 .order-table tr {
+  border-top: 1px solid #f1f1f1;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+.token-333333 .order-table th {
+  text-align: right;
+  padding: 15px 10px;
+  color: rgb(145, 145, 145);
+  font-weight: 300;
+  font-size: 0.8rem;
+}
+
+.token-333333 .order-table tr th:first-child,
+.token-333333 .order-table tr td:first-child {
+  text-align: left;
+}
+
+.token-333333 .order-table tr th:nth-child(1),
+.token-333333 .order-table tr th:nth-child(4) {
+  border-right: 1px solid #f1f1f1;
+}
+
+.token-333333 .order-table tr td:nth-child(1),
+.token-333333 .order-table tr td:nth-child(4) {
+  border-right: 1px solid #f1f1f1;
+}
+
+.token-333333 .order-table tr td:last-child {
+  font-size: 0.6rem;
+}
+
+.token-333333 .order-table td {
+  padding: 10px 10px;
+  text-align: right;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: rgb(73, 73, 73);
+}
+
+.token-333333 .align-left {
+  text-align: left;
+}
+
+.token-333333 .order-table td.profit {
+  color: rgb(72, 194, 55);
+}
+
+.token-333333 .order-table td.loss {
+  color: rgb(250, 118, 78);
+}
+
+.token-333333 .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 5%;
+}
+
+.token-333333 .col {
+  flex-basis: 33%;
+}
+
+.token-333333 .col h5 {
+  font-size: 1.8rem;
+  color: rgb(71, 71, 71);
+  font-weight: 300;
+}
+
+.token-333333 .col h5 span {
+  font-weight: 300;
+  font-size: 0.9rem;
+}
+
+.token-333333 .col p {
+  font-size: 0.8rem;
+  color: rgb(153, 153, 153);
+  font-weight: 300;
+  margin-top: 2%;
+}
+
+.token-333333 .row .col:last-child h5 {
+  color: rgb(72, 194, 55);
+}
+
+.token-333333 .holding-row .delete-tooltip-container {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.token-333333 .deletebtn {
+  background: #fff;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+}
+.token-333333 .deletebtn:hover {
+  background: #ffeaea;
+}
+
+.token-333333 .receiptdownloadicon :hover{
+  cursor: pointer;
+}
+
+.token-333333 .reciepit-card-body-tabel-padding{
+  padding-left: 40px  !important;
+  padding-right: 40px !important;
+}
+
+.token-333333 .logo, .token-333333 .brandName{
+  text-align: center;
+}
+
+.token-333333 .pavti-uper-header{
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+.token-333333 .invoice-margin-input-section{
+  width: 10em;
+  height: 25px;
+  background-color: none;
+  color: grey;
+}
+
+.token-333333 .holdings-container {
+  padding: 20px;
+}
+
+.token-333333 .holdings-scroll {
+  overflow-x: auto;
+}
+
+.token-333333 .holdings-table {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.token-333333 .holdings-table th,
+.token-333333 .holdings-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.token-333333 .holdings-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.token-333333 .pl-profit {
+  color: green;
+  font-weight: 500;
+}
+
+.token-333333 .pl-loss {
+  color: red;
+  font-weight: 500;
+}
+
+.token-333333 .holding-row {
+  position: relative;
+}
+
+.token-333333 .deletebtn {
+  background: #fff;
+  border: none;
+  color: #d32f2f;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+}
+
+.token-333333 .deletebtn:hover {
+  background: #ffeaea;
+}
+
+.token-333333 .receipt-btn {
+  background: #fff;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+
+.token-333333 .receipt-btn:hover {
+  background: #e7f1ff;
+}
+
+.token-333333 .average-entries-scroll {
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  position: relative;
+  margin-bottom: 20px;
+}
+.token-333333 .scroll-blur-top,
+.token-333333 .scroll-blur-bottom {
+  position: sticky;
+  left: 0;
+  right: 0;
+  height: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+.token-333333 .scroll-blur-top {
+  top: 0;
+  background: linear-gradient(to bottom, rgba(200,200,200,0.15), rgba(200,200,200,0));
+}
+.token-333333 .scroll-blur-bottom {
+  bottom: 0;
+  background: linear-gradient(to top, rgba(200,200,200,0.15), rgba(200,200,200,0));
+}

@@ -1,0 +1,115 @@
+.token-444444 .receipt {
+  background: #fff;
+  width: 400px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+  margin: 0 auto;
+}
+.token-444444 .header {
+  background: linear-gradient(90deg,#2563eb,#1d4ed8);
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.token-444444 .header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.token-444444 .user-info {
+  font-size: 12px;
+  text-align: right;
+  line-height: 1.4;
+}
+.token-444444 .stock-card {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+.token-444444 .stock-card h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+.token-444444 .stock-card span {
+  font-size: 14px;
+  color: #555;
+  font-weight: 600;
+}
+.token-444444 .grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+.token-444444 .grid-item {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+}
+.token-444444 .grid-item p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #555;
+}
+.token-444444 .grid-item h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+}
+.token-444444 .details {
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.token-444444 .details strong {
+  display: inline-block;
+  width: 130px;
+  color: #111;
+}
+
+.token-444444 .realised-profit { color: #2a9551; }
+.token-444444 .realised-loss { color: #e13e3edf;}
+
+.token-444444 .realised-box {
+    margin: 4px 0;
+    font-size: 15px;
+}
+
+.token-444444 .actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding-bottom: 20px;
+}
+.token-444444 .btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 600;
+}
+.token-444444 .btn-download { background: #10b981; color: #fff;}
+.token-444444 .btn-download:hover { background: #059669;}
+.token-444444 .btn-print { background: #3b82f6; color: #fff;}
+.token-444444 .btn-print:hover { background: #2563eb;}
+.token-444444 .footer {
+  background: #f9fafb;
+  padding: 12px;
+  font-size: 12px;
+  text-align: center;
+  color: #555;
+}
+
+@media print {
+  .token-444444 .no-print {
+    display: none !important;
+  }
+}
