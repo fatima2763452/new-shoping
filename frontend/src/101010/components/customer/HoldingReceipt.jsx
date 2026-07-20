@@ -21,7 +21,11 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
         price: holding.avgCost || 0,
         ltp: holding.lastPrice || 0,
         marginRs: holding.totalMargin || 0,
-        brokerageFee: holding.totalBrokerage || 0
+        brokerageFee: holding.totalBrokerage || 0,
+        date: holding.date ? new Date(holding.date).toISOString().split('T')[0] : '',
+        time: holding.time || '',
+        exchange: holding.exchange || 'NSE',
+        tradeType: holding.tradeType || 'INTRADAY'
       });
     }
   }, [holding, isEditing]);
@@ -126,6 +130,21 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
       : 'bg-slate-100 text-slate-900 border-slate-300 focus:border-blue-500'
   }`;
 
+  const formatTime12Hr = (timeStr) => {
+    if (!timeStr) return '';
+    if (timeStr.includes('AM') || timeStr.includes('PM') || timeStr.includes('am') || timeStr.includes('pm')) return timeStr;
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    if (isNaN(hours)) return timeStr;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursFormatted = hours < 10 ? `0${hours}` : hours;
+    return `${hoursFormatted}:${minutes} ${ampm}`;
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-300 overflow-y-auto">
       {/* Background clickable area to close */}
@@ -223,7 +242,7 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
               <div className="flex items-center mb-2">
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
                 <span className={`mx-4 text-[10px] font-bold tracking-[0.25em] uppercase ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} whitespace-nowrap`}>
-                  TRADE ENTRY RECEIPT
+                  TRADE ENTRY 
                 </span>
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
               </div>
@@ -240,7 +259,7 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
                     <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
                       theme === 'dark' ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'
                     }`}>
-                      NSE
+                      {(holding.exchange || 'NSE').toUpperCase()}
                     </span>
                   </div>
                   
@@ -257,7 +276,7 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
                         ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
                         : 'bg-blue-50 text-blue-600 border border-blue-200'
                     } whitespace-nowrap`}>
-                      ENTRY
+                      {(holding.tradeType || 'INTRADAY').toUpperCase()}
                     </span>
                   </div>
                 </div>
@@ -283,8 +302,8 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
                   <div className={`text-[10px] font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>
                     ENTRY DATE
                   </div>
-                  <div className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-950'} whitespace-nowrap`}>
-                    {formatDateTime()}
+                  <div className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-955'} whitespace-nowrap`}>
+                    {new Date(holding.date).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   </div>
                 </div>
                 
@@ -360,7 +379,24 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
                     {isEditing ? (
                       <input type="number" className={inputClassName} value={editData.marginRs} onChange={e => setEditData({ ...editData, marginRs: e.target.value })} />
                     ) : (
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency(holding.totalMargin || 0)}</span>
+                      <span className={`text-sm font-semibold flex items-center gap-2 ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>
+                        {(() => {
+                          const marginRsVal = parseFloat(holding.totalMargin) || 0;
+                          const totalVal = holding.totalInvestment || ((holding.netQty || 0) * (holding.avgCost || 0));
+                          let marginPctVal = parseFloat(holding.marginPct) || 0;
+                          if (marginRsVal <= 0) {
+                            marginPctVal = 0;
+                          } else if (marginPctVal <= 0 && totalVal > 0) {
+                            marginPctVal = (marginRsVal / totalVal) * 100;
+                          }
+                          return marginPctVal > 0 ? (
+                            <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">
+                              {marginPctVal.toFixed(2)}%
+                            </span>
+                          ) : null;
+                        })()}
+                        {formatCurrency(holding.totalMargin || 0)}
+                      </span>
                     )}
                   </div>
                   <div className="flex justify-between items-center py-2.5">
@@ -394,7 +430,7 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
                         : 'bg-gradient-to-r from-rose-50 to-rose-100/50 border-rose-200 text-rose-700')
                 }`}>
                   <span className="text-[10px] font-bold uppercase tracking-[0.15em] mb-1">
-                    TOTAL P/L
+                    NET P/L
                   </span>
                   <span className="text-2xl font-black tracking-tight whitespace-nowrap">
                     {displayTotalPnl >= 0 ? '+' : ''}{formatCurrency(displayTotalPnl)}

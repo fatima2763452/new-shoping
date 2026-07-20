@@ -39,7 +39,8 @@ const Holdings = ({ customer, onEditRequest }) => {
     try {
       setIsLoading(true);
       const { data } = await api.get(`/trades/holdings/${customer._id}`);
-      setHoldings(data);
+      const sorted = (data || []).sort((a, b) => new Date(b.lastUpdated || b.createdAt || b.date || 0) - new Date(a.lastUpdated || a.createdAt || a.date || 0));
+      setHoldings(sorted);
     } catch (err) {
       console.error(err);
       setError('Failed to load holdings.');

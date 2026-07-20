@@ -3,7 +3,7 @@ const Exit = require('../models/Exit');
 
 const createTrade = async (req, res) => {
   try {
-    const { customerId, type, action, symbol, quantity, lot, price, ltp, marginRs, marginPct, date, brokeragePct } = req.body;
+    const { customerId, type, action, symbol, quantity, lot, price, ltp, marginRs, marginPct, date, time, exchange, tradeType, brokeragePct, brokerageFee: reqBrokerageFee } = req.body;
 
     if (!customerId || !type || !action || !symbol || !quantity || !price || !ltp || !date) {
       return res.status(400).json({ message: 'Please provide all required fields' });
@@ -13,9 +13,18 @@ const createTrade = async (req, res) => {
     const priceNum = parseFloat(price) || 0;
     const estimatedTotal = qtyNum * priceNum;
     
-    let activeBrokeragePct = parseFloat(brokeragePct);
-    if (isNaN(activeBrokeragePct)) activeBrokeragePct = 0;
-    let brokerageFee = (estimatedTotal * activeBrokeragePct) / 100;
+    let brokerageFee = 0;
+    let activeBrokeragePct = 0.01;
+    if (reqBrokerageFee !== undefined && reqBrokerageFee !== '' && !isNaN(parseFloat(reqBrokerageFee))) {
+      brokerageFee = parseFloat(reqBrokerageFee);
+      activeBrokeragePct = estimatedTotal > 0 ? (brokerageFee / estimatedTotal) * 100 : 0;
+    } else if (brokeragePct !== undefined && brokeragePct !== '' && !isNaN(parseFloat(brokeragePct))) {
+      activeBrokeragePct = parseFloat(brokeragePct);
+      brokerageFee = (estimatedTotal * activeBrokeragePct) / 100;
+    } else {
+      activeBrokeragePct = 0.01;
+      brokerageFee = (estimatedTotal * 0.01) / 100;
+    }
 
     const tradeData = {
       customerId,
@@ -28,6 +37,9 @@ const createTrade = async (req, res) => {
       marginRs: parseFloat(marginRs) || (parseFloat(marginPct) > 0 ? (estimatedTotal * parseFloat(marginPct) / 100) : 0),
       marginPct: parseFloat(marginPct) || 0,
       date,
+      time: time || '',
+      exchange: exchange || 'NSE',
+      tradeType: tradeType || 'INTRADAY',
       brokeragePct: activeBrokeragePct,
       brokerageFee,
       estimatedTotal
@@ -97,13 +109,23 @@ const getCustomerHoldings = async (req, res) => {
           totalBrokerage: 0,
           totalMargin: 0,
           lastPrice: 0,
-          lot: 0
+          lot: 0,
+          exchange: 'NSE',
+          tradeType: 'INTRADAY',
+          date: trade.date,
+          time: trade.time || '',
+          _id: trade._id
         };
       }
 
       const holding = holdingsMap[trade.symbol];
       holding.lastPrice = trade.ltp || trade.price; // Fallback to price for older trades
       if (trade.lot) holding.lot = trade.lot;
+      if (trade.exchange) holding.exchange = trade.exchange;
+      if (trade.tradeType) holding.tradeType = trade.tradeType;
+      if (trade.date) holding.date = trade.date;
+      if (trade.time) holding.time = trade.time;
+      if (trade._id) holding._id = trade._id;
       if (trade.customInvested !== undefined) holding.customInvested = trade.customInvested;
       if (trade.customUpnl !== undefined) holding.customUpnl = trade.customUpnl;
       if (trade.customTotalPnl !== undefined) holding.customTotalPnl = trade.customTotalPnl;
@@ -154,12 +176,17 @@ const getCustomerHoldings = async (req, res) => {
       upnl -= h.totalBrokerage;
 
       return {
+        _id: h._id,
         symbol: h.symbol,
         netQty: absoluteQty,
         lot: h.lot,
         type,
         avgCost,
         lastPrice: h.lastPrice,
+        exchange: h.exchange || 'NSE',
+        tradeType: h.tradeType || 'INTRADAY',
+        date: h.date,
+        time: h.time || '',
         totalInvestment: h.customInvested !== undefined ? h.customInvested : absoluteQty * avgCost,
         totalValue: absoluteQty * h.lastPrice,
         totalBrokerage: h.totalBrokerage,
@@ -170,7 +197,7 @@ const getCustomerHoldings = async (req, res) => {
       };
     })
     .filter(h => h.type !== 'Closed') // Filter out fully exited positions
-    .sort((a, b) => b.lastUpdated - a.lastUpdated); // Sort by most recent activity descending
+    .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)); // Sort by most recent activity descending (newest first)
 
     res.json(holdings);
   } catch (error) {
@@ -186,7 +213,7 @@ const getWeeklyRecords = async (req, res) => {
       return res.status(400).json({ message: 'Customer ID is required' });
     }
 
-    const exits = await Exit.find({ customerId }).sort({ date: -1, createdAt: -1 }).lean();
+    const exits = await Exit.find({ customerId }).sort({ createdAt: -1, date: -1 }).lean();
     res.json(exits);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -214,10 +241,10 @@ const deleteHolding = async (req, res) => {
 const editHolding = async (req, res) => {
   try {
     const { customerId, symbol } = req.params;
-    const { quantity, lot, price, ltp, marginRs, brokerageFee, invested, unrealisedPnl, totalPnl } = req.body;
+    const { quantity, lot, price, ltp, marginRs, brokerageFee, invested, unrealisedPnl, totalPnl, exchange, tradeType, date, time } = req.body;
     
     // Find the most recent entry for this holding
-    const entries = await Entry.find({ customerId, symbol: symbol.toUpperCase() }).sort({ date: -1 });
+    const entries = await Entry.find({ customerId, symbol: symbol.toUpperCase() }).sort({ createdAt: -1, date: -1 });
     
     if (entries.length === 0) {
       return res.status(404).json({ message: 'No entries found for this holding' });
@@ -230,6 +257,10 @@ const editHolding = async (req, res) => {
     if (price !== undefined) latestEntry.price = parseFloat(price) || 0;
     if (ltp !== undefined) latestEntry.ltp = parseFloat(ltp) || 0;
     if (marginRs !== undefined) latestEntry.marginRs = parseFloat(marginRs) || 0;
+    if (exchange !== undefined) latestEntry.exchange = exchange;
+    if (tradeType !== undefined) latestEntry.tradeType = tradeType;
+    if (date !== undefined) latestEntry.date = date;
+    if (time !== undefined) latestEntry.time = time;
     
     // Custom overrides for display
     if (invested !== undefined) latestEntry.customInvested = parseFloat(invested) || 0;
@@ -246,9 +277,6 @@ const editHolding = async (req, res) => {
     }
 
     await latestEntry.save();
-    
-    // If there are exits for this holding, we might need to update their entry prices? 
-    // Let's keep it simple and just update the entry.
     
     res.json({ message: 'Holding updated successfully', trade: latestEntry });
   } catch (error) {
@@ -275,7 +303,7 @@ const deleteExit = async (req, res) => {
 const editTrade = async (req, res) => {
   try {
     const { id } = req.params;
-    const { type, action, symbol, quantity, lot, price, ltp, marginRs, marginPct, date, brokeragePct } = req.body;
+    const { type, action, symbol, quantity, lot, price, ltp, marginRs, marginPct, date, time, exchange, tradeType, brokeragePct, brokerageFee: reqBrokerageFee } = req.body;
 
     if (!id || !type || !action || !symbol || !quantity || !price || !ltp || !date) {
       return res.status(400).json({ message: 'Please provide all required fields' });
@@ -285,9 +313,18 @@ const editTrade = async (req, res) => {
     const priceNum = parseFloat(price) || 0;
     const estimatedTotal = qtyNum * priceNum;
     
-    let activeBrokeragePct = parseFloat(brokeragePct);
-    if (isNaN(activeBrokeragePct)) activeBrokeragePct = 0;
-    let brokerageFee = (estimatedTotal * activeBrokeragePct) / 100;
+    let brokerageFee = 0;
+    let activeBrokeragePct = 0.01;
+    if (reqBrokerageFee !== undefined && reqBrokerageFee !== '' && !isNaN(parseFloat(reqBrokerageFee))) {
+      brokerageFee = parseFloat(reqBrokerageFee);
+      activeBrokeragePct = estimatedTotal > 0 ? (brokerageFee / estimatedTotal) * 100 : 0;
+    } else if (brokeragePct !== undefined && brokeragePct !== '' && !isNaN(parseFloat(brokeragePct))) {
+      activeBrokeragePct = parseFloat(brokeragePct);
+      brokerageFee = (estimatedTotal * activeBrokeragePct) / 100;
+    } else {
+      activeBrokeragePct = 0.01;
+      brokerageFee = (estimatedTotal * 0.01) / 100;
+    }
 
     const tradeData = {
       action: action.toLowerCase(),
@@ -299,6 +336,9 @@ const editTrade = async (req, res) => {
       marginRs: parseFloat(marginRs) || (parseFloat(marginPct) > 0 ? (estimatedTotal * parseFloat(marginPct) / 100) : 0),
       marginPct: parseFloat(marginPct) || 0,
       date,
+      time: time !== undefined ? time : '',
+      exchange: exchange || 'NSE',
+      tradeType: tradeType || 'INTRADAY',
       brokeragePct: activeBrokeragePct,
       brokerageFee,
       estimatedTotal

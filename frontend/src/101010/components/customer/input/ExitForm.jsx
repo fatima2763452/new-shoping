@@ -5,6 +5,8 @@ import TradeReceipt from '../TradeReceipt';
 const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeData }) => {
   const [symbol, setSymbol] = useState('');
   const [action, setAction] = useState('sell'); // default to sell for exit
+  const [exchange, setExchange] = useState('NSE'); // 'NSE' or 'BSE'
+  const [tradeType, setTradeType] = useState('INTRADAY'); // 'INTRADAY' or 'DELIVERY'
   const [quantity, setQuantity] = useState('');
   const [lot, setLot] = useState('');
   const [price, setPrice] = useState('');
@@ -12,6 +14,7 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
   const [marginRs, setMarginRs] = useState('');
   const [marginPct, setMarginPct] = useState('');
   const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
   const [brokerage, setBrokerage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [receiptData, setReceiptData] = useState(null);
@@ -24,16 +27,19 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
       setEditingId(editingTradeData._id || null);
       setSymbol(editingTradeData.symbol || '');
       setAction(editingTradeData.action || 'sell');
+      setExchange(editingTradeData.exchange || 'NSE');
+      setTradeType(editingTradeData.tradeType || 'INTRADAY');
       setQuantity(editingTradeData.quantity || '');
       setLot(editingTradeData.lot || '');
       setPrice(editingTradeData.price || editingTradeData.avgCost || '');
       setLtp(editingTradeData.ltp || editingTradeData.lastPrice || '');
-      setMarginRs(editingTradeData.marginRs || '');
-      setMarginPct(editingTradeData.marginPct || '');
+      setMarginRs(editingTradeData.marginRs !== undefined ? editingTradeData.marginRs : '');
+      setMarginPct(editingTradeData.marginPct !== undefined ? editingTradeData.marginPct : '');
       if (editingTradeData.date) {
         try { setDate(new Date(editingTradeData.date).toISOString().split('T')[0]); } catch(e) {}
       }
-      setBrokerage(editingTradeData.brokeragePct || '');
+      setTime(editingTradeData.time || '');
+      setBrokerage(editingTradeData.brokerageFee !== undefined ? editingTradeData.brokerageFee : '');
     }
   }, [editingTradeData]);
 
@@ -41,9 +47,23 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
   const priceNum = parseFloat(price) || 0;
   const estimatedTotal = qtyNum * priceNum;
   
-  // Brokerage: blank or input = flat ₹ amount (default to 0)
-  const brokerageFee = parseFloat(brokerage) || 0;
-  const activeBrokeragePct = estimatedTotal > 0 ? (brokerageFee / estimatedTotal) * 100 : 0;
+  // Brokerage: if blank, default to 0.01% of estimatedTotal
+  const brokerageFee = brokerage !== '' && brokerage !== null && !isNaN(parseFloat(brokerage)) 
+    ? parseFloat(brokerage) 
+    : (estimatedTotal * 0.01) / 100;
+
+  const activeBrokeragePct = brokerage !== '' && brokerage !== null && !isNaN(parseFloat(brokerage)) 
+    ? (estimatedTotal > 0 ? (parseFloat(brokerage) / estimatedTotal) * 100 : 0) 
+    : 0.01;
+
+  // Effective Margin calculation
+  const effectiveMarginRs = marginRs !== '' 
+    ? (parseFloat(marginRs) || 0)
+    : (marginPct !== '' && estimatedTotal > 0 ? (estimatedTotal * (parseFloat(marginPct) / 100)) : 0);
+
+  const effectiveMarginPct = marginPct !== ''
+    ? (parseFloat(marginPct) || 0)
+    : (estimatedTotal > 0 && marginRs !== '' ? ((parseFloat(marginRs) / estimatedTotal) * 100) : 0);
 
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
@@ -55,35 +75,34 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
     setIsSubmitting(true);
     
     try {
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      
       const payload = {
         customerId: customer._id,
         type: 'exit',
         action: action,
         symbol: symbol,
+        exchange: exchange,
+        tradeType: tradeType,
         quantity: qtyNum,
         lot: parseFloat(lot) || 0,
         price: priceNum,
         ltp: parseFloat(ltp) || 0,
-        marginRs: parseFloat(marginRs) || 0,
-        marginPct: parseFloat(marginPct) || 0,
+        marginRs: effectiveMarginRs,
+        marginPct: effectiveMarginPct,
         date: date,
+        time: time,
+        brokerageFee: brokerageFee,
         brokeragePct: activeBrokeragePct
       };
 
-      const res = await api.post('/trades', payload);
-      let savedData;
       if (editingId) {
-        const res = await api.put(`/trades/${editingId}`, payload);
+        await api.put(`/trades/${editingId}`, payload);
         showToast(`Successfully updated EXIT ${action.toUpperCase()} for ${qtyNum} ${symbol}`, 'success');
-        savedData = res.data;
       } else {
+        await api.post('/trades', payload);
         showToast(`Successfully saved EXIT ${action.toUpperCase()} for ${qtyNum} ${symbol}`, 'success');
-        savedData = res.data;
       }
-      
-      // Reset form on success
+
+      // Reset form state on success
       setEditingId(null);
       if (setEditingTradeData) setEditingTradeData(null);
       setSymbol('');
@@ -94,47 +113,16 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
       setMarginRs('');
       setMarginPct('');
       setDate('');
+      setTime('');
       setBrokerage('');
+      setExchange('NSE');
+      setTradeType('INTRADAY');
     } catch (err) {
       console.error(err);
       showToast(err.response?.data?.message || 'Server error. Did you restart the backend?', 'error');
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleEditReceipt = () => {
-    if (receiptData) {
-      setEditingId(receiptData._id);
-      setSymbol(receiptData.symbol);
-      setAction(receiptData.action || 'sell');
-      setQuantity(receiptData.quantity.toString());
-      setLot((receiptData.lot || '').toString());
-      setPrice((receiptData.price || receiptData.exitPrice || '').toString());
-      setLtp((receiptData.ltp || '').toString());
-      setMarginRs((receiptData.marginRs || '').toString());
-      setMarginPct((receiptData.marginPct || '').toString());
-      if (receiptData.date) {
-        setDate(new Date(receiptData.date).toISOString().split('T')[0]);
-      }
-      setBrokerage((receiptData.brokeragePct || '').toString());
-      setReceiptData(null);
-    }
-  };
-
-  const handleCloseReceipt = () => {
-    setReceiptData(null);
-    // Reset form
-    setEditingId(null);
-    setSymbol('');
-    setQuantity('');
-    setLot('');
-    setPrice('');
-    setLtp('');
-    setMarginRs('');
-    setMarginPct('');
-    setDate('');
-    setBrokerage('');
   };
 
   return (
@@ -150,6 +138,66 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
       )}
 
       <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      
+      {/* Exchange & Product Type Toggles */}
+      <div className="flex gap-4 mb-5">
+        <div className="flex-1">
+          {/* <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Exchange</label> */}
+          <div className="flex gap-2">
+            <button 
+              type="button"
+              onClick={() => setExchange('NSE')}
+              className={`flex-1 py-2.5 rounded-lg font-bold text-xs transition-all ${
+                exchange === 'NSE' 
+                  ? 'bg-amber-500 text-slate-950 shadow border border-amber-400' 
+                  : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'
+              }`}
+            >
+              NSE
+            </button>
+            <button 
+              type="button"
+              onClick={() => setExchange('BSE')}
+              className={`flex-1 py-2.5 rounded-lg font-bold text-xs transition-all ${
+                exchange === 'BSE' 
+                  ? 'bg-amber-500 text-slate-950 shadow border border-amber-400' 
+                  : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'
+              }`}
+            >
+              BSE
+            </button>
+          </div>
+        </div>
+
+        <div className="flex-1">
+          {/* <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Product Type (R2 Only)</label> */}
+          <div className="flex gap-2">
+            <button 
+              type="button"
+              onClick={() => setTradeType('INTRADAY')}
+              className={`flex-1 py-2.5 rounded-lg font-bold text-xs transition-all ${
+                tradeType === 'INTRADAY' 
+                  ? 'bg-indigo-600 text-white shadow border border-indigo-500' 
+                  : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'
+              }`}
+            >
+              INTRADAY
+            </button>
+            <button 
+              type="button"
+              onClick={() => setTradeType('DELIVERY')}
+              className={`flex-1 py-2.5 rounded-lg font-bold text-xs transition-all ${
+                tradeType === 'DELIVERY' 
+                  ? 'bg-indigo-600 text-white shadow border border-indigo-500' 
+                  : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'
+              }`}
+            >
+              DELIVERY
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Stock Symbol */}
       <div className="mb-5">
         <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Stock Symbol</label>
@@ -160,7 +208,7 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
             required
             value={symbol}
             onChange={e => setSymbol(e.target.value.toUpperCase())}
-            placeholder="e.g., NVDA, AAPL"
+            placeholder="e.g., RELIANCE, TCS"
             className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-10 pr-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none transition-all uppercase"
           />
         </div>
@@ -208,7 +256,7 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
             value={quantity}
             onChange={e => setQuantity(e.target.value)}
             placeholder="100"
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 px-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-blue-500 outline-none transition-all"
+            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 px-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-amber-500 outline-none transition-all"
           />
         </div>
         <div className="flex-[0.8]">
@@ -219,7 +267,7 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
             value={lot}
             onChange={e => setLot(e.target.value)}
             placeholder="0"
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 px-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-blue-500 outline-none transition-all"
+            className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 px-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-amber-500 outline-none transition-all"
           />
         </div>
         <div className="flex-1">
@@ -234,12 +282,12 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
               value={price}
               onChange={e => setPrice(e.target.value)}
               placeholder="150.00"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-8 pr-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-blue-500 outline-none transition-all"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-8 pr-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-amber-500 outline-none transition-all"
             />
           </div>
         </div>
         <div className="flex-1">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">exit price</label>
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Exit Price</label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-sm">₹</span>
             <input 
@@ -250,22 +298,29 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
               value={ltp}
               onChange={e => setLtp(e.target.value)}
               placeholder="155.00"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-8 pr-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-blue-500 outline-none transition-all"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-8 pr-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-amber-500 outline-none transition-all"
             />
           </div>
         </div>
       </div>
 
-      {/* Margin */}
+      {/* Margin with Bracket Percentage Display */}
       <div className="flex gap-4 mb-5">
         <div className="flex-1">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Money Margin (₹)</label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Money Margin (₹)</label>
+            {effectiveMarginPct > 0 && (
+              <span className="text-[11px] font-mono font-bold text-amber-400">
+                ({effectiveMarginPct.toFixed(2)}%)
+              </span>
+            )}
+          </div>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-sm">₹</span>
             <input 
               type="number" 
               value={marginRs}
-              onChange={e => setMarginRs(e.target.value)}
+              onChange={e => { setMarginRs(e.target.value); setMarginPct(''); }}
               placeholder="0.00"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-8 pr-4 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-amber-500 outline-none transition-all"
             />
@@ -278,7 +333,7 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
               type="number" 
               step="0.01"
               value={marginPct}
-              onChange={e => setMarginPct(e.target.value)}
+              onChange={e => { setMarginPct(e.target.value); setMarginRs(''); }}
               placeholder="10"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-4 pr-8 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-amber-500 outline-none transition-all"
             />
@@ -287,9 +342,9 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
         </div>
       </div>
 
-      {/* Execution Date & Brokerage */}
+      {/* Execution Date, Time & Brokerage */}
       <div className="flex gap-4 mb-6">
-        <div className="flex-[1.2]">
+        <div className="flex-[1]">
           <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Execution Date</label>
           <div className="relative">
             <input 
@@ -302,15 +357,29 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
             <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">calendar_month</span>
           </div>
         </div>
-        <div className="flex-[0.8]">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Brockerage (₹)</label>
+
+        <div className="flex-[1]">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Time</label>
+          <div className="relative">
+            <input 
+              type="time" 
+              value={time}
+              onChange={e => setTime(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 px-4 text-sm font-mono text-slate-200 focus:border-amber-500 outline-none transition-all appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+            />
+            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">schedule</span>
+          </div>
+        </div>
+
+        <div className="flex-[0.9]">
+          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Brockerage</label>
           <div className="relative">
             <input 
               type="number" 
               step="0.01"
               value={brokerage}
               onChange={e => setBrokerage(e.target.value)}
-              placeholder="0.00"
+              placeholder="0.01"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg py-3 pl-4 pr-8 text-sm font-mono text-slate-200 placeholder:text-slate-600 focus:border-amber-500 outline-none transition-all"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-sm">₹</span>
@@ -326,7 +395,7 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
         </div>
         <div className="text-right">
           <div className="text-[10px] font-bold uppercase tracking-wider mb-1 text-amber-400">Brockerage</div>
-          <div className="text-sm font-mono text-slate-500">{formatCurrency(brokerageFee)}</div>
+          <div className="text-sm font-mono text-slate-300">{formatCurrency(brokerageFee)}</div>
         </div>
       </div>
 

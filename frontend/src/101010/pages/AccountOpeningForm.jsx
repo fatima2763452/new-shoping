@@ -467,14 +467,7 @@ const AccountOpeningForm = () => {
                     <span>☐ High</span>
                   </td>
                 </tr>
-                <tr>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Preferred Platform</td>
-                  <td style={{ ...valueStyle }}>
-                    <span style={{ marginRight: '16px' }}>☑ Web</span>
-                    <span style={{ marginRight: '16px' }}>☐ Mobile App</span>
-                    <span>☐ API</span>
-                  </td>
-                </tr>
+               
               </tbody>
             </table>
 

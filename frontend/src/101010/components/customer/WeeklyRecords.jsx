@@ -35,7 +35,8 @@ const WeeklyRecords = ({ customer, onEditRequest }) => {
     try {
       setIsLoading(true);
       const { data } = await api.get(`/trades/weekly/${customer._id}`);
-      setExits(data);
+      const sorted = (data || []).sort((a, b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0));
+      setExits(sorted);
     } catch (err) {
       console.error(err);
       setError('Failed to load past exits.');

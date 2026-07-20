@@ -20,8 +20,13 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
         lot: trade.lot || '',
         price: type === 'exit' ? trade.price : (trade.entryPrice || trade.price || ''),
         ltp: type === 'exit' ? trade.ltp : (trade.ltp || ''),
-        marginRs: trade.marginRs || '',
-        brokeragePct: trade.brokeragePct || ''
+        marginRs: trade.marginRs !== undefined ? trade.marginRs : '',
+        brokerageFee: trade.brokerageFee !== undefined ? trade.brokerageFee : '',
+        brokeragePct: trade.brokeragePct !== undefined ? trade.brokeragePct : '',
+        date: trade.date ? new Date(trade.date).toISOString().split('T')[0] : '',
+        time: trade.time || '',
+        exchange: trade.exchange || 'NSE',
+        tradeType: trade.tradeType || 'INTRADAY'
       });
     }
   }, [trade, isEditing, type]);
@@ -137,9 +142,39 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
   const totalSellValue = sellPrice !== null ? sellPrice * trade.quantity : null;
   const isShortExit = trade.action.toLowerCase() === 'buy'; // Exiting a short position by buying
 
-  const displayTotalPnl = trade.realizedPnl || 0;
-  const costBasis = (isExit ? trade.price : (trade.entryPrice || trade.price || 0)) * (trade.quantity || 1);
+  let calculatedPnl = 0;
+  if (isExit) {
+    calculatedPnl = trade.realizedPnl !== undefined ? trade.realizedPnl : 0;
+  } else {
+    if (trade.customUpnl !== undefined) {
+      calculatedPnl = trade.customUpnl;
+    } else if (trade.ltp > 0 && trade.ltp !== (trade.price || trade.entryPrice)) {
+      calculatedPnl = isBuy 
+        ? ((trade.ltp - (trade.price || trade.entryPrice || 0)) * trade.quantity - (trade.brokerageFee || 0))
+        : (((trade.price || trade.entryPrice || 0) - trade.ltp) * trade.quantity - (trade.brokerageFee || 0));
+    } else {
+      calculatedPnl = 0;
+    }
+  }
+
+  const displayTotalPnl = calculatedPnl;
+  const costBasis = (trade.price || trade.entryPrice || 0) * (trade.quantity || 1);
   const pnlPercent = costBasis > 0 ? (displayTotalPnl / costBasis) * 100 : 0;
+
+  const formatTime12Hr = (timeStr) => {
+    if (!timeStr) return '';
+    if (timeStr.includes('AM') || timeStr.includes('PM') || timeStr.includes('am') || timeStr.includes('pm')) return timeStr;
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return timeStr;
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    if (isNaN(hours)) return timeStr;
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursFormatted = hours < 10 ? `0${hours}` : hours;
+    return `${hoursFormatted}:${minutes} ${ampm}`;
+  };
 
   const inputClassName = `w-24 px-2 py-1 text-sm text-right rounded border transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
     theme === 'dark' 
@@ -244,7 +279,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
               <div className="flex items-center mb-2">
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
                 <span className={`mx-4 text-[10px] font-bold tracking-[0.25em] uppercase ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} whitespace-nowrap`}>
-                  TRADE {type.toUpperCase()} RECEIPT
+                  TRADE {type.toUpperCase()} 
                 </span>
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
               </div>
@@ -261,7 +296,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
                       theme === 'dark' ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'
                     }`}>
-                      NSE
+                      {(trade.exchange || 'NSE').toUpperCase()}
                     </span>
                   </div>
                   
@@ -278,7 +313,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                         ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
                         : 'bg-blue-50 text-blue-600 border border-blue-200'
                     } whitespace-nowrap`}>
-                      {type.toUpperCase()}
+                      {(trade.tradeType || 'INTRADAY').toUpperCase()}
                     </span>
                   </div>
                 </div>
@@ -329,7 +364,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                     AVG PRICE
                   </div>
                   <div className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-950'} whitespace-nowrap`}>
-                    {formatCurrency(isExit ? trade.price : (trade.entryPrice || 0))}
+                    {formatCurrency(trade.price || trade.entryPrice || 0)}
                   </div>
                 </div>
               </div>
@@ -360,62 +395,71 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                   </div>
                   
                   <div className="flex justify-between items-center py-2.5">
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>{isShortExit ? 'Avg' : 'Avg'}</span>
+                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Avg</span>
                     {isEditing ? (
                       <input type="number" className={inputClassName} value={editData.price} onChange={e => setEditData({...editData, price: e.target.value})} />
                     ) : (
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency(isExit ? trade.price : (trade.entryPrice || 0))}</span>
+                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency(trade.price || trade.entryPrice || 0)}</span>
                     )}
                   </div>
                   {!isEditing && (
                     <div className="flex justify-between items-center py-2.5">
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>{isShortExit ? 'Invested' : 'Invested'}</span>
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency((isExit ? trade.price : (trade.entryPrice || 0)) * trade.quantity)}</span>
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Invested</span>
+                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency((trade.price || trade.entryPrice || 0) * trade.quantity)}</span>
                     </div>
                   )}
                   
                   <div className="flex justify-between items-center py-2.5">
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Exit Price</span>
+                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>{isExit ? 'Exit Price' : 'Exit Price (LTP)'}</span>
                     {isEditing ? (
                       <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({...editData, ltp: e.target.value})} />
                     ) : (
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency(isExit ? trade.ltp : trade.price)}</span>
+                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency(isExit ? trade.ltp : (trade.ltp || 0))}</span>
                     )}
                   </div>
 
-                  {(isEditing || parseFloat(trade.marginRs) > 0 || parseFloat(trade.marginPct) > 0) && (
-                    <div className="flex justify-between items-center py-2.5">
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Money Margin</span>
-                      {isEditing ? (
-                        <input type="number" className={inputClassName} value={editData.marginRs || editData.marginPct} onChange={e => setEditData({...editData, marginRs: e.target.value})} />
-                      ) : (
-                        <span className={`text-sm font-semibold flex items-center gap-2 ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>
-                          {parseFloat(trade.marginPct) > 0 && (
-                            <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">{trade.marginPct}%</span>
-                          )}
-                          {formatCurrency(trade.marginRs)}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  <div className="flex justify-between items-center py-2.5">
+                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Money Margin</span>
+                    {isEditing ? (
+                      <input type="number" className={inputClassName} value={editData.marginRs !== undefined ? editData.marginRs : editData.marginPct} onChange={e => setEditData({...editData, marginRs: e.target.value})} />
+                    ) : (
+                      <span className={`text-sm font-semibold flex items-center gap-2 ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>
+                        {(() => {
+                          const marginRsVal = parseFloat(trade.marginRs) || 0;
+                          const totalVal = (trade.quantity || 0) * (isExit ? trade.price : (trade.entryPrice || trade.price || 0));
+                          let marginPctVal = parseFloat(trade.marginPct) || 0;
+                          if (marginRsVal <= 0) {
+                            marginPctVal = 0;
+                          } else if (marginPctVal <= 0 && totalVal > 0) {
+                            marginPctVal = (marginRsVal / totalVal) * 100;
+                          }
+                          return marginPctVal > 0 ? (
+                            <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">
+                              {marginPctVal.toFixed(2)}%
+                            </span>
+                          ) : null;
+                        })()}
+                        {formatCurrency(trade.marginRs || 0)}
+                      </span>
+                    )}
+                  </div>
 
-                  {!isEditing && parseFloat(trade.brokerageFee) > 0 && (
+                  {!isEditing && (parseFloat(trade.brokerageFee) > 0 || trade.brokerageFee !== undefined) && (
                     <div className="flex justify-between items-center py-2.5">
                       <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Brockerage</span>
-                      <span className={`text-sm font-semibold flex items-center gap-2 ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>
-                        {parseFloat(trade.brokeragePct) > 0 && (
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${theme === 'dark' ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'}`}>{trade.brokeragePct}%</span>
-                        )}
-                        {formatCurrency(trade.brokerageFee)}
+                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>
+                        {formatCurrency(trade.brokerageFee !== undefined ? trade.brokerageFee : 0.01)}
                       </span>
                     </div>
                   )}
 
-                  {!isEditing && trade.realizedPnl !== undefined && (
+                  {!isEditing && (
                     <div className="flex justify-between items-center py-2.5">
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Realised P&L</span>
-                      <span className={`text-sm font-bold ${trade.realizedPnl >= 0 ? 'text-emerald-500' : 'text-rose-500'} whitespace-nowrap`}>
-                        {trade.realizedPnl >= 0 ? '+' : ''}{formatCurrency(trade.realizedPnl)}
+                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>
+                        {isExit ? 'Realised P&L' : 'Unrealised P&L'}
+                      </span>
+                      <span className={`text-sm font-bold ${calculatedPnl >= 0 ? 'text-emerald-500' : 'text-rose-500'} whitespace-nowrap`}>
+                        {calculatedPnl >= 0 ? '+' : ''}{formatCurrency(calculatedPnl)}
                       </span>
                     </div>
                   )}
@@ -423,9 +467,9 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
               </div>
 
               {/* Total P&L Footer */}
-              {!isEditing && trade.realizedPnl !== undefined && (
+              {!isEditing && (
                 <div className={`p-4 rounded-xl border flex flex-col justify-center items-start transition-all ${
-                  trade.realizedPnl >= 0 
+                  calculatedPnl >= 0 
                     ? (theme === 'dark' 
                         ? 'bg-gradient-to-r from-emerald-950/40 to-emerald-900/10 border-emerald-900/50 text-emerald-400' 
                         : 'bg-gradient-to-r from-emerald-50 to-emerald-100/50 border-emerald-200 text-emerald-700')
@@ -434,10 +478,10 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                         : 'bg-gradient-to-r from-rose-50 to-rose-100/50 border-rose-200 text-rose-700')
                 }`}>
                   <span className="text-[10px] font-bold uppercase tracking-[0.15em] mb-1">
-                    TOTAL P/L
+                    NET P/L
                   </span>
                   <span className="text-2xl font-black tracking-tight whitespace-nowrap">
-                    {trade.realizedPnl >= 0 ? '+' : ''}{formatCurrency(trade.realizedPnl)}
+                    {calculatedPnl >= 0 ? '+' : ''}{formatCurrency(calculatedPnl)}
                   </span>
                 </div>
               )}

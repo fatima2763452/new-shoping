@@ -44,6 +44,20 @@ const exitSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  time: {
+    type: String,
+    default: '',
+  },
+  exchange: {
+    type: String,
+    enum: ['NSE', 'BSE'],
+    default: 'NSE',
+  },
+  tradeType: {
+    type: String,
+    enum: ['INTRADAY', 'DELIVERY'],
+    default: 'INTRADAY',
+  },
   brokeragePct: {
     type: Number,
     default: 0.01,

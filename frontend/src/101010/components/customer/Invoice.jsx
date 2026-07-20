@@ -287,7 +287,7 @@ export default function Invoice() {
 
             // Header Elements (Logo on the left)
             if (logoBase64) {
-                const logoH = 50; // height in pt
+                const logoH = 70; // height in pt
                 const logoW = (dims.width / dims.height) * logoH;
                 pdf.addImage(logoBase64, 'JPEG', marginSize, cursorY, logoW, logoH);
             }
@@ -468,9 +468,9 @@ export default function Invoice() {
             const summaryCardW = (contentW - 15) / 2;
 
             // Left Card: MARGIN DETAILS
-            const displayFreeMargin = freeMargin ? parseFloat(freeMargin) : totalBuyValueSum;
-            const displayHoldMargin = holdMargin ? parseFloat(holdMargin) : totalSellValueSum;
-            const displayTotalMargin = totalMargin ? parseFloat(totalMargin) : totalSellValueSum;
+            const displayFreeMargin = freeMargin !== '' && freeMargin !== null && !isNaN(parseFloat(freeMargin)) ? parseFloat(freeMargin) : 0;
+            const displayHoldMargin = holdMargin !== '' && holdMargin !== null && !isNaN(parseFloat(holdMargin)) ? parseFloat(holdMargin) : 0;
+            const displayTotalMargin = totalMargin !== '' && totalMargin !== null && !isNaN(parseFloat(totalMargin)) ? parseFloat(totalMargin) : 0;
 
             pdf.setDrawColor(226, 232, 240);
             pdf.setFillColor(248, 250, 252);
@@ -932,19 +932,19 @@ export default function Invoice() {
                                 <div className="flex justify-between pb-2">
                                     <span className="text-slate-400">Free Margin</span>
                                     <span className="text-slate-900">
-                                        {formatIndianCurrency(freeMargin ? parseFloat(freeMargin) : totalBuyValueSum)}
+                                        {formatIndianCurrency(freeMargin !== '' && freeMargin !== null && !isNaN(parseFloat(freeMargin)) ? parseFloat(freeMargin) : 0)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between pb-2">
                                     <span className="text-slate-400">Hold Margin</span>
                                     <span className="text-slate-900">
-                                        {formatIndianCurrency(holdMargin ? parseFloat(holdMargin) : totalSellValueSum)}
+                                        {formatIndianCurrency(holdMargin !== '' && holdMargin !== null && !isNaN(parseFloat(holdMargin)) ? parseFloat(holdMargin) : 0)}
                                     </span>
                                 </div>
                                 <div className="flex justify-between pb-2">
                                     <span className="text-slate-400">Total Margin</span>
                                     <span className="text-slate-900">
-                                        {formatIndianCurrency(totalMargin ? parseFloat(totalMargin) : totalSellValueSum)}
+                                        {formatIndianCurrency(totalMargin !== '' && totalMargin !== null && !isNaN(parseFloat(totalMargin)) ? parseFloat(totalMargin) : 0)}
                                     </span>
                                 </div>
 
