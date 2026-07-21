@@ -388,7 +388,11 @@ function App() {
         bootstrapCSS.href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css';
         bootstrapCSS.integrity = 'sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT';
         bootstrapCSS.crossOrigin = 'anonymous';
-        document.head.appendChild(bootstrapCSS);
+        if (document.head.firstChild) {
+          document.head.insertBefore(bootstrapCSS, document.head.firstChild);
+        } else {
+          document.head.appendChild(bootstrapCSS);
+        }
       }
 
       // Load Bootstrap JS

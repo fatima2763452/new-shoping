@@ -42,7 +42,7 @@ const AccountOpeningForm = () => {
     wrapper.style.display = 'block';
 
     try {
-      const html2canvas = (await import('html2canvas')).default;
+      const html2canvas = (await import('html2canvas-pro')).default;
       const { jsPDF } = await import('jspdf');
 
       const element = document.getElementById('pdf-page-1');

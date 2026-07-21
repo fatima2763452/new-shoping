@@ -10,11 +10,6 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 4000
     },
-    resolve: {
-      alias: {
-        html2canvas: 'html2canvas-pro'
-      }
-    },
     define: {
       'process.env': JSON.stringify({
         PUBLIC_URL: '',

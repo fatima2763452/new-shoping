@@ -1,6 +1,7 @@
-/* Global CSS */
+/* Scoped Tailwind CSS for token 101010 */
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
-@import "tailwindcss";
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
 
 /* Force premium sans-serif typography for token 101010, bypassing global Bootstrap body font overrides */
 #token-101010-root {
@@ -512,18 +513,19 @@
 
 /* --- Print Styles for PDF Generation --- */
 @media print {
-  /* Hide absolutely everything initially */
-  body * {
+  /* Hide elements inside token-101010-root initially */
+  #token-101010-root * {
     visibility: hidden;
   }
 
   /* Only make the print receipt area and its children visible */
-  .receipt-print-area, .receipt-print-area * {
+  #token-101010-root .receipt-print-area,
+  #token-101010-root .receipt-print-area * {
     visibility: visible;
   }
 
   /* Reset layout for the receipt to be perfectly aligned on the page */
-  .receipt-print-area {
+  #token-101010-root .receipt-print-area {
     position: fixed;
     left: 0;
     top: 0;
@@ -542,7 +544,7 @@
   }
 
   /* Hide interactive elements like close buttons and theme toggles */
-  .print-hide {
+  #token-101010-root .print-hide {
     display: none !important;
   }
 }
