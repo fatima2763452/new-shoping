@@ -184,26 +184,57 @@ export default function Invoice() {
         fetchOrders();
     }, [customerId]);
 
+    const isDateInRange = (rawDate, startStr, endStr) => {
+        if (!rawDate || !startStr || !endStr) return false;
+        
+        let dStr = '';
+        if (typeof rawDate === 'string') {
+            if (rawDate.includes('T')) {
+                dStr = rawDate.split('T')[0];
+            } else if (rawDate.includes('-')) {
+                dStr = rawDate.slice(0, 10);
+            }
+        }
+        
+        if (!dStr) {
+            const d = new Date(rawDate);
+            if (!isNaN(d.getTime())) {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                dStr = `${year}-${month}-${day}`;
+            }
+        }
+
+        if (!dStr) return false;
+
+        const dObj = new Date(rawDate);
+        let localDStr = dStr;
+        if (!isNaN(dObj.getTime())) {
+            const localYYYY = dObj.getFullYear();
+            const localMM = String(dObj.getMonth() + 1).padStart(2, '0');
+            const localDD = String(dObj.getDate()).padStart(2, '0');
+            localDStr = `${localYYYY}-${localMM}-${localDD}`;
+        }
+
+        const inUtc = (dStr >= startStr && dStr <= endStr);
+        const inLocal = (localDStr >= startStr && localDStr <= endStr);
+
+        return inUtc || inLocal;
+    };
+
     const generateInvoice = () => {
         if (!startDate || !endDate) return;
 
-        const [sYear, sMonth, sDay] = startDate.split('-').map(Number);
-        const [eYear, eMonth, eDay] = endDate.split('-').map(Number);
-
-        const start = new Date(sYear, sMonth - 1, sDay, 0, 0, 0, 0);
-        const end = new Date(eYear, eMonth - 1, eDay, 23, 59, 59, 999);
-
         const filtered = orders.filter(o => {
             const fallbackDate = o.date || o.createdAt;
-            if (!fallbackDate) return false;
-            const date = new Date(fallbackDate);
-            return date >= start && date <= end;
+            return isDateInRange(fallbackDate, startDate, endDate);
         });
 
         setFilterStats({
             total: orders.length,
             matched: filtered.length,
-            range: `${start.toLocaleDateString()} to ${end.toLocaleDateString()}`
+            range: `${startDate} to ${endDate}`
         });
 
         // Generate Invoice ID if not already set
