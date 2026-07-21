@@ -3,6 +3,12 @@ import token101010Css from '../index.css?inline';
 
 export default function TokenWrapper({ children }) {
   useEffect(() => {
+    const origMargin = document.body.style.margin;
+    const origBg = document.body.style.backgroundColor;
+
+    document.body.style.margin = '0px';
+    document.body.style.backgroundColor = '#051424';
+
     let styleEl = document.getElementById('token-101010-styles');
     if (!styleEl) {
       styleEl = document.createElement('style');
@@ -12,6 +18,8 @@ export default function TokenWrapper({ children }) {
     }
 
     return () => {
+      document.body.style.margin = origMargin;
+      document.body.style.backgroundColor = origBg;
       const el = document.getElementById('token-101010-styles');
       if (el) {
         el.remove();
