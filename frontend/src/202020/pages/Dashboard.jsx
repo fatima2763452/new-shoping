@@ -298,16 +298,16 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right Side: Logout Button */}
-        <div className="flex items-center">
+        {/* Right Side: Bell Notifications */}
+        {/* <div className="flex gap-1.5 items-center">
           <button 
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-500/20 bg-rose-500/5 hover:bg-rose-500/15 text-rose-400 hover:text-rose-300 font-semibold text-xs transition-all duration-200 active:scale-95 shadow-sm shadow-rose-950/20"
+            className="text-slate-400 hover:text-indigo-400 p-2 rounded-xl hover:bg-slate-900/60 transition-colors relative"
+            title="Notifications"
           >
-            <span className="material-symbols-outlined text-[16px]">logout</span>
-            Logout
+            <span className="material-symbols-outlined text-[22px]">notifications</span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-violet-500 rounded-full border border-slate-950"></span>
           </button>
-        </div>
+        </div> */}
       </header>
 
       {/* Main Content Area */}
@@ -449,13 +449,13 @@ const Dashboard = () => {
               <span className="text-[9px] font-bold mt-1">Form</span>
             </button>
 
-            {/* Tab 4: ID Card */}
+            {/* Tab 4: Logout */}
             <button 
-              onClick={() => navigate('/id-card')}
-              className="flex flex-col items-center justify-center w-14 py-1 text-slate-400 hover:text-violet-400 transition-all cursor-pointer"
+              onClick={handleLogout}
+              className="flex flex-col items-center justify-center w-14 py-1 text-slate-400 hover:text-rose-400 transition-all cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[22px]">badge</span>
-              <span className="text-[9px] font-bold mt-1">ID Card</span>
+              <span className="material-symbols-outlined text-[22px]">logout</span>
+              <span className="text-[9px] font-bold mt-1">Logout</span>
             </button>
           </div>
         </div>

@@ -40,96 +40,52 @@
   border-left-width: 1px !important;
   border-left-style: solid !important;
 }
-/* Wipe out any default browser/Bootstrap white bottom borders inside token 101010 */
-#token-101010-root *,
-#token-101010-root *::before,
-#token-101010-root *::after {
-  border-bottom-color: transparent !important;
-}
 
-/* Specific Border Color Overrides using safe attribute selectors (bypasses Vite/PostCSS slash escaping issues) */
-#token-101010-root [class*="border-slate-800"] {
-  border-color: rgba(30, 41, 59, 0.8) !important;
-  border-top-color: rgba(30, 41, 59, 0.8) !important;
-  border-bottom-color: rgba(30, 41, 59, 0.8) !important;
-  border-left-color: rgba(30, 41, 59, 0.8) !important;
-  border-right-color: rgba(30, 41, 59, 0.8) !important;
+/* Specific Border Color Overrides */
+#token-101010-root .border-slate-800\/60 {
+  border-color: rgba(30, 41, 59, 0.6) !important;
 }
-#token-101010-root [class*="border-slate-700"] {
+#token-101010-root .border-slate-800\/80 {
+  border-color: rgba(30, 41, 59, 0.8) !important;
+}
+#token-101010-root .border-slate-800 {
+  border-color: rgb(30, 41, 59) !important;
+}
+#token-101010-root .border-slate-700\/50 {
+  border-color: rgba(51, 65, 85, 0.5) !important;
+}
+#token-101010-root .border-slate-700\/80 {
   border-color: rgba(51, 65, 85, 0.8) !important;
-  border-top-color: rgba(51, 65, 85, 0.8) !important;
-  border-bottom-color: rgba(51, 65, 85, 0.8) !important;
-  border-left-color: rgba(51, 65, 85, 0.8) !important;
-  border-right-color: rgba(51, 65, 85, 0.8) !important;
 }
-#token-101010-root [class*="border-slate-900"] {
+#token-101010-root .border-slate-900\/30 {
+  border-color: rgba(15, 23, 42, 0.3) !important;
+}
+#token-101010-root .border-slate-900\/60 {
   border-color: rgba(15, 23, 42, 0.6) !important;
-  border-top-color: rgba(15, 23, 42, 0.6) !important;
-  border-bottom-color: rgba(15, 23, 42, 0.6) !important;
-  border-left-color: rgba(15, 23, 42, 0.6) !important;
-  border-right-color: rgba(15, 23, 42, 0.6) !important;
 }
-#token-101010-root [class*="border-slate-950"] {
+#token-101010-root .border-slate-950 {
   border-color: rgb(2, 6, 23) !important;
-  border-top-color: rgb(2, 6, 23) !important;
-  border-bottom-color: rgb(2, 6, 23) !important;
-  border-left-color: rgb(2, 6, 23) !important;
-  border-right-color: rgb(2, 6, 23) !important;
 }
-#token-101010-root [class*="border-emerald-500"] {
-  border-color: rgba(16, 185, 129, 0.2) !important;
-  border-top-color: rgba(16, 185, 129, 0.2) !important;
-  border-bottom-color: rgba(16, 185, 129, 0.2) !important;
-  border-left-color: rgba(16, 185, 129, 0.2) !important;
-  border-right-color: rgba(16, 185, 129, 0.2) !important;
+#token-101010-root .border-violet-500\/20 {
+  border-color: rgba(139, 92, 246, 0.2) !important;
 }
-#token-101010-root [class*="border-rose-500"] {
-  border-color: rgba(244, 63, 94, 0.2) !important;
-  border-top-color: rgba(244, 63, 94, 0.2) !important;
-  border-bottom-color: rgba(244, 63, 94, 0.2) !important;
-  border-left-color: rgba(244, 63, 94, 0.2) !important;
-  border-right-color: rgba(244, 63, 94, 0.2) !important;
-}
-#token-101010-root [class*="border-rose-900"] {
-  border-color: rgba(136, 19, 55, 0.5) !important;
-  border-top-color: rgba(136, 19, 55, 0.5) !important;
-  border-bottom-color: rgba(136, 19, 55, 0.5) !important;
-  border-left-color: rgba(136, 19, 55, 0.5) !important;
-  border-right-color: rgba(136, 19, 55, 0.5) !important;
-}
-#token-101010-root [class*="border-[#e2e8f0]"] {
-  border-color: #e2e8f0 !important;
-  border-top-color: #e2e8f0 !important;
-  border-bottom-color: #e2e8f0 !important;
-  border-left-color: #e2e8f0 !important;
-  border-right-color: #e2e8f0 !important;
-}
-#token-101010-root [class*="border-slate-200"] {
-  border-color: rgb(226, 232, 240) !important;
-  border-top-color: rgb(226, 232, 240) !important;
-  border-bottom-color: rgb(226, 232, 240) !important;
-  border-left-color: rgb(226, 232, 240) !important;
-  border-right-color: rgb(226, 232, 240) !important;
-}
-#token-101010-root .theme-dark .border {
-  border-color: rgba(30, 41, 59, 0.8) !important;
-  border-top-color: rgba(30, 41, 59, 0.8) !important;
-  border-bottom-color: rgba(30, 41, 59, 0.8) !important;
-  border-left-color: rgba(30, 41, 59, 0.8) !important;
-  border-right-color: rgba(30, 41, 59, 0.8) !important;
-}
-#token-101010-root .theme-light .border {
-  border-color: #e2e8f0 !important;
-  border-top-color: #e2e8f0 !important;
-  border-bottom-color: #e2e8f0 !important;
-  border-left-color: #e2e8f0 !important;
-  border-right-color: #e2e8f0 !important;
-}
-#token-101010-root [class*="border-violet-500"] {
+#token-101010-root .border-violet-500\/25 {
   border-color: rgba(139, 92, 246, 0.25) !important;
 }
-#token-101010-root [class*="border-violet-400"] {
+#token-101010-root .border-violet-500\/40 {
+  border-color: rgba(139, 92, 246, 0.4) !important;
+}
+#token-101010-root .border-violet-400\/20 {
   border-color: rgba(167, 139, 250, 0.2) !important;
+}
+#token-101010-root .border-emerald-500\/20 {
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+#token-101010-root .border-rose-500\/20 {
+  border-color: rgba(244, 63, 94, 0.2) !important;
+}
+#token-101010-root .border-rose-900\/50 {
+  border-color: rgba(136, 19, 55, 0.5) !important;
 }
 
 /* Shadow Overrides */

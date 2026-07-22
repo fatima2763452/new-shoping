@@ -25,6 +25,8 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
         brokeragePct: trade.brokeragePct !== undefined ? trade.brokeragePct : '',
         date: trade.date ? new Date(trade.date).toISOString().split('T')[0] : '',
         time: trade.time || '',
+        holdingDate: trade.holdingDate ? new Date(trade.holdingDate).toISOString().split('T')[0] : '',
+        holdingTime: trade.holdingTime || '',
         exchange: trade.exchange || 'NSE',
         tradeType: trade.tradeType || 'INTRADAY'
       });
@@ -82,7 +84,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
       const height = el.offsetHeight;
 
       const dataUrl = await toPng(el, {
-        backgroundColor: theme === 'dark' ? '#0b1329' : '#ffffff',
+        backgroundColor: theme === 'dark' ? '#03060d' : '#ffffff',
         width: width,
         height: height,
         pixelRatio: 4,
@@ -246,251 +248,334 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
             ref={receiptRef}
             className={`overflow-hidden transition-colors duration-300 ${
               theme === 'dark' 
-                ? 'bg-[#0b1329] text-slate-200 border border-[#1e293b]' 
-                : 'bg-[#ffffff] text-slate-800 border border-[#e2e8f0]'
+                ? 'bg-[#03060d] text-slate-200 border border-slate-800 theme-dark' 
+                : 'bg-[#ffffff] text-slate-800 border border-[#e2e8f0] theme-light'
             } rounded-2xl shadow-2xl shrink-0`}
             style={{ 
               fontFamily: "'Inter', sans-serif",
               width: receiptVersion === 'R1' ? '420px' : '720px',
-              minWidth: receiptVersion === 'R1' ? '420px' : '720px'
+              minWidth: receiptVersion === 'R1' ? '420px' : '720px',
+              backgroundColor: theme === 'dark' ? '#03060d' : '#ffffff'
             }}
           >
           {receiptVersion === 'R1' ? (
-            <div className="p-1.5 sm:px-3 sm:py-3">
-              {/* Header */}
-              <div className="flex justify-between items-start pb-4">
+            <div className="p-3 sm:p-3.5">
+              {/* Top Header with Company Name & Customer ID */}
+              <div className="flex justify-between items-start pb-1.5">
                 <div>
-                  <h1 className={`text-3xl font-black tracking-wider ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
-                    RADHE
+                  <h1 className={`text-2xl font-black tracking-wider ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
+                    DHANLAXMI
                   </h1>
-                  <div className={`text-[10px] font-bold tracking-[0.2em] uppercase mt-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
-                    BROCKRAGE PVT. LTD.
+                  <div className={`text-[9px] font-bold tracking-[0.2em] uppercase mt-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+                    CAPITAL PVT. LTD.
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className={`text-[10px] font-bold uppercase tracking-wider block mt-2.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>Customer ID</span>
-                  <span className={`text-sm font-semibold block mt-0.5 ${theme === 'dark' ? 'text-white' : 'text-slate-955'} whitespace-nowrap`}>
-                    {customer.id}
+                  <span className={`text-[9px] font-bold uppercase tracking-wider block mt-1 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>Customer ID</span>
+                  <span className={`text-xs font-bold block mt-0.5 ${theme === 'dark' ? 'text-white' : 'text-slate-900'} whitespace-nowrap`}>
+                    {customer?.id || customer?.customerId || customer?._id || 'CUST-101'}
                   </span>
                 </div>
               </div>
 
               {/* Subheader Line */}
-              <div className="flex items-center mb-2">
+              <div className="flex items-center my-2">
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
-                <span className={`mx-4 text-[10px] font-bold tracking-[0.25em] uppercase ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} whitespace-nowrap`}>
-                  TRADE {type.toUpperCase()} 
+                <span className={`mx-2.5 text-[9px] font-bold tracking-[0.2em] uppercase ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} whitespace-nowrap`}>
+                  {type.toUpperCase()} RECEIPT
                 </span>
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
               </div>
 
-              {/* Asset Banner Card */}
-              <div className={`p-4 rounded-xl border mb-4 flex justify-between items-center transition-colors ${
-                theme === 'dark' ? 'bg-[#0f172a]/80 border-[#1e293b]' : 'bg-[#f8fafc] border-[#e2e8f0]'
+              {/* Customer Details Block */}
+              <div className={`p-2.5 rounded-xl border mb-2.5 ${
+                theme === 'dark' ? 'bg-[#05070f] border-slate-800/80' : 'bg-[#f8fafc] border-[#e2e8f0]'
               }`}>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className={`text-2xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'} whitespace-nowrap`}>
-                      {trade.symbol}
-                    </h3>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${
-                      theme === 'dark' ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'
-                    }`}>
-                      {(trade.exchange || 'NSE').toUpperCase()}
-                    </span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className={`text-[9px] font-bold uppercase tracking-wider block ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Customer Name</span>
+                    <span className={`font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{customer?.name || 'N/A'}</span>
                   </div>
-                  
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider ${
-                      isBuy 
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                        : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                    } whitespace-nowrap`}>
-                      {productType}
-                    </span>
-                    <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider ${
-                      theme === 'dark' 
-                        ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' 
-                        : 'bg-blue-50 text-blue-600 border border-blue-200'
-                    } whitespace-nowrap`}>
-                      {(trade.tradeType || 'INTRADAY').toUpperCase()}
+                  <div className="text-right">
+                    <span className={`text-[9px] font-bold uppercase tracking-wider block ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>Entry Date & Time</span>
+                    <span className={`font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-800'}`}>
+                      {formatDate(trade.date)} {trade.time ? `| ${formatTime12Hr(trade.time)}` : ''}
                     </span>
                   </div>
                 </div>
+              </div>
 
-                {trade.realizedPnl !== undefined && (
-                  <div className="text-right flex flex-col items-end">
-                    <span className={`text-[10px] font-semibold uppercase tracking-wider block ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>
-                      NET P&L
+              {/* Stock Header Bar (Symbol + Exchange, LTP) */}
+              <div className={`p-2.5 rounded-xl border mb-2.5 flex justify-between items-center ${
+                theme === 'dark' ? 'bg-[#05070f] border-slate-800/80' : 'bg-[#ffffff] border-[#e2e8f0]'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <h2 className={`text-xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'} uppercase`}>
+                    {trade.symbol}
+                  </h2>
+                  <span className={`text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                    theme === 'dark' ? 'bg-slate-800 text-slate-300 border border-slate-700/60' : 'bg-slate-200 text-slate-700'
+                  }`}>
+                    {(trade.exchange || 'NSE').toUpperCase()}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className={`text-[9px] font-bold uppercase tracking-wider block ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+                    LTP
+                  </span>
+                  <span className={`text-sm font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>
+                    {formatCurrency(trade.ltp || trade.price || 0)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Horizontal Net Position Card (Ref Image 1: Left, Center, Right Alignment) */}
+              <div className={`p-3 rounded-xl border mb-2.5 ${
+                theme === 'dark' ? 'bg-[#05070f] border-slate-800/80' : 'bg-[#f8fafc] border-[#e2e8f0]'
+              }`}>
+                <div className="flex justify-between items-center mb-2">
+                  <span className={`text-[10px] font-extrabold uppercase tracking-widest ${
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
+                    NET POSITION
+                  </span>
+                  <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
+                    isBuy 
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                      : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                  }`}>
+                    {productType}
+                  </span>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-1">
+                  {/* Left Aligned QTY */}
+                  <div className="text-left">
+                    <span className={`text-[9px] font-bold uppercase tracking-wider block mb-0.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+                      QTY.
                     </span>
-                    <span className={`text-xl font-black block mt-0.5 whitespace-nowrap ${trade.realizedPnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}`}>
-                      {trade.realizedPnl >= 0 ? '+' : ''}{formatCurrency(trade.realizedPnl)}
+                    <span className={`text-xs sm:text-sm font-black `}>
+                      {trade.quantity} {trade.lot ? `(${trade.lot})` : ''}
                     </span>
-                    <span className={`text-[11px] font-bold block mt-0.5 whitespace-nowrap ${trade.realizedPnl >= 0 ? 'text-emerald-400/90' : 'text-rose-500/90'}`}>
+                  </div>
+
+                  {/* Center Aligned UNREALISED P&L */}
+                  <div className="text-center">
+                    <span className={`text-[9px] font-bold uppercase tracking-wider block mb-0.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+                      UNREALISED P&L
+                    </span>
+                    <span className={`text-xs sm:text-sm font-black block ${calculatedPnl >= 0 ? (theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600') : 'text-rose-500'}`}>
+                      {calculatedPnl >= 0 ? '+' : ''}{formatCurrency(calculatedPnl)}
+                    </span>
+                    <span className={`text-[9px] font-bold block ${calculatedPnl >= 0 ? 'text-emerald-500/90' : 'text-rose-500/90'}`}>
                       ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
                     </span>
                   </div>
-                )}
-              </div>
 
-              {/* Metric Cards Grid */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className={`py-3 px-2 rounded-xl border flex flex-col items-center justify-center text-center transition-colors ${
-                  theme === 'dark' ? 'bg-[#0f172a]/50 border-[#1e293b]' : 'bg-[#f8fafc] border-[#e2e8f0]'
-                }`}>
-                  <div className={`text-[10px] font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>
-                    {type.toUpperCase()} DATE
-                  </div>
-                  <div className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-955'} whitespace-nowrap`}>
-                    {formatDate(trade.date)}
-                  </div>
-                </div>
-                
-                <div className={`py-3 px-2 rounded-xl border flex flex-col items-center justify-center text-center transition-colors ${
-                  theme === 'dark' ? 'bg-[#0f172a]/50 border-[#1e293b]' : 'bg-[#f8fafc] border-[#e2e8f0]'
-                }`}>
-                  <div className={`text-[10px] font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>
-                    NAME
-                  </div>
-                  <div className={`text-sm font-bold tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-950'} whitespace-nowrap`}>
-                    {customer.name?.split(' ')[0] || 'User'}
-                  </div>
-                </div>
-
-                <div className={`py-3 px-2 rounded-xl border flex flex-col items-center justify-center text-center transition-colors ${
-                  theme === 'dark' ? 'bg-[#0f172a]/50 border-[#1e293b]' : 'bg-[#f8fafc] border-[#e2e8f0]'
-                }`}>
-                  <div className={`text-[10px] font-bold uppercase tracking-wider mb-1.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>
-                    AVG PRICE
-                  </div>
-                  <div className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-950'} whitespace-nowrap`}>
-                    {formatCurrency(trade.price || trade.entryPrice || 0)}
+                  {/* Right Aligned AVG. PRICE */}
+                  <div className="text-right">
+                    <span className={`text-[9px] font-bold uppercase tracking-wider block mb-0.5 ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
+                      AVG. PRICE
+                    </span>
+                    <span className={`text-xs sm:text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                      {formatCurrency(trade.price || trade.entryPrice || 0)}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              {/* Trade Details Table */}
-              <div className={`rounded-xl border overflow-hidden mb-4 transition-colors ${
-                theme === 'dark' ? 'bg-[#0f172a]/30 border-[#1e293b]' : 'bg-white border-[#e2e8f0] shadow-sm'
+              {/* Main Trade Details Card (Ref Image 2: Label on top, Value below, NO LINES!) */}
+              <div className={`p-3 rounded-xl border mb-2.5 ${
+                theme === 'dark' ? 'bg-[#05070f] border-slate-800/80' : 'bg-white border-[#e2e8f0] shadow-sm'
               }`}>
-                <div className={`px-3 py-2 divide-y ${theme === 'dark' ? 'divide-slate-800/60' : 'divide-slate-200'}`}>
-                  {!isEditing && (
-                    <div className="flex justify-between items-center py-2.5">
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Mode</span>
-                      <span className={`text-sm font-bold ${theme === 'dark' ? 'text-white' : 'text-slate-955'} whitespace-nowrap`}>{productType}</span>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                  {/* Product */}
+                  {(!isEditing && trade.tradeType) && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Product</span>
+                      <span className={`text-xs font-bold block ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{trade.tradeType.toUpperCase()}</span>
                     </div>
                   )}
-                  <div className="flex justify-between items-center py-2.5">
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Qty (Lot)</span>
-                    {isEditing ? (
-                      <div className="flex gap-2">
-                        <input type="number" className={inputClassName} value={editData.quantity} onChange={e => setEditData({...editData, quantity: e.target.value})} placeholder="Qty" />
-                        <input type="number" className={inputClassName} value={editData.lot} onChange={e => setEditData({...editData, lot: e.target.value})} placeholder="Lot" />
-                      </div>
-                    ) : (
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>
-                        {trade.quantity} {trade.lot ? `(${trade.lot})` : ''}
-                      </span>
-                    )}
-                  </div>
-                  
-                  <div className="flex justify-between items-center py-2.5">
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Avg</span>
-                    {isEditing ? (
-                      <input type="number" className={inputClassName} value={editData.price} onChange={e => setEditData({...editData, price: e.target.value})} />
-                    ) : (
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency(trade.price || trade.entryPrice || 0)}</span>
-                    )}
-                  </div>
-                  {!isEditing && (
-                    <div className="flex justify-between items-center py-2.5">
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Invested</span>
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency((trade.price || trade.entryPrice || 0) * trade.quantity)}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-between items-center py-2.5">
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>{isExit ? 'Exit Price' : 'Exit Price (LTP)'}</span>
-                    {isEditing ? (
-                      <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({...editData, ltp: e.target.value})} />
-                    ) : (
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>{formatCurrency(isExit ? trade.ltp : (trade.ltp || 0))}</span>
-                    )}
-                  </div>
 
-                  <div className="flex justify-between items-center py-2.5">
-                    <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Money Margin</span>
-                    {isEditing ? (
-                      <input type="number" className={inputClassName} value={editData.marginRs !== undefined ? editData.marginRs : editData.marginPct} onChange={e => setEditData({...editData, marginRs: e.target.value})} />
-                    ) : (
-                      <span className={`text-sm font-semibold flex items-center gap-2 ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>
-                        {(() => {
-                          const marginRsVal = parseFloat(trade.marginRs) || 0;
-                          const totalVal = (trade.quantity || 0) * (isExit ? trade.price : (trade.entryPrice || trade.price || 0));
-                          let marginPctVal = parseFloat(trade.marginPct) || 0;
-                          if (marginRsVal <= 0) {
-                            marginPctVal = 0;
-                          } else if (marginPctVal <= 0 && totalVal > 0) {
-                            marginPctVal = (marginRsVal / totalVal) * 100;
-                          }
-                          return marginPctVal > 0 ? (
-                            <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">
-                              {marginPctVal.toFixed(2)}%
-                            </span>
-                          ) : null;
-                        })()}
-                        {formatCurrency(trade.marginRs || 0)}
-                      </span>
-                    )}
-                  </div>
-
-                  {!isEditing && (parseFloat(trade.brokerageFee) > 0 || trade.brokerageFee !== undefined) && (
-                    <div className="flex justify-between items-center py-2.5">
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>Brockerage</span>
-                      <span className={`text-sm font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'} whitespace-nowrap`}>
-                        {formatCurrency(trade.brokerageFee !== undefined ? trade.brokerageFee : 0.01)}
+                  {/* Trade Type */}
+                  {productType && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Trade Type</span>
+                      <span className={`text-xs font-bold inline-block px-1.5 py-0.5 rounded ${
+                        isBuy 
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                          : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                      }`}>
+                        {productType}
                       </span>
                     </div>
                   )}
 
-                  {!isEditing && (
-                    <div className="flex justify-between items-center py-2.5">
-                      <span className={`text-sm font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'} whitespace-nowrap`}>
-                        {isExit ? 'Realised P&L' : 'Unrealised P&L'}
+                  {/* Buy Qty. */}
+                  {(isEditing || trade.quantity > 0) && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Buy Qty.</span>
+                      {isEditing ? (
+                        <div className="flex gap-2">
+                          <input type="number" className={inputClassName} value={editData.quantity} onChange={e => setEditData({...editData, quantity: e.target.value})} placeholder="Qty" />
+                          <input type="number" className={inputClassName} value={editData.lot} onChange={e => setEditData({...editData, lot: e.target.value})} placeholder="Lot" />
+                        </div>
+                      ) : (
+                        <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
+                          {trade.quantity} {trade.lot ? `(${trade.lot})` : ''}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* LTP */}
+                  {(isEditing || trade.ltp > 0) && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>LTP</span>
+                      {isEditing ? (
+                        <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({...editData, ltp: e.target.value})} />
+                      ) : (
+                        <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
+                          {formatCurrency(trade.ltp || 0)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Avg. Buy Price */}
+                  {(isEditing || (trade.price || trade.entryPrice) > 0) && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Avg. Buy Price</span>
+                      {isEditing ? (
+                        <input type="number" className={inputClassName} value={editData.price} onChange={e => setEditData({...editData, price: e.target.value})} />
+                      ) : (
+                        <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
+                          {formatCurrency(trade.price || trade.entryPrice || 0)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Brokerage */}
+                  {(!isEditing && trade.brokerageFee > 0) && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Brokerage</span>
+                      <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
+                        {formatCurrency(trade.brokerageFee)}
                       </span>
-                      <span className={`text-sm font-bold ${calculatedPnl >= 0 ? 'text-emerald-500' : 'text-rose-500'} whitespace-nowrap`}>
-                        {calculatedPnl >= 0 ? '+' : ''}{formatCurrency(calculatedPnl)}
+                    </div>
+                  )}
+
+                  {/* Buy Value */}
+                  {(!isEditing && ((trade.price || trade.entryPrice || 0) * trade.quantity) > 0) && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Buy Value</span>
+                      <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
+                        {formatCurrency((trade.price || trade.entryPrice || 0) * trade.quantity)}
                       </span>
+                    </div>
+                  )}
+
+                  {/* Exchange */}
+                  {trade.exchange && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Exchange</span>
+                      <span className={`text-xs font-bold block ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{trade.exchange.toUpperCase()}</span>
+                    </div>
+                  )}
+
+                  {/* Money Margin */}
+                  {(isEditing || trade.marginRs > 0 || trade.marginPct > 0) && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Money Margin</span>
+                      {isEditing ? (
+                        <input type="number" className={inputClassName} value={editData.marginRs !== undefined ? editData.marginRs : editData.marginPct} onChange={e => setEditData({...editData, marginRs: e.target.value})} />
+                      ) : (
+                        <span className={`text-xs font-semibold flex items-center gap-1.5 ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
+                          {(() => {
+                            const marginRsVal = parseFloat(trade.marginRs) || 0;
+                            const totalVal = (trade.quantity || 0) * (trade.price || trade.entryPrice || 0);
+                            let marginPctVal = parseFloat(trade.marginPct) || 0;
+                            if (marginRsVal <= 0) {
+                              marginPctVal = 0;
+                            } else if (marginPctVal <= 0 && totalVal > 0) {
+                              marginPctVal = (marginRsVal / totalVal) * 100;
+                            }
+                            return marginPctVal > 0 ? (
+                              <span className="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded">
+                                {marginPctVal.toFixed(2)}%
+                              </span>
+                            ) : null;
+                          })()}
+                          {formatCurrency(trade.marginRs || 0)}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Trade Time */}
+                  {trade.time && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Trade Time</span>
+                      <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>{formatTime12Hr(trade.time)}</span>
+                    </div>
+                  )}
+
+                  {/* Order Date */}
+                  {trade.date && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Order Date</span>
+                      <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>{formatDate(trade.date)}</span>
+                    </div>
+                  )}
+
+                  {/* Conditional Holding Date & Holding Time (Only show if provided/input) */}
+                  {trade.holdingDate && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Holding Date</span>
+                      <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>{formatDate(trade.holdingDate)}</span>
+                    </div>
+                  )}
+
+                  {trade.holdingTime && (
+                    <div>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Holding Time</span>
+                      <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>{formatTime12Hr(trade.holdingTime)}</span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Total P&L Footer */}
+              {/* Net P&L Footer Box */}
               {!isEditing && (
-                <div className={`p-4 rounded-xl border flex flex-col justify-center items-start transition-all ${
+                <div className={`p-3 rounded-xl border flex flex-col justify-center items-start transition-all mb-2.5 ${
                   calculatedPnl >= 0 
                     ? (theme === 'dark' 
-                        ? 'bg-gradient-to-r from-emerald-950/40 to-emerald-900/10 border-emerald-900/50 text-emerald-400' 
+                        ? 'bg-gradient-to-r from-emerald-950/40 to-emerald-900/10 border-emerald-500/20 text-emerald-400' 
                         : 'bg-gradient-to-r from-emerald-50 to-emerald-100/50 border-emerald-200 text-emerald-700')
                     : (theme === 'dark' 
-                        ? 'bg-gradient-to-r from-rose-950/40 to-rose-900/10 border-rose-900/50 text-rose-400' 
+                        ? 'bg-gradient-to-r from-rose-950/40 to-rose-900/10 border-rose-500/20 text-rose-400' 
                         : 'bg-gradient-to-r from-rose-50 to-rose-100/50 border-rose-200 text-rose-700')
                 }`}>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.15em] mb-1">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.15em] mb-0.5">
                     NET P/L
                   </span>
-                  <span className="text-2xl font-black tracking-tight whitespace-nowrap">
-                    {calculatedPnl >= 0 ? '+' : ''}{formatCurrency(calculatedPnl)}
-                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xl font-black tracking-tight whitespace-nowrap">
+                      {calculatedPnl >= 0 ? '+' : ''}{formatCurrency(calculatedPnl)}
+                    </span>
+                    <span className={`text-[11px] font-bold ${calculatedPnl >= 0 ? 'text-emerald-400/90' : 'text-rose-400/90'}`}>
+                      ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
+                    </span>
+                  </div>
                 </div>
               )}
 
               {/* Footer Line */}
-              <div className="flex items-center my-6">
+              <div className="flex items-center my-3">
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
-                <span className={`mx-4 text-[10px] font-bold tracking-[0.2em] uppercase ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>
-                  © RADHE BROCKRAGE PVT. LTD.
+                <span className={`mx-2.5 text-[9px] font-bold tracking-[0.2em] uppercase ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>
+                  © DHANLAXMI CAPITAL PVT. LTD.
                 </span>
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
               </div>

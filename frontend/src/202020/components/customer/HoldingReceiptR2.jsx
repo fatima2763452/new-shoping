@@ -57,12 +57,12 @@ const HoldingReceiptR2 = ({
   const isDark = theme === 'dark';
 
   return (
-    <div className={`p-6 sm:p-8 transition-colors duration-300 ${isDark ? 'bg-[#03060d]' : 'bg-white'} ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+    <div className={`p-6 sm:p-8 transition-colors duration-300 ${isDark ? 'bg-[#0b1329] text-slate-200' : 'bg-white text-slate-800'}`}>
       {/* Header section */}
       <div className={`pb-5 border-b border-dashed ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
         <div>
           <h1 className={`text-2xl font-black tracking-wide ${isDark ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
-            DHANLAXMI CAPITAL PVT. LTD.
+            SHREE LAXMI TRADER PVT. LTD.
           </h1>
           <p className={`text-xs font-bold tracking-wider uppercase mt-1 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
             TRADE ENTRY 
@@ -97,7 +97,7 @@ const HoldingReceiptR2 = ({
             </select>
           ) : (
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-              isDark ? 'bg-slate-800 text-slate-300 border border-slate-700/60' : 'bg-slate-100 text-slate-600 border border-slate-200'
+              isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-600 border border-slate-200'
             }`}>
               {holding.exchange || 'NSE'}
             </span>
@@ -123,7 +123,7 @@ const HoldingReceiptR2 = ({
 
       {/* Grid 1: Details Table */}
       <div className={`flex justify-between items-center p-3 rounded-xl border mb-5 ${
-        isDark ? 'bg-[#05070f] border-slate-800/80' : 'bg-slate-50 border-slate-200'
+        isDark ? 'bg-[#0f172a]/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
       }`}>
         
         <div className={`flex-1 min-w-0 pl-3 ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
@@ -180,7 +180,7 @@ const HoldingReceiptR2 = ({
 
       {/* Grid 2: Buy & Sell details */}
       <div className={`flex justify-between items-stretch p-5 rounded-xl border mb-5 ${
-        isDark ? 'bg-[#05070f] border-slate-800/80' : 'bg-slate-50 border-slate-200'
+        isDark ? 'bg-[#0f172a]/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
       }`}>
         <div className="flex-1 pr-6">
           <span className="block text-xs font-black uppercase text-emerald-400 mb-2">BUY</span>
@@ -247,7 +247,7 @@ const HoldingReceiptR2 = ({
 
       {/* Grid 3: Value Summary */}
       <div className={`flex justify-between items-center p-5 rounded-xl border mb-6 ${
-        isDark ? 'bg-[#05070f] border-slate-800/80' : 'bg-slate-50 border-slate-200'
+        isDark ? 'bg-[#0f172a]/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
       }`}>
         <div className="flex-1 min-w-0">
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>TOTAL BUY VALUE</span>

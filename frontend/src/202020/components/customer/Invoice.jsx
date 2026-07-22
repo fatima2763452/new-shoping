@@ -588,16 +588,16 @@ export default function Invoice() {
             pdf.setFont(activeFont, 'bold');
             pdf.setFontSize(5.5);
             pdf.setTextColor(37, 99, 235);
-            pdf.text('DHANLAXMI', sealX, sealY - 8, { align: 'center' });
+            pdf.text('SHREE LAXMI', sealX, sealY - 8, { align: 'center' });
             pdf.text('AHMEDABAD', sealX, sealY + 1, { align: 'center' });
-            pdf.text('CAPITAL', sealX, sealY + 9, { align: 'center' });
+            pdf.text('TRADER', sealX, sealY + 9, { align: 'center' });
 
             // Signature (Right)
             const rightEdgeX = pageW - marginSize;
             pdf.setFont(activeFont, 'italic');
             pdf.setFontSize(11);
             pdf.setTextColor(71, 85, 105);
-            pdf.text('Dhanlaxmi Capital', rightEdgeX - 80, cursorY + 18);
+            pdf.text('Shree Laxmi Trader', rightEdgeX - 80, cursorY + 18);
 
             pdf.setDrawColor(203, 213, 225);
             pdf.setLineWidth(1);

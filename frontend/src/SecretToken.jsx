@@ -29,6 +29,17 @@ function SecretToken() {const [token, setToken] = useState('');
         localStorage.setItem('token', mockOwner.token);
         navigate('/form');
         break;
+      case '202020': // Shree Laxmi Trader Pvt. Ltd. token
+        const mockOwner202020 = {
+          _id: 'owner_id_202020',
+          username: '9574074927',
+          role: 'owner',
+          token: 'mock-owner-token-202020'
+        };
+        localStorage.setItem('userInfo', JSON.stringify(mockOwner202020));
+        localStorage.setItem('token', mockOwner202020.token);
+        navigate('/form');
+        break;
       case '000000': // close
         navigate('/form');
         break;

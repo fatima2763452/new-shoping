@@ -364,6 +364,16 @@ import Token101010Invoice from './101010/components/customer/Invoice';
 import Token101010AccountOpeningForm from './101010/pages/AccountOpeningForm';
 import Token101010SecretAdmin from './101010/pages/SecretAdmin';
 import Token101010RecycleBin from './101010/pages/RecycleBin';
+import Token101010IdCardPage from './101010/pages/IdCardPage';
+
+import Token202020Wrapper from './202020/components/TokenWrapper';
+import Token202020Login from './202020/pages/Login';
+import Token202020Dashboard from './202020/pages/Dashboard';
+import Token202020CustomerDetail from './202020/pages/CustomerDetail';
+import Token202020Invoice from './202020/components/customer/Invoice';
+import Token202020AccountOpeningForm from './202020/pages/AccountOpeningForm';
+import Token202020SecretAdmin from './202020/pages/SecretAdmin';
+import Token202020RecycleBin from './202020/pages/RecycleBin';
 
 const ProtectedRoute_101010 = ({ children }) => {
   const innerToken = localStorage.getItem('token');
@@ -378,7 +388,7 @@ function App() {
   const token = localStorage.getItem('authToken') || localStorage.getItem('token'); // Token to identify admin
 
   React.useEffect(() => {
-    if (token !== '101010') {
+    if (token !== '101010' && token !== '202020') {
       // Load Bootstrap CSS
       let bootstrapCSS = document.getElementById('bootstrap-css-cdn');
       if (!bootstrapCSS) {
@@ -406,7 +416,7 @@ function App() {
         document.body.appendChild(bootstrapJS);
       }
     } else {
-      // Remove Bootstrap elements to completely isolate 101010 styling
+      // Remove Bootstrap elements to completely isolate 101010 and 202020 styling
       const bootstrapCSS = document.getElementById('bootstrap-css-cdn');
       if (bootstrapCSS) {
         bootstrapCSS.remove();
@@ -972,6 +982,67 @@ function App() {
                 <Token101010Wrapper>
                   <Token101010SecretAdmin />
                 </Token101010Wrapper>
+              } 
+            />
+            <Route 
+              path="/id-card" 
+              element={
+                <Token101010Wrapper>
+                  <Token101010IdCardPage />
+                </Token101010Wrapper>
+              } 
+            />
+          </>
+        )}
+
+        {token === '202020' && (
+          <>
+            <Route 
+              path="/form" 
+              element={
+                <Token202020Wrapper>
+                  <Token202020Dashboard />
+                </Token202020Wrapper>
+              } 
+            />
+            <Route 
+              path="/recycle-bin" 
+              element={
+                <Token202020Wrapper>
+                  <Token202020RecycleBin />
+                </Token202020Wrapper>
+              } 
+            />
+            <Route 
+              path="/account-opening" 
+              element={
+                <Token202020Wrapper>
+                  <Token202020AccountOpeningForm />
+                </Token202020Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id" 
+              element={
+                <Token202020Wrapper>
+                  <Token202020CustomerDetail />
+                </Token202020Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id/invoice" 
+              element={
+                <Token202020Wrapper>
+                  <Token202020Invoice />
+                </Token202020Wrapper>
+              } 
+            />
+            <Route 
+              path="/secret-admin" 
+              element={
+                <Token202020Wrapper>
+                  <Token202020SecretAdmin />
+                </Token202020Wrapper>
               } 
             />
           </>

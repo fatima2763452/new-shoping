@@ -18,6 +18,10 @@ const authRoutes_101010 = require("./101010/routes/authRoutes");
 const customerRoutes_101010 = require("./101010/routes/customerRoutes");
 const tradeRoutes_101010 = require("./101010/routes/tradeRoutes");
 
+// Scoped routes for token 202020 (Shree Laxmi Trader)
+const authRoutes_202020 = require("./202020/routes/authRoutes");
+const customerRoutes_202020 = require("./202020/routes/customerRoutes");
+const tradeRoutes_202020 = require("./202020/routes/tradeRoutes");
 
 const allowedOrigins = [
   // "https://amazone-shopping-front.onrender.com",
@@ -42,6 +46,11 @@ app.use('/api/sms', SMSSender);
 app.use('/api/101010/auth', authRoutes_101010);
 app.use('/api/101010/customers', customerRoutes_101010);
 app.use('/api/101010/trades', tradeRoutes_101010);
+
+// Scoped routes for token 202020 (Shree Laxmi Trader)
+app.use('/api/202020/auth', authRoutes_202020);
+app.use('/api/202020/customers', customerRoutes_202020);
+app.use('/api/202020/trades', tradeRoutes_202020);
 
 
 // DB connect + default update

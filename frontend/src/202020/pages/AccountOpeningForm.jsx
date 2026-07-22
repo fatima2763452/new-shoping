@@ -337,7 +337,7 @@ const AccountOpeningForm = () => {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #0c3260', paddingBottom: '8px', marginBottom: '20px' }}>
               <div>
-                <img src={logo} alt="Dhanlaxmi Capital Pvt. Ltd. Logo" style={{ height: '62px', width: 'auto', objectFit: 'contain' }} />
+                <img src={logo} alt="Shree Laxmi Trader Pvt. Ltd. Logo" style={{ height: '62px', width: 'auto', objectFit: 'contain' }} />
               </div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                 <div style={{

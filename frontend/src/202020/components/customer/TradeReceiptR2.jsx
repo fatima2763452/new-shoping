@@ -1,26 +1,53 @@
 import React from 'react';
 
-const HoldingReceiptR2 = ({
+const TradeReceiptR2 = ({
+  trade,
   customer,
-  holding,
+  type,
   theme,
   isEditing,
   editData,
   setEditData,
   inputClassName
 }) => {
-  const displayQty = isEditing ? (parseFloat(editData.quantity) || 0) : (holding.netQty || 0);
-  const displayPrice = isEditing ? (parseFloat(editData.price) || 0) : (holding.avgCost || 0);
-  const displayLtp = isEditing ? (parseFloat(editData.ltp) || 0) : (holding.lastPrice || 0);
+  const isDark = theme === 'dark';
+  const isExit = type === 'exit';
+  
+  const productType = (trade.action || 'Unknown').toUpperCase();
+  const isBuy = productType === 'BUY';
+
+  // Dynamic values
+  const displayQty = isEditing ? (parseFloat(editData.quantity) || 0) : (trade.quantity || 0);
+  const displayPrice = isEditing ? (parseFloat(editData.price) || 0) : (trade.price || trade.entryPrice || 0);
+  const displayLtp = isEditing ? (parseFloat(editData.ltp) || 0) : (trade.ltp || 0);
   const displayMargin = isEditing 
     ? (parseFloat(editData.marginRs) || 0) 
-    : (holding.totalMargin !== undefined && holding.totalMargin !== null && !isNaN(parseFloat(holding.totalMargin)) ? parseFloat(holding.totalMargin) : 0);
-  const displayBrokerage = isEditing ? (parseFloat(editData.brokerageFee) || 0) : (holding.totalBrokerage || 0);
+    : (trade.marginRs !== undefined && trade.marginRs !== null && !isNaN(parseFloat(trade.marginRs)) ? parseFloat(trade.marginRs) : 0);
+  const displayBrokerage = isEditing ? (parseFloat(editData.brokerageFee) || 0) : (trade.brokerageFee || 0);
+  
+  let displayTotalPnl = 0;
+  if (isExit) {
+    displayTotalPnl = trade.realizedPnl !== undefined ? trade.realizedPnl : (
+      isBuy 
+        ? ((displayLtp - displayPrice) * displayQty - displayBrokerage)
+        : ((displayPrice - displayLtp) * displayQty - displayBrokerage)
+    );
+  } else {
+    if (trade.customUpnl !== undefined) {
+      displayTotalPnl = trade.customUpnl;
+    } else if (displayLtp > 0 && displayLtp !== displayPrice) {
+      displayTotalPnl = isBuy 
+        ? ((displayLtp - displayPrice) * displayQty - displayBrokerage)
+        : ((displayPrice - displayLtp) * displayQty - displayBrokerage);
+    } else {
+      displayTotalPnl = 0;
+    }
+  }
 
-  const totalVal = holding.totalInvestment || (displayQty * displayPrice);
+  const totalVal = displayQty * displayPrice;
   let marginPctVal = isEditing 
     ? (parseFloat(editData.marginPct) || 0) 
-    : (holding.marginPct !== undefined && holding.marginPct !== null && !isNaN(parseFloat(holding.marginPct)) ? parseFloat(holding.marginPct) : 0);
+    : (trade.marginPct !== undefined && trade.marginPct !== null && !isNaN(parseFloat(trade.marginPct)) ? parseFloat(trade.marginPct) : 0);
 
   if (displayMargin <= 0) {
     marginPctVal = 0;
@@ -28,15 +55,35 @@ const HoldingReceiptR2 = ({
     marginPctVal = (displayMargin / totalVal) * 100;
   }
 
-  const displayInvested = holding.customInvested !== undefined ? holding.customInvested : (holding.totalInvestment || (displayQty * displayPrice));
-  const displayUnrealisedPnl = holding.customUpnl !== undefined ? holding.customUpnl : (holding.upnl !== undefined ? holding.upnl : 0);
-  const displayTotalPnl = holding.customTotalPnl !== undefined ? holding.customTotalPnl : displayUnrealisedPnl;
-  const isBuy = (holding.type || 'buy').toLowerCase() === 'buy';
-  const pnlPercent = displayInvested > 0 ? (displayTotalPnl / displayInvested) * 100 : 0;
+  let buyPrice = null;
+  let sellPrice = null;
+
+  if (isExit) {
+    if (isBuy) { // Exiting a short
+      buyPrice = displayLtp;
+      sellPrice = displayPrice;
+    } else { // Exiting a long
+      sellPrice = displayLtp;
+      buyPrice = displayPrice;
+    }
+  } else {
+    if (isBuy) {
+      buyPrice = displayPrice;
+    } else {
+      sellPrice = displayPrice;
+    }
+  }
+
+  const totalBuyValue = buyPrice !== null ? buyPrice * displayQty : 0;
+  const totalSellValue = sellPrice !== null ? sellPrice * displayQty : 0;
+  
+  const costBasis = buyPrice * displayQty;
+  const pnlPercent = costBasis > 0 ? (displayTotalPnl / costBasis) * 100 : 0;
 
   const formatCurrency = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val);
-  const formatDateTime = () => {
-    const d = new Date();
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   };
   const formatTime12Hr = (timeStr) => {
@@ -54,26 +101,24 @@ const HoldingReceiptR2 = ({
     return `${hoursFormatted}:${minutes} ${ampm}`;
   };
 
-  const isDark = theme === 'dark';
-
   return (
-    <div className={`p-6 sm:p-8 transition-colors duration-300 ${isDark ? 'bg-[#03060d]' : 'bg-white'} ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
+    <div className={`p-6 sm:p-8 transition-colors duration-300 ${isDark ? 'bg-[#0b1329] text-slate-200' : 'bg-white text-slate-800'}`}>
       {/* Header section */}
       <div className={`pb-5 border-b border-dashed ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
         <div>
           <h1 className={`text-2xl font-black tracking-wide ${isDark ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
-            DHANLAXMI CAPITAL PVT. LTD.
+            SHREE LAXMI TRADER PVT. LTD.
           </h1>
           <p className={`text-xs font-bold tracking-wider uppercase mt-1 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
-            TRADE ENTRY 
+            TRADE {type.toUpperCase()} 
           </p>
         </div>
-        <div className="flex justify-between gap-12 mt-6 text-xs">
+        <div className="flex justify-evenly gap-12 mt-6 text-xs">
           <div>
             <span className={`block font-semibold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Customer Name</span>
             <span className={`block font-bold mt-1 text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{customer.name || 'Customer'}</span>
           </div>
-          <div className={` pl-10 ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
+          <div className={`border-l pl-10 ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
             <span className={`block font-semibold uppercase tracking-wider ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Customer ID</span>
             <span className={`block font-bold mt-1 text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>{customer.id}</span>
           </div>
@@ -84,7 +129,7 @@ const HoldingReceiptR2 = ({
       <div className="flex justify-between items-center my-6">
         <div className="flex items-center gap-3">
           <h2 className={`text-3xl font-black tracking-tight ${isDark ? 'text-white' : 'text-slate-900'}`}>
-            {holding.symbol}
+            {trade.symbol}
           </h2>
           {isEditing ? (
             <select 
@@ -97,9 +142,9 @@ const HoldingReceiptR2 = ({
             </select>
           ) : (
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-              isDark ? 'bg-slate-800 text-slate-300 border border-slate-700/60' : 'bg-slate-100 text-slate-600 border border-slate-200'
+              isDark ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-600 border border-slate-200'
             }`}>
-              {holding.exchange || 'NSE'}
+              {trade.exchange || 'NSE'}
             </span>
           )}
         </div>
@@ -122,11 +167,11 @@ const HoldingReceiptR2 = ({
       </div>
 
       {/* Grid 1: Details Table */}
-      <div className={`flex justify-between items-center p-3 rounded-xl border mb-5 ${
-        isDark ? 'bg-[#05070f] border-slate-800/80' : 'bg-slate-50 border-slate-200'
+      <div className={`flex justify-between items-center p-5 rounded-xl border mb-5 ${
+        isDark ? 'bg-[#0f172a]/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
       }`}>
         
-        <div className={`flex-1 min-w-0 pl-3 ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
+        <div className={`flex-1 min-w-0 pl-6 ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Qty</span>
           {isEditing ? (
             <div className="flex flex-col gap-1">
@@ -134,26 +179,26 @@ const HoldingReceiptR2 = ({
               <input type="text" className={inputClassName} value={editData.lot} onChange={e => setEditData({ ...editData, lot: e.target.value })} placeholder="Lot" />
             </div>
           ) : (
-            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{displayQty} {holding.lot ? `(${holding.lot})` : ''}</span>
+            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{displayQty} {trade.lot ? `(${trade.lot})` : ''}</span>
           )}
         </div>
-        <div className={`flex-1 min-w-0 pl-3 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
+        <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Avg. Price</span>
           {isEditing ? (
             <input type="number" className={inputClassName} value={editData.price} onChange={e => setEditData({ ...editData, price: e.target.value })} />
           ) : (
-            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(displayPrice)}</span>
+            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(buyPrice)}</span>
           )}
         </div>
-        <div className={`flex-1 min-w-0 pl-3 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
-          <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>LTP</span>
+        <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
+          <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Exit Price (LTP)</span>
           {isEditing ? (
             <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({ ...editData, ltp: e.target.value })} />
           ) : (
-            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(displayLtp)}</span>
+            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(sellPrice)}</span>
           )}
         </div>
-        <div className={`flex-1 min-w-0 pl-3 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
+        <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Money Margin</span>
           {isEditing ? (
             <input type="number" className={inputClassName} value={editData.marginRs} onChange={e => setEditData({ ...editData, marginRs: e.target.value })} />
@@ -180,7 +225,7 @@ const HoldingReceiptR2 = ({
 
       {/* Grid 2: Buy & Sell details */}
       <div className={`flex justify-between items-stretch p-5 rounded-xl border mb-5 ${
-        isDark ? 'bg-[#05070f] border-slate-800/80' : 'bg-slate-50 border-slate-200'
+        isDark ? 'bg-[#0f172a]/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
       }`}>
         <div className="flex-1 pr-6">
           <span className="block text-xs font-black uppercase text-emerald-400 mb-2">BUY</span>
@@ -190,7 +235,7 @@ const HoldingReceiptR2 = ({
               {isEditing ? (
                 <input type="date" className={inputClassName} value={editData.date ? new Date(editData.date).toISOString().split('T')[0] : ''} onChange={e => setEditData({ ...editData, date: e.target.value })} />
               ) : (
-                <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>{holding.date ? new Date(holding.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : formatDateTime()}</span>
+                <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>{formatDate(trade.entryDate || trade.date)}</span>
               )}
             </div>
             {isEditing ? (
@@ -198,72 +243,97 @@ const HoldingReceiptR2 = ({
                 <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Time:</span>
                 <input type="time" className={inputClassName} value={editData.time || ''} onChange={e => setEditData({ ...editData, time: e.target.value })} />
               </div>
-            ) : (holding.time || editData.time) ? (
+            ) : (trade.time || editData.time) ? (
               <div className="flex justify-between items-center">
                 <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Time:</span>
-                <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>{formatTime12Hr(holding.time || editData.time)}</span>
+                <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>{formatTime12Hr(trade.time || editData.time)}</span>
               </div>
             ) : null}
           </div>
         </div>
-        <div className={`flex-1 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
-          <span className="block text-xs font-black uppercase text-blue-400 mb-2">HOLDING DATE</span>
-          <div className="space-y-1.5 text-xs">
-            <div className="flex justify-between items-center">
-              <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Date:</span>
+        {isExit ? (
+          <div className={`flex-1 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
+            <span className="block text-xs font-black uppercase text-rose-500 mb-2">EXIT</span>
+            <div className="space-y-1.5 text-xs">
+              <div className="flex justify-between items-center">
+                <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Date:</span>
+                {isEditing ? (
+                  <input type="date" className={inputClassName} value={editData.date ? new Date(editData.date).toISOString().split('T')[0] : ''} onChange={e => setEditData({ ...editData, date: e.target.value })} />
+                ) : (
+                  <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>{formatDate(trade.date)}</span>
+                )}
+              </div>
               {isEditing ? (
-                <input 
-                  type="date" 
-                  className={inputClassName} 
-                  value={editData.holdingDate ? new Date(editData.holdingDate).toISOString().split('T')[0] : (editData.date ? new Date(editData.date).toISOString().split('T')[0] : '')} 
-                  onChange={e => setEditData({ ...editData, holdingDate: e.target.value })} 
-                />
-              ) : (
-                <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
-                  {holding.holdingDate 
-                    ? new Date(holding.holdingDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) 
-                    : (editData.holdingDate ? new Date(editData.holdingDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : (holding.date ? new Date(holding.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : formatDateTime()))}
-                </span>
-              )}
-            </div>
-            <div className="flex justify-between items-center">
-              <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Time:</span>
-              {isEditing ? (
-                <input 
-                  type="time" 
-                  className={inputClassName} 
-                  value={editData.holdingTime !== undefined ? editData.holdingTime : (editData.time || '')} 
-                  onChange={e => setEditData({ ...editData, holdingTime: e.target.value })} 
-                />
-              ) : (
-                <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
-                  {formatTime12Hr(holding.holdingTime || editData.holdingTime || holding.time || editData.time)}
-                </span>
-              )}
+                <div className="flex justify-between items-center">
+                  <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Time:</span>
+                  <input type="time" className={inputClassName} value={editData.time || ''} onChange={e => setEditData({ ...editData, time: e.target.value })} />
+                </div>
+              ) : (trade.time || editData.time) ? (
+                <div className="flex justify-between items-center">
+                  <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Time:</span>
+                  <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>{formatTime12Hr(trade.time || editData.time)}</span>
+                </div>
+              ) : null}
             </div>
           </div>
-        </div>
+        ) : (
+          <div className={`flex-1 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
+            <span className="block text-xs font-black uppercase text-blue-400 mb-2">HOLDING DATE</span>
+            <div className="space-y-1.5 text-xs">
+              <div className="flex justify-between items-center">
+                <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Date:</span>
+                {isEditing ? (
+                  <input 
+                    type="date" 
+                    className={inputClassName} 
+                    value={editData.holdingDate ? new Date(editData.holdingDate).toISOString().split('T')[0] : (editData.date ? new Date(editData.date).toISOString().split('T')[0] : '')} 
+                    onChange={e => setEditData({ ...editData, holdingDate: e.target.value })} 
+                  />
+                ) : (
+                  <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                    {formatDate(trade.holdingDate || editData.holdingDate || trade.date)}
+                  </span>
+                )}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className={isDark ? 'text-slate-500' : 'text-slate-400'}>Time:</span>
+                {isEditing ? (
+                  <input 
+                    type="time" 
+                    className={inputClassName} 
+                    value={editData.holdingTime !== undefined ? editData.holdingTime : (editData.time || '')} 
+                    onChange={e => setEditData({ ...editData, holdingTime: e.target.value })} 
+                  />
+                ) : (
+                  <span className={`font-bold ${isDark ? 'text-slate-300' : 'text-slate-800'}`}>
+                    {formatTime12Hr(trade.holdingTime || editData.holdingTime || trade.time)}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Grid 3: Value Summary */}
       <div className={`flex justify-between items-center p-5 rounded-xl border mb-6 ${
-        isDark ? 'bg-[#05070f] border-slate-800/80' : 'bg-slate-50 border-slate-200'
+        isDark ? 'bg-[#0f172a]/50 border-slate-800/80' : 'bg-slate-50 border-slate-200'
       }`}>
         <div className="flex-1 min-w-0">
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>TOTAL BUY VALUE</span>
-          <span className={`text-base font-black whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-950'}`}>{formatCurrency(displayInvested)}</span>
+          <span className={`text-base font-black whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-950'}`}>{formatCurrency(totalBuyValue)}</span>
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>TOTAL SELL VALUE</span>
-          <span className={`text-base font-black whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-950'}`}>{formatCurrency(displayQty * displayLtp)}</span>
+          <span className={`text-base font-black whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-950'}`}>{formatCurrency(totalSellValue)}</span>
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>TOTAL BROKERAGE</span>
-          <span className={`text-base font-black whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-950'}`}>{formatCurrency(displayBrokerage)}</span>
+          <span className={`text-base font-black whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-955'}`}>{formatCurrency(displayBrokerage)}</span>
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
-          <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>UNREALISEDP&L</span>
-          <span className={`text-base font-black whitespace-nowrap ${displayTotalPnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}`}>
+          <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{isExit ? 'REALISED P&L' : 'UNREALISEDP&L'}</span>
+          <span className={`text-base font-black whitespace-nowrap ${displayTotalPnl >= 0 ? 'text-emerald-400' : 'text-rose-505'}`}>
             {displayTotalPnl >= 0 ? '+' : ''}{formatCurrency(displayTotalPnl)}
           </span>
         </div>
@@ -272,9 +342,11 @@ const HoldingReceiptR2 = ({
       {/* Badges footer */}
       <div className="flex gap-3 items-center text-[10px] font-black uppercase tracking-wider">
         <span className={`px-2.5 py-1 rounded border whitespace-nowrap ${
-          isDark ? 'text-emerald-400 border-emerald-500/25 bg-emerald-500/5' : 'text-emerald-700 border-emerald-300 bg-emerald-50'
+          isExit
+            ? (isDark ? 'text-emerald-400 border-emerald-500/25 bg-emerald-500/5' : 'text-emerald-700 border-emerald-300 bg-emerald-50')
+            : (isDark ? 'text-amber-400 border-amber-500/25 bg-amber-500/5' : 'text-amber-700 border-amber-300 bg-amber-50')
         }`}>
-          TRADE ACTIVE
+          {isExit ? 'TRADE CLOSED' : 'TRADE ACTIVE'}
         </span>
         {isEditing ? (
           <select 
@@ -289,7 +361,7 @@ const HoldingReceiptR2 = ({
           <span className={`px-2.5 py-1 rounded border whitespace-nowrap ${
             isDark ? 'text-blue-400 border-blue-500/25 bg-blue-500/5' : 'text-blue-700 border-blue-300 bg-blue-50'
           }`}>
-            {(holding.tradeType || 'INTRADAY').toUpperCase()}
+            {(trade.tradeType || 'INTRADAY').toUpperCase()}
           </span>
         )}
         {isEditing ? (
@@ -305,7 +377,7 @@ const HoldingReceiptR2 = ({
           <span className={`px-2.5 py-1 rounded border whitespace-nowrap ${
             isDark ? 'text-slate-400 border-slate-700 bg-slate-800' : 'text-slate-655 border-slate-200 bg-slate-100'
           }`}>
-            {(holding.exchange || 'NSE').toUpperCase()}
+            {(trade.exchange || 'NSE').toUpperCase()}
           </span>
         )}
       </div>
@@ -313,4 +385,4 @@ const HoldingReceiptR2 = ({
   );
 };
 
-export default HoldingReceiptR2;
+export default TradeReceiptR2;
