@@ -18,6 +18,11 @@ const authRoutes_101010 = require("./101010/routes/authRoutes");
 const customerRoutes_101010 = require("./101010/routes/customerRoutes");
 const tradeRoutes_101010 = require("./101010/routes/tradeRoutes");
 
+// Scoped routes for token 008765
+const authRoutes_008765 = require("./008765/routes/authRoutes");
+const customerRoutes_008765 = require("./008765/routes/customerRoutes");
+const tradeRoutes_008765 = require("./008765/routes/tradeRoutes");
+
 // Scoped routes for token 202020 (Shree Laxmi Trader)
 const authRoutes_202020 = require("./202020/routes/authRoutes");
 const customerRoutes_202020 = require("./202020/routes/customerRoutes");
@@ -46,6 +51,11 @@ app.use('/api/sms', SMSSender);
 app.use('/api/101010/auth', authRoutes_101010);
 app.use('/api/101010/customers', customerRoutes_101010);
 app.use('/api/101010/trades', tradeRoutes_101010);
+
+// Scoped routes for token 008765
+app.use('/api/008765/auth', authRoutes_008765);
+app.use('/api/008765/customers', customerRoutes_008765);
+app.use('/api/008765/trades', tradeRoutes_008765);
 
 // Scoped routes for token 202020 (Shree Laxmi Trader)
 app.use('/api/202020/auth', authRoutes_202020);

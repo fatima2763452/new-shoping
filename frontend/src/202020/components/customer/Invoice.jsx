@@ -32,6 +32,19 @@ const getImgDimensions = (src) => {
         img.src = src;
     });
 };
+
+let logoAssetCache = null;
+const getLogoAsset = async (src) => {
+    if (logoAssetCache) return logoAssetCache;
+    const [base64, dims] = await Promise.all([
+        loadImageAsBase64(src),
+        getImgDimensions(src)
+    ]);
+    if (base64) {
+        logoAssetCache = { base64, dims };
+    }
+    return { base64, dims };
+};
 // Helper for standard Indian currency formatting
 const formatIndianCurrency = (n) => {
     const num = Number(n ?? 0);
@@ -182,6 +195,7 @@ export default function Invoice() {
         setEndDate(now.toISOString().split('T')[0]);
 
         fetchOrders();
+        getLogoAsset(logo);
     }, [customerId]);
 
     const isDateInRange = (rawDate, startStr, endStr) => {
@@ -310,11 +324,8 @@ export default function Invoice() {
             const redColor = [239, 68, 68];     // Red
             const contentW = pageW - 2 * marginSize;
 
-            // Load logo as base64 and get image size
-            const [logoBase64, dims] = await Promise.all([
-                loadImageAsBase64(logo),
-                getImgDimensions(logo)
-            ]);
+            // Load logo as base64 and get image size (cached)
+            const { base64: logoBase64, dims } = await getLogoAsset(logo);
 
             // Header Elements (Logo on the left)
             if (logoBase64) {

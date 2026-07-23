@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.jpeg';
+import html2canvas from 'html2canvas-pro';
+import { jsPDF } from 'jspdf';
 
 const AccountOpeningForm = () => {
   const navigate = useNavigate();
@@ -42,20 +44,18 @@ const AccountOpeningForm = () => {
     wrapper.style.display = 'block';
 
     try {
-      const html2canvas = (await import('html2canvas-pro')).default;
-      const { jsPDF } = await import('jspdf');
-
       const element = document.getElementById('pdf-page-1');
 
       const canvas = await html2canvas(element, {
-        scale: 3,
+        scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
         width: 800,
         windowWidth: 800,
         scrollX: 0,
         scrollY: 0,
-        logging: false
+        logging: false,
+        imageTimeout: 0,
       });
       const imgData = canvas.toDataURL('image/png');
 

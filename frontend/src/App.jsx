@@ -366,6 +366,15 @@ import Token101010SecretAdmin from './101010/pages/SecretAdmin';
 import Token101010RecycleBin from './101010/pages/RecycleBin';
 import Token101010IdCardPage from './101010/pages/IdCardPage';
 
+import Token008765Wrapper from './008765/components/TokenWrapper';
+import Token008765Dashboard from './008765/pages/Dashboard';
+import Token008765CustomerDetail from './008765/pages/CustomerDetail';
+import Token008765Invoice from './008765/components/customer/Invoice';
+import Token008765AccountOpeningForm from './008765/pages/AccountOpeningForm';
+import Token008765SecretAdmin from './008765/pages/SecretAdmin';
+import Token008765RecycleBin from './008765/pages/RecycleBin';
+import Token008765IdCardPage from './008765/pages/IdCardPage';
+
 import Token202020Wrapper from './202020/components/TokenWrapper';
 import Token202020Login from './202020/pages/Login';
 import Token202020Dashboard from './202020/pages/Dashboard';
@@ -388,7 +397,7 @@ function App() {
   const token = localStorage.getItem('authToken') || localStorage.getItem('token'); // Token to identify admin
 
   React.useEffect(() => {
-    if (token !== '101010' && token !== '202020') {
+    if (token !== '101010' && token !== '202020' && token !== '008765') {
       // Load Bootstrap CSS
       let bootstrapCSS = document.getElementById('bootstrap-css-cdn');
       if (!bootstrapCSS) {
@@ -416,7 +425,7 @@ function App() {
         document.body.appendChild(bootstrapJS);
       }
     } else {
-      // Remove Bootstrap elements to completely isolate 101010 and 202020 styling
+      // Remove Bootstrap elements to completely isolate 101010, 202020 and 008765 styling
       const bootstrapCSS = document.getElementById('bootstrap-css-cdn');
       if (bootstrapCSS) {
         bootstrapCSS.remove();
@@ -990,6 +999,67 @@ function App() {
                 <Token101010Wrapper>
                   <Token101010IdCardPage />
                 </Token101010Wrapper>
+              } 
+            />
+          </>
+        )}
+
+        {token === '008765' && (
+          <>
+            <Route 
+              path="/form" 
+              element={
+                <Token008765Wrapper>
+                  <Token008765Dashboard />
+                </Token008765Wrapper>
+              } 
+            />
+            <Route 
+              path="/recycle-bin" 
+              element={
+                <Token008765Wrapper>
+                  <Token008765RecycleBin />
+                </Token008765Wrapper>
+              } 
+            />
+            <Route 
+              path="/account-opening" 
+              element={
+                <Token008765Wrapper>
+                  <Token008765AccountOpeningForm />
+                </Token008765Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id" 
+              element={
+                <Token008765Wrapper>
+                  <Token008765CustomerDetail />
+                </Token008765Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id/invoice" 
+              element={
+                <Token008765Wrapper>
+                  <Token008765Invoice />
+                </Token008765Wrapper>
+              } 
+            />
+            <Route 
+              path="/secret-admin" 
+              element={
+                <Token008765Wrapper>
+                  <Token008765SecretAdmin />
+                </Token008765Wrapper>
+              } 
+            />
+            <Route 
+              path="/id-card" 
+              element={
+                <Token008765Wrapper>
+                  <Token008765IdCardPage />
+                </Token008765Wrapper>
               } 
             />
           </>

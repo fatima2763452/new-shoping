@@ -1,0 +1,592 @@
+/* CSS for token 008765 */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined');
+@import "tailwindcss";
+
+/* Force premium sans-serif typography for token 008765, bypassing global Bootstrap body font overrides */
+#token-008765-root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
+}
+
+/* Fix Tailwind CSS v4 calc(infinity * 1px) rounded-full bug on elements like buttons and avatars */
+#token-008765-root .rounded-full {
+  border-radius: 9999px !important;
+}
+
+/* --- Bootstrap Specificity Override Layer ---
+   Bootstrap utility classes (like .border, .shadow-sm, etc.) define rules with !important,
+   which overrides Tailwind's class properties. The rules below force Tailwind's styles
+   to take precedence inside the token-008765-root sub-app.
+*/
+#token-008765-root .border {
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+#token-008765-root .border-0 {
+  border-width: 0px !important;
+}
+#token-008765-root .border-t {
+  border-top-width: 1px !important;
+  border-top-style: solid !important;
+}
+#token-008765-root .border-b {
+  border-bottom-width: 1px !important;
+  border-bottom-style: solid !important;
+}
+#token-008765-root .border-r {
+  border-right-width: 1px !important;
+  border-right-style: solid !important;
+}
+#token-008765-root .border-l {
+  border-left-width: 1px !important;
+  border-left-style: solid !important;
+}
+/* Wipe out any default browser/Bootstrap white bottom borders inside token 008765 */
+#token-008765-root *,
+#token-008765-root *::before,
+#token-008765-root *::after {
+  border-bottom-color: transparent !important;
+}
+
+/* Specific Border Color Overrides using safe attribute selectors (bypasses Vite/PostCSS slash escaping issues) */
+#token-008765-root [class*="border-slate-800"] {
+  border-color: rgba(30, 41, 59, 0.8) !important;
+  border-top-color: rgba(30, 41, 59, 0.8) !important;
+  border-bottom-color: rgba(30, 41, 59, 0.8) !important;
+  border-left-color: rgba(30, 41, 59, 0.8) !important;
+  border-right-color: rgba(30, 41, 59, 0.8) !important;
+}
+#token-008765-root [class*="border-slate-700"] {
+  border-color: rgba(51, 65, 85, 0.8) !important;
+  border-top-color: rgba(51, 65, 85, 0.8) !important;
+  border-bottom-color: rgba(51, 65, 85, 0.8) !important;
+  border-left-color: rgba(51, 65, 85, 0.8) !important;
+  border-right-color: rgba(51, 65, 85, 0.8) !important;
+}
+#token-008765-root [class*="border-slate-900"] {
+  border-color: rgba(15, 23, 42, 0.6) !important;
+  border-top-color: rgba(15, 23, 42, 0.6) !important;
+  border-bottom-color: rgba(15, 23, 42, 0.6) !important;
+  border-left-color: rgba(15, 23, 42, 0.6) !important;
+  border-right-color: rgba(15, 23, 42, 0.6) !important;
+}
+#token-008765-root [class*="border-slate-950"] {
+  border-color: rgb(2, 6, 23) !important;
+  border-top-color: rgb(2, 6, 23) !important;
+  border-bottom-color: rgb(2, 6, 23) !important;
+  border-left-color: rgb(2, 6, 23) !important;
+  border-right-color: rgb(2, 6, 23) !important;
+}
+#token-008765-root [class*="border-emerald-500"] {
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  border-top-color: rgba(16, 185, 129, 0.2) !important;
+  border-bottom-color: rgba(16, 185, 129, 0.2) !important;
+  border-left-color: rgba(16, 185, 129, 0.2) !important;
+  border-right-color: rgba(16, 185, 129, 0.2) !important;
+}
+#token-008765-root [class*="border-rose-500"] {
+  border-color: rgba(244, 63, 94, 0.2) !important;
+  border-top-color: rgba(244, 63, 94, 0.2) !important;
+  border-bottom-color: rgba(244, 63, 94, 0.2) !important;
+  border-left-color: rgba(244, 63, 94, 0.2) !important;
+  border-right-color: rgba(244, 63, 94, 0.2) !important;
+}
+#token-008765-root [class*="border-rose-900"] {
+  border-color: rgba(136, 19, 55, 0.5) !important;
+  border-top-color: rgba(136, 19, 55, 0.5) !important;
+  border-bottom-color: rgba(136, 19, 55, 0.5) !important;
+  border-left-color: rgba(136, 19, 55, 0.5) !important;
+  border-right-color: rgba(136, 19, 55, 0.5) !important;
+}
+#token-008765-root [class*="border-[#e2e8f0]"] {
+  border-color: #e2e8f0 !important;
+  border-top-color: #e2e8f0 !important;
+  border-bottom-color: #e2e8f0 !important;
+  border-left-color: #e2e8f0 !important;
+  border-right-color: #e2e8f0 !important;
+}
+#token-008765-root [class*="border-slate-200"] {
+  border-color: rgb(226, 232, 240) !important;
+  border-top-color: rgb(226, 232, 240) !important;
+  border-bottom-color: rgb(226, 232, 240) !important;
+  border-left-color: rgb(226, 232, 240) !important;
+  border-right-color: rgb(226, 232, 240) !important;
+}
+#token-008765-root .theme-dark .border {
+  border-color: rgba(30, 41, 59, 0.8) !important;
+  border-top-color: rgba(30, 41, 59, 0.8) !important;
+  border-bottom-color: rgba(30, 41, 59, 0.8) !important;
+  border-left-color: rgba(30, 41, 59, 0.8) !important;
+  border-right-color: rgba(30, 41, 59, 0.8) !important;
+}
+#token-008765-root .theme-light .border {
+  border-color: #e2e8f0 !important;
+  border-top-color: #e2e8f0 !important;
+  border-bottom-color: #e2e8f0 !important;
+  border-left-color: #e2e8f0 !important;
+  border-right-color: #e2e8f0 !important;
+}
+#token-008765-root [class*="border-violet-500"] {
+  border-color: rgba(139, 92, 246, 0.25) !important;
+}
+#token-008765-root [class*="border-violet-400"] {
+  border-color: rgba(167, 139, 250, 0.2) !important;
+}
+
+/* Shadow Overrides */
+#token-008765-root .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+#token-008765-root .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+}
+#token-008765-root .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+}
+#token-008765-root .shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Input Focus & Reset Overrides */
+#token-008765-root input {
+  border-width: 1px !important;
+  border-style: solid !important;
+  outline: none !important;
+}
+#token-008765-root input:focus {
+  border-color: rgba(139, 92, 246, 0.8) !important;
+  box-shadow: none !important;
+}
+
+#token-008765-root .material-symbols-outlined {
+  font-family: 'Material Symbols Outlined' !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  display: inline-block !important;
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  direction: ltr !important;
+  
+  /* Ensure ligatures (icon translation from text) render properly across all browsers */
+  font-feature-settings: 'liga' 1 !important;
+  font-variant-ligatures: common-ligatures !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-feature-settings: 'liga' !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@theme {
+  --color-tertiary-fixed: #d9e3f6;
+  --color-outline-variant: #424754;
+  --color-error: #ffb4ab;
+  --color-primary-fixed-dim: #adc6ff;
+  --color-surface-container: #122131;
+  --color-secondary: #c0c6db;
+  --color-error-container: #93000a;
+  --color-surface-bright: #2c3a4c;
+  --color-on-error: #690005;
+  --color-primary-container: #4d8eff;
+  --color-surface-container-low: #0d1c2d;
+  --color-on-secondary-container: #aeb5c9;
+  --color-secondary-fixed-dim: #c0c6db;
+  --color-inverse-on-surface: #233143;
+  --color-on-background: #d4e4fa;
+  --color-surface-variant: #273647;
+  --color-on-secondary-fixed-variant: #404758;
+  --color-on-error-container: #ffdad6;
+  --color-on-tertiary-fixed: #121c2a;
+  --color-on-primary-fixed-variant: #004395;
+  --color-inverse-primary: #005ac2;
+  --color-on-secondary-fixed: #141b2b;
+  --color-inverse-surface: #d4e4fa;
+  --color-on-secondary: #293040;
+  --color-on-tertiary: #27313f;
+  --color-background: #051424;
+  --color-surface-container-highest: #273647;
+  --color-tertiary-fixed-dim: #bdc7d9;
+  --color-on-primary-container: #00285d;
+  --color-on-tertiary-fixed-variant: #3d4756;
+  --color-surface-tint: #adc6ff;
+  --color-tertiary: #bdc7d9;
+  --color-surface: #051424;
+  --color-surface-container-lowest: #010f1f;
+  --color-on-primary-fixed: #001a42;
+  --color-on-tertiary-container: #202a38;
+  --color-on-surface: #d4e4fa;
+  --color-on-surface-variant: #c2c6d6;
+  --color-surface-container-high: #1c2b3c;
+  --color-secondary-container: #404758;
+  --color-primary: #adc6ff;
+  --color-tertiary-container: #8791a3;
+  --color-on-primary: #002e6a;
+  --color-outline: #8c909f;
+  --color-surface-dim: #051424;
+  --color-primary-fixed: #d8e2ff;
+  --color-secondary-fixed: #dce2f7;
+}
+
+#token-008765-root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#token-008765-root .glass-panel {
+    background: rgba(17, 24, 39, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+#token-008765-root .stock-bg {
+    background-image: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                      linear-gradient(to bottom, rgba(5, 20, 36, 0.9), rgba(5, 20, 36, 1));
+}
+
+#token-008765-root input:-webkit-autofill,
+#token-008765-root input:-webkit-autofill:hover, 
+#token-008765-root input:-webkit-autofill:focus, 
+#token-008765-root input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #030712 inset !important;
+    -webkit-text-fill-color: #d4e4fa !important;
+}
+
+#token-008765-root .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+#token-008765-root .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* --- Global Spacing & Tag Isolation Reset ---
+   Bootstrap's Reboot resets margins and paddings globally. These rules scope standard
+   Tailwind preflight defaults inside #token-008765-root so headings, paragraphs, and list
+   tags render properly in all sub-pages.
+*/
+#token-008765-root h1,
+#token-008765-root h2,
+#token-008765-root h3,
+#token-008765-root h4,
+#token-008765-root h5,
+#token-008765-root h6,
+#token-008765-root p,
+#token-008765-root ul,
+#token-008765-root ol,
+#token-008765-root dl,
+#token-008765-root blockquote,
+#token-008765-root figure,
+#token-008765-root pre {
+  margin: 0;
+}
+#token-008765-root ul,
+#token-008765-root ol {
+  padding: 0;
+  list-style: none;
+}
+
+/* Scoped Container Reset to bypass Bootstrap's responsive width behaviors */
+#token-008765-root .container {
+  width: 100% !important;
+  max-width: none !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Scoped .btn Overrides to bypass Bootstrap's button padding and borders */
+#token-008765-root .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 10px 18px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: inherit !important;
+  transition: all 0.2s !important;
+}
+#token-008765-root .btn-download {
+  color: #fff !important;
+  background-color: #10b981 !important;
+}
+#token-008765-root .btn-print {
+  color: #fff !important;
+  background-color: #3b82f6 !important;
+}
+
+/* Explicit Spacing Overrides to override Bootstrap's !important spacing classes (0 to 5) */
+#token-008765-root .p-0 { padding: 0px !important; }
+#token-008765-root .p-0\.5 { padding: 0.125rem !important; }
+#token-008765-root .p-1 { padding: 0.25rem !important; }
+#token-008765-root .p-1\.5 { padding: 0.375rem !important; }
+#token-008765-root .p-2 { padding: 0.5rem !important; }
+#token-008765-root .p-2\.5 { padding: 0.625rem !important; }
+#token-008765-root .p-3 { padding: 0.75rem !important; }
+#token-008765-root .p-3\.5 { padding: 0.875rem !important; }
+#token-008765-root .p-4 { padding: 1rem !important; }
+#token-008765-root .p-5 { padding: 1.25rem !important; }
+#token-008765-root .p-6 { padding: 1.5rem !important; }
+#token-008765-root .p-8 { padding: 2rem !important; }
+#token-008765-root .p-10 { padding: 2.5rem !important; }
+#token-008765-root .p-12 { padding: 3rem !important; }
+
+#token-008765-root .px-0 { padding-left: 0px !important; padding-right: 0px !important; }
+#token-008765-root .px-0\.5 { padding-left: 0.125rem !important; padding-right: 0.125rem !important; }
+#token-008765-root .px-1 { padding-left: 0.25rem !important; padding-right: 0.25rem !important; }
+#token-008765-root .px-1\.5 { padding-left: 0.375rem !important; padding-right: 0.375rem !important; }
+#token-008765-root .px-2 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+#token-008765-root .px-2\.5 { padding-left: 0.625rem !important; padding-right: 0.625rem !important; }
+#token-008765-root .px-3 { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
+#token-008765-root .px-3\.5 { padding-left: 0.875rem !important; padding-right: 0.875rem !important; }
+#token-008765-root .px-4 { padding-left: 1rem !important; padding-right: 1rem !important; }
+#token-008765-root .px-5 { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
+#token-008765-root .px-6 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+#token-008765-root .px-8 { padding-left: 2rem !important; padding-right: 2rem !important; }
+#token-008765-root .px-10 { padding-left: 2.5rem !important; padding-right: 2.5rem !important; }
+
+#token-008765-root .py-0 { padding-top: 0px !important; padding-bottom: 0px !important; }
+#token-008765-root .py-0\.5 { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; }
+#token-008765-root .py-1 { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+#token-008765-root .py-1\.5 { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; }
+#token-008765-root .py-2 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+#token-008765-root .py-2\.5 { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
+#token-008765-root .py-3 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+#token-008765-root .py-3\.5 { padding-top: 0.875rem !important; padding-bottom: 0.875rem !important; }
+#token-008765-root .py-4 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+#token-008765-root .py-5 { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+#token-008765-root .py-6 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
+#token-008765-root .py-8 { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+
+#token-008765-root .pt-0 { padding-top: 0px !important; }
+#token-008765-root .pt-0\.5 { padding-top: 0.125rem !important; }
+#token-008765-root .pt-1 { padding-top: 0.25rem !important; }
+#token-008765-root .pt-1\.5 { padding-top: 0.375rem !important; }
+#token-008765-root .pt-2 { padding-top: 0.5rem !important; }
+#token-008765-root .pt-2\.5 { padding-top: 0.625rem !important; }
+#token-008765-root .pt-3 { padding-top: 0.75rem !important; }
+#token-008765-root .pt-3\.5 { padding-top: 0.875rem !important; }
+#token-008765-root .pt-4 { padding-top: 1rem !important; }
+#token-008765-root .pt-5 { padding-top: 1.25rem !important; }
+#token-008765-root .pt-6 { padding-top: 1.5rem !important; }
+#token-008765-root .pt-8 { padding-top: 2rem !important; }
+
+#token-008765-root .pb-0 { padding-bottom: 0px !important; }
+#token-008765-root .pb-0\.5 { padding-bottom: 0.125rem !important; }
+#token-008765-root .pb-1 { padding-bottom: 0.25rem !important; }
+#token-008765-root .pb-1\.5 { padding-bottom: 0.375rem !important; }
+#token-008765-root .pb-2 { padding-bottom: 0.5rem !important; }
+#token-008765-root .pb-2\.5 { padding-bottom: 0.625rem !important; }
+#token-008765-root .pb-3 { padding-bottom: 0.75rem !important; }
+#token-008765-root .pb-3\.5 { padding-bottom: 0.875rem !important; }
+#token-008765-root .pb-4 { padding-bottom: 1rem !important; }
+#token-008765-root .pb-5 { padding-bottom: 1.25rem !important; }
+#token-008765-root .pb-6 { padding-bottom: 1.5rem !important; }
+#token-008765-root .pb-8 { padding-bottom: 2rem !important; }
+
+#token-008765-root .pl-0 { padding-left: 0px !important; }
+#token-008765-root .pl-0\.5 { padding-left: 0.125rem !important; }
+#token-008765-root .pl-1 { padding-left: 0.25rem !important; }
+#token-008765-root .pl-1\.5 { padding-left: 0.375rem !important; }
+#token-008765-root .pl-2 { padding-left: 0.5rem !important; }
+#token-008765-root .pl-2\.5 { padding-left: 0.625rem !important; }
+#token-008765-root .pl-3 { padding-left: 0.75rem !important; }
+#token-008765-root .pl-3\.5 { padding-left: 0.875rem !important; }
+#token-008765-root .pl-4 { padding-left: 1rem !important; }
+#token-008765-root .pl-5 { padding-left: 1.25rem !important; }
+#token-008765-root .pl-6 { padding-left: 1.5rem !important; }
+#token-008765-root .pl-8 { padding-left: 2rem !important; }
+#token-008765-root .pl-10 { padding-left: 2.5rem !important; }
+
+#token-008765-root .pr-0 { padding-right: 0px !important; }
+#token-008765-root .pr-0\.5 { padding-right: 0.125rem !important; }
+#token-008765-root .pr-1 { padding-right: 0.25rem !important; }
+#token-008765-root .pr-1\.5 { padding-right: 0.375rem !important; }
+#token-008765-root .pr-2 { padding-right: 0.5rem !important; }
+#token-008765-root .pr-2\.5 { padding-right: 0.625rem !important; }
+#token-008765-root .pr-3 { padding-right: 0.75rem !important; }
+#token-008765-root .pr-3\.5 { padding-right: 0.875rem !important; }
+#token-008765-root .pr-4 { padding-right: 1rem !important; }
+#token-008765-root .pr-5 { padding-right: 1.25rem !important; }
+#token-008765-root .pr-6 { padding-right: 1.5rem !important; }
+#token-008765-root .pr-8 { padding-right: 2rem !important; }
+#token-008765-root .pr-10 { padding-right: 2.5rem !important; }
+
+#token-008765-root .m-0 { margin: 0px !important; }
+#token-008765-root .m-0\.5 { margin: 0.125rem !important; }
+#token-008765-root .m-1 { margin: 0.25rem !important; }
+#token-008765-root .m-1\.5 { margin: 0.375rem !important; }
+#token-008765-root .m-2 { margin: 0.5rem !important; }
+#token-008765-root .m-2\.5 { margin: 0.625rem !important; }
+#token-008765-root .m-3 { margin: 0.75rem !important; }
+#token-008765-root .m-3\.5 { margin: 0.875rem !important; }
+#token-008765-root .m-4 { margin: 1rem !important; }
+#token-008765-root .m-5 { margin: 1.25rem !important; }
+#token-008765-root .m-6 { margin: 1.5rem !important; }
+#token-008765-root .m-8 { margin: 2rem !important; }
+
+#token-008765-root .mx-0 { margin-left: 0px !important; margin-right: 0px !important; }
+#token-008765-root .mx-0\.5 { margin-left: 0.125rem !important; margin-right: 0.125rem !important; }
+#token-008765-root .mx-1 { margin-left: 0.25rem !important; margin-right: 0.25rem !important; }
+#token-008765-root .mx-1\.5 { margin-left: 0.375rem !important; margin-right: 0.375rem !important; }
+#token-008765-root .mx-2 { margin-left: 0.5rem !important; margin-right: 0.5rem !important; }
+#token-008765-root .mx-2\.5 { margin-left: 0.625rem !important; margin-right: 0.625rem !important; }
+#token-008765-root .mx-3 { margin-left: 0.75rem !important; margin-right: 0.75rem !important; }
+#token-008765-root .mx-3\.5 { margin-left: 0.875rem !important; margin-right: 0.875rem !important; }
+#token-008765-root .mx-4 { margin-left: 1rem !important; margin-right: 1rem !important; }
+#token-008765-root .mx-5 { margin-left: 1.25rem !important; margin-right: 1.25rem !important; }
+#token-008765-root .mx-6 { margin-left: 1.5rem !important; margin-right: 1.5rem !important; }
+#token-008765-root .mx-8 { margin-left: 2rem !important; margin-right: 2rem !important; }
+#token-008765-root .mx-auto { margin-left: auto !important; margin-right: auto !important; }
+
+#token-008765-root .my-0 { margin-top: 0px !important; margin-bottom: 0px !important; }
+#token-008765-root .my-0\.5 { margin-top: 0.125rem !important; margin-bottom: 0.125rem !important; }
+#token-008765-root .my-1 { margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; }
+#token-008765-root .my-1\.5 { margin-top: 0.375rem !important; margin-bottom: 0.375rem !important; }
+#token-008765-root .my-2 { margin-top: 0.5rem !important; margin-bottom: 0.5rem !important; }
+#token-008765-root .my-2\.5 { margin-top: 0.625rem !important; margin-bottom: 0.625rem !important; }
+#token-008765-root .my-3 { margin-top: 0.75rem !important; margin-bottom: 0.75rem !important; }
+#token-008765-root .my-3\.5 { margin-top: 0.875rem !important; margin-bottom: 0.875rem !important; }
+#token-008765-root .my-4 { margin-top: 1rem !important; margin-bottom: 1rem !important; }
+#token-008765-root .my-5 { margin-top: 1.25rem !important; margin-bottom: 1.25rem !important; }
+#token-008765-root .my-6 { margin-top: 1.5rem !important; margin-bottom: 1.5rem !important; }
+#token-008765-root .my-8 { margin-top: 2rem !important; margin-bottom: 2rem !important; }
+
+#token-008765-root .mt-0 { margin-top: 0px !important; }
+#token-008765-root .mt-0\.5 { margin-top: 0.125rem !important; }
+#token-008765-root .mt-1 { margin-top: 0.25rem !important; }
+#token-008765-root .mt-1\.5 { margin-top: 0.375rem !important; }
+#token-008765-root .mt-2 { margin-top: 0.5rem !important; }
+#token-008765-root .mt-2\.5 { margin-top: 0.625rem !important; }
+#token-008765-root .mt-3 { margin-top: 0.75rem !important; }
+#token-008765-root .mt-3\.5 { margin-top: 0.875rem !important; }
+#token-008765-root .mt-4 { margin-top: 1rem !important; }
+#token-008765-root .mt-5 { margin-top: 1.25rem !important; }
+#token-008765-root .mt-6 { margin-top: 1.5rem !important; }
+#token-008765-root .mt-8 { margin-top: 2rem !important; }
+#token-008765-root .mt-10 { margin-top: 2.5rem !important; }
+#token-008765-root .mt-12 { margin-top: 3rem !important; }
+#token-008765-root .mt-auto { margin-top: auto !important; }
+
+#token-008765-root .mb-0 { margin-bottom: 0px !important; }
+#token-008765-root .mb-0\.5 { margin-bottom: 0.125rem !important; }
+#token-008765-root .mb-1 { margin-bottom: 0.25rem !important; }
+#token-008765-root .mb-1\.5 { margin-bottom: 0.375rem !important; }
+#token-008765-root .mb-2 { margin-bottom: 0.5rem !important; }
+#token-008765-root .mb-2\.5 { margin-bottom: 0.625rem !important; }
+#token-008765-root .mb-3 { margin-bottom: 0.75rem !important; }
+#token-008765-root .mb-3\.5 { margin-bottom: 0.875rem !important; }
+#token-008765-root .mb-4 { margin-bottom: 1rem !important; }
+#token-008765-root .mb-5 { margin-bottom: 1.25rem !important; }
+#token-008765-root .mb-6 { margin-bottom: 1.5rem !important; }
+#token-008765-root .mb-8 { margin-bottom: 2rem !important; }
+#token-008765-root .mb-10 { margin-bottom: 2.5rem !important; }
+#token-008765-root .mb-12 { margin-bottom: 3rem !important; }
+#token-008765-root .mb-auto { margin-bottom: auto !important; }
+
+#token-008765-root .ms-0 { margin-left: 0px !important; }
+#token-008765-root .ms-0\.5 { margin-left: 0.125rem !important; }
+#token-008765-root .ms-1 { margin-left: 0.25rem !important; }
+#token-008765-root .ms-1\.5 { margin-left: 0.375rem !important; }
+#token-008765-root .ms-2 { margin-left: 0.5rem !important; }
+#token-008765-root .ms-2\.5 { margin-left: 0.625rem !important; }
+#token-008765-root .ms-3 { margin-left: 0.75rem !important; }
+#token-008765-root .ms-3\.5 { margin-left: 0.875rem !important; }
+#token-008765-root .ms-4 { margin-left: 1rem !important; }
+#token-008765-root .ms-5 { margin-left: 1.25rem !important; }
+#token-008765-root .ms-6 { margin-left: 1.5rem !important; }
+#token-008765-root .ms-8 { margin-left: 2rem !important; }
+
+#token-008765-root .me-0 { margin-right: 0px !important; }
+#token-008765-root .me-0\.5 { margin-right: 0.125rem !important; }
+#token-008765-root .me-1 { margin-right: 0.25rem !important; }
+#token-008765-root .me-1\.5 { margin-right: 0.375rem !important; }
+#token-008765-root .me-2 { margin-right: 0.5rem !important; }
+#token-008765-root .me-2\.5 { margin-right: 0.625rem !important; }
+#token-008765-root .me-3 { margin-right: 0.75rem !important; }
+#token-008765-root .me-3\.5 { margin-right: 0.875rem !important; }
+#token-008765-root .me-4 { margin-right: 1rem !important; }
+#token-008765-root .me-5 { margin-right: 1.25rem !important; }
+#token-008765-root .me-6 { margin-right: 1.5rem !important; }
+#token-008765-root .me-8 { margin-right: 2rem !important; }
+
+/* Grid Overrides to bypass Bootstrap's .grid !important */
+#token-008765-root .grid-animate {
+  display: grid !important;
+}
+#token-008765-root .grid {
+  display: grid !important;
+}
+#token-008765-root .grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+}
+#token-008765-root .grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+#token-008765-root .grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+#token-008765-root .grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+#token-008765-root .col-span-1 {
+  grid-column: span 1 / span 1 !important;
+}
+#token-008765-root .col-span-2 {
+  grid-column: span 2 / span 2 !important;
+}
+@media (min-width: 768px) {
+  #token-008765-root .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  #token-008765-root .md\:col-span-2 {
+    grid-column: span 2 / span 2 !important;
+  }
+}
+
+/* --- Print Styles for PDF Generation --- */
+@media print {
+  /* Hide elements inside token-008765-root initially */
+  #token-008765-root * {
+    visibility: hidden;
+  }
+
+  /* Only make the print receipt area and its children visible */
+  #token-008765-root .receipt-print-area,
+  #token-008765-root .receipt-print-area * {
+    visibility: visible;
+  }
+
+  /* Reset layout for the receipt to be perfectly aligned on the page */
+  #token-008765-root .receipt-print-area {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 2rem;
+    background: transparent !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide interactive elements like close buttons and theme toggles */
+  #token-008765-root .print-hide {
+    display: none !important;
+  }
+}
