@@ -283,7 +283,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
               <div className="flex items-center my-2">
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
                 <span className={`mx-2.5 text-[9px] font-bold tracking-[0.2em] uppercase ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} whitespace-nowrap`}>
-                  {type.toUpperCase()} RECEIPT
+                  {type.toLowerCase() === 'exit' ? 'TRADE EXIT' : 'TRADE ENTRY'}
                 </span>
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
               </div>

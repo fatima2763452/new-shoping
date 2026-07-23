@@ -35,15 +35,15 @@ const getImgDimensions = (src) => {
     });
 };
 
-let logoAssetCache = null;
-const getLogoAsset = async (src) => {
-    if (logoAssetCache) return logoAssetCache;
+const assetCache = {};
+const getImageAsset = async (src) => {
+    if (assetCache[src]) return assetCache[src];
     const [base64, dims] = await Promise.all([
         loadImageAsBase64(src),
         getImgDimensions(src)
     ]);
     if (base64) {
-        logoAssetCache = { base64, dims };
+        assetCache[src] = { base64, dims };
     }
     return { base64, dims };
 };
@@ -197,7 +197,9 @@ export default function Invoice() {
         setEndDate(now.toISOString().split('T')[0]);
 
         fetchOrders();
-        getLogoAsset(logo);
+        getImageAsset(logo);
+        getImageAsset(dhanlaxmiStamp);
+        getImageAsset(dhanlaxmiSignature);
     }, [customerId]);
 
     const isDateInRange = (rawDate, startStr, endStr) => {
@@ -326,13 +328,17 @@ export default function Invoice() {
             const redColor = [239, 68, 68];     // Red
             const contentW = pageW - 2 * marginSize;
 
-            // Load logo as base64 and get image size (cached)
-            const { base64: logoBase64, dims } = await getLogoAsset(logo);
+            // Load cached image assets (Logo, Stamp, Signature)
+            const [{ base64: logoBase64, dims: logoDims }, { base64: stampBase64 }, { base64: sigBase64 }] = await Promise.all([
+                getImageAsset(logo),
+                getImageAsset(dhanlaxmiStamp),
+                getImageAsset(dhanlaxmiSignature)
+            ]);
 
             // Header Elements (Logo on the left)
             if (logoBase64) {
                 const logoH = 70; // height in pt
-                const logoW = (dims.width / dims.height) * logoH;
+                const logoW = (logoDims.width / logoDims.height) * logoH;
                 pdf.addImage(logoBase64, 'JPEG', marginSize, cursorY, logoW, logoH);
             }
 
@@ -585,41 +591,28 @@ export default function Invoice() {
 
             cursorY += 130;
 
-            // Stamp, QR and Signature block
+            // Real Stamp & Signature block
             ensureSpace(70);
 
-            // Stamp Seal (Middle-ish)
-            const sealX = marginSize + 100;
-            const sealY = cursorY + 22;
+            // Stamp Image (Left)
+            if (stampBase64) {
+                pdf.addImage(stampBase64, 'PNG', marginSize + 20, cursorY - 10, 75, 75);
+            }
 
-            pdf.setDrawColor(37, 99, 235);
-            pdf.setLineWidth(1.5);
-            pdf.ellipse(sealX, sealY, 26, 26, 'D');
-            pdf.setLineWidth(0.5);
-            pdf.ellipse(sealX, sealY, 23, 23, 'D');
-
-            pdf.setFont(activeFont, 'bold');
-            pdf.setFontSize(5.5);
-            pdf.setTextColor(37, 99, 235);
-            pdf.text('DHANLAXMI', sealX, sealY - 8, { align: 'center' });
-            pdf.text('AHMEDABAD', sealX, sealY + 1, { align: 'center' });
-            pdf.text('CAPITAL', sealX, sealY + 9, { align: 'center' });
-
-            // Signature (Right)
+            // Signature Image (Right)
             const rightEdgeX = pageW - marginSize;
-            pdf.setFont(activeFont, 'italic');
-            pdf.setFontSize(11);
-            pdf.setTextColor(71, 85, 105);
-            pdf.text('Dhanlaxmi Capital', rightEdgeX - 80, cursorY + 18);
+            if (sigBase64) {
+                pdf.addImage(sigBase64, 'PNG', rightEdgeX - 140, cursorY - 15, 140, 45);
+            }
 
             pdf.setDrawColor(203, 213, 225);
             pdf.setLineWidth(1);
-            pdf.line(rightEdgeX - 120, cursorY + 28, rightEdgeX, cursorY + 28);
+            pdf.line(rightEdgeX - 140, cursorY + 32, rightEdgeX, cursorY + 32);
 
             pdf.setFont(activeFont, 'bold');
             pdf.setFontSize(7.5);
             pdf.setTextColor(148, 163, 184);
-            pdf.text('Authorized Signatory', rightEdgeX - 60, cursorY + 38, { align: 'center' });
+            pdf.text('Authorized Signatory', rightEdgeX - 70, cursorY + 42, { align: 'center' });
 
             cursorY += 55;
 

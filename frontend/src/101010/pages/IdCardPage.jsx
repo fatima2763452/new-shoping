@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
+import dhanlaxmiBlueStamp from '../assets/dhanlaxmi_blue_stamp.png';
+import ashokStambhImg from '../assets/ashok_stambh.png';
 
 const IdCardPage = () => {
   const navigate = useNavigate();
@@ -276,12 +278,13 @@ const IdCardPage = () => {
                 zIndex: 10
               }}
             >
-              {/* Left Crest Logo */}
-              <div style={{ flexShrink: 0 }}>
-                <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M50 10 C68 25 78 28 85 30 C85 62 68 85 50 92 C32 85 15 62 15 30 C22 28 32 25 50 10 Z" fill="#FFD700" stroke="#B8860B" strokeWidth="4"/>
-                  <path d="M35 40 L50 25 L65 40 L50 35 Z M50 35 V75 M38 55 H62" stroke="#8B6508" strokeWidth="4" strokeLinecap="round"/>
-                </svg>
+              {/* Left Ashok Stambh Logo Image */}
+              <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                <img 
+                  src={ashokStambhImg} 
+                  alt="Ashok Stambh" 
+                  style={{ height: '32px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1) drop-shadow(0px 1px 2px rgba(0,0,0,0.5))' }} 
+                />
               </div>
 
               {/* Company Name */}
@@ -297,16 +300,17 @@ const IdCardPage = () => {
                     textShadow: '1px 1px 2px rgba(0,0,0,0.6)'
                   }}
                 >
-                  ABBOTWEALTH MANAGEMENT BROKARAGE PVT
+                  DHANLAXMI CAPITAL PVT. LTD.
                 </h1>
               </div>
 
-              {/* Right Crest Logo */}
-              <div style={{ flexShrink: 0 }}>
-                <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M50 10 C68 25 78 28 85 30 C85 62 68 85 50 92 C32 85 15 62 15 30 C22 28 32 25 50 10 Z" fill="#FFD700" stroke="#B8860B" strokeWidth="4"/>
-                  <path d="M35 40 L50 25 L65 40 L50 35 Z M50 35 V75 M38 55 H62" stroke="#8B6508" strokeWidth="4" strokeLinecap="round"/>
-                </svg>
+              {/* Right Ashok Stambh Logo Image */}
+              <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                <img 
+                  src={ashokStambhImg} 
+                  alt="Ashok Stambh" 
+                  style={{ height: '32px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1) drop-shadow(0px 1px 2px rgba(0,0,0,0.5))' }} 
+                />
               </div>
             </div>
 
@@ -380,55 +384,25 @@ const IdCardPage = () => {
                   </div>
                 )}
 
-                {/* Stamp & Cursive Signature Overlay */}
+                {/* Dhanlaxmi Circular Blue Stamp Overlay */}
                 <div 
                   style={{
                     position: 'absolute',
-                    left: '70px',
-                    top: '50px',
-                    width: '55px',
-                    height: '55px',
+                    left: '2px',
+                    top: '52px',
+                    width: '56px',
+                    height: '56px',
                     opacity: 0.95,
                     pointerEvents: 'none',
-                    transform: 'rotate(10deg)',
+                    transform: 'rotate(-4deg)',
                     zIndex: 20
                   }}
                 >
-                  {/* Stamp Background Circle */}
-                  <div 
-                    style={{
-                      width: '38px',
-                      height: '38px',
-                      borderRadius: '50%',
-                      border: '1px dashed rgba(59, 130, 246, 0.8)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'relative'
-                    }}
-                  >
-                    <span style={{ fontSize: '3.5px', fontWeight: 900, color: 'rgba(59, 130, 246, 0.7)', textAlign: 'center', textTransform: 'uppercase', lineHeight: 1.1 }}>
-                      ABBOTWEALTH
-                      <br />
-                      BROKERAGE
-                    </span>
-                  </div>
-                  {/* Blue Cursive Signature */}
-                  <div 
-                    style={{
-                      position: 'absolute',
-                      top: '12px',
-                      left: '-8px',
-                      color: 'rgba(37, 99, 235, 0.95)',
-                      fontSize: '9px',
-                      fontWeight: 'bold',
-                      whiteSpace: 'nowrap',
-                      fontFamily: "'Parisienne', 'Dancing Script', cursive",
-                      textShadow: '0.5px 0.5px 0px rgba(255,255,255,0.4)'
-                    }}
-                  >
-                    Santoshbhai Patel
-                  </div>
+                  <img 
+                    src={dhanlaxmiBlueStamp} 
+                    alt="Dhanlaxmi Blue Stamp" 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+                  />
                 </div>
               </div>
 

@@ -149,7 +149,7 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-300 overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-start justify-center bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-300 overflow-y-auto pb-32">
       {/* Background clickable area to close */}
       <div className="fixed inset-0 min-h-screen print-hide" onClick={onClose}></div>
 
@@ -246,7 +246,7 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
               <div className="flex items-center my-2">
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
                 <span className={`mx-2.5 text-[9px] font-bold tracking-[0.2em] uppercase ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'} whitespace-nowrap`}>
-                  ENTRY RECEIPT
+                  TRADE ENTRY
                 </span>
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
               </div>
@@ -560,7 +560,7 @@ const HoldingReceipt = ({ customer, holding, onClose, onEdit }) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex w-full mt-6 gap-4 print-hide" style={{ maxWidth: receiptVersion === 'R1' ? '420px' : '720px' }}>
+      <div className="flex w-full mt-6 mb-28 gap-4 print-hide" style={{ maxWidth: receiptVersion === 'R1' ? '420px' : '720px' }}>
           <button
             onClick={onClose}
             className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors ${

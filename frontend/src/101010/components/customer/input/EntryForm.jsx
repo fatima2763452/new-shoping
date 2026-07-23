@@ -139,7 +139,7 @@ const EntryForm = ({ formatCurrency, customer, editingTradeData, setEditingTrade
   };
 
   return (
-    <div className="relative">
+    <div className="relative pb-28 md:pb-6">
       {/* Toast Notification */}
       {toast.show && (
         <div className={`absolute -top-12 left-1/2 -translate-x-1/2 z-50 px-4 py-1.5 rounded-full font-bold text-xs whitespace-nowrap flex items-center gap-2 shadow-lg animate-in slide-in-from-top-4 fade-in duration-300 ${toast.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
@@ -150,7 +150,7 @@ const EntryForm = ({ formatCurrency, customer, editingTradeData, setEditingTrade
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg relative z-10 animate-in fade-in slide-in-from-bottom-2 duration-300 mb-8">
       
       {/* Exchange & Product Type Toggles */}
       <div className="flex gap-4 mb-5">
