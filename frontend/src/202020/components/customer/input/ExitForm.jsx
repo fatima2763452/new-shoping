@@ -138,7 +138,7 @@ const ExitForm = ({ formatCurrency, customer, editingTradeData, setEditingTradeD
   };
 
   return (
-    <div className="relative">
+    <div className="relative pb-36 sm:pb-32">
       {/* Toast Notification */}
       {toast.show && (
         <div className={`absolute -top-12 left-1/2 -translate-x-1/2 z-50 px-4 py-1.5 rounded-full font-bold text-xs whitespace-nowrap flex items-center gap-2 shadow-lg animate-in slide-in-from-top-4 fade-in duration-300 ${toast.type === 'success' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>

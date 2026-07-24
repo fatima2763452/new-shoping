@@ -254,7 +254,7 @@ const WeeklyRecords = ({ customer, onEditRequest }) => {
                 <div className="flex items-center">
                   <div className="text-right">
                     <div className="font-bold text-slate-100 text-base">{formatCurrency(item.price)}</div>
-                    <div className="text-[10px] text-slate-400">LTP: <span className="text-slate-300">{formatCurrency(item.ltp)}</span></div>
+                    <div className="text-[10px] text-slate-400">EXIT PRICE: <span className="text-slate-300">{formatCurrency(item.ltp)}</span></div>
                   </div>
                   {/* Chevron Right Button */}
                   <div className="ml-3 p-1.5 rounded-lg bg-slate-950/60 border border-slate-800/80 text-slate-400 group-hover:text-slate-200 transition-colors">

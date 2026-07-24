@@ -191,7 +191,7 @@ const TradeReceiptR2 = ({
           )}
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
-          <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Exit Price (LTP)</span>
+          <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>{isExit ? 'Exit Price' : 'LTP'}</span>
           {isEditing ? (
             <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({ ...editData, ltp: e.target.value })} />
           ) : (

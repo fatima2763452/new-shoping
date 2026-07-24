@@ -322,7 +322,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                 </div>
                 <div className="text-right">
                   <span className={`text-[9px] font-bold uppercase tracking-wider block ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'}`}>
-                    LTP
+                    {type?.toLowerCase() === 'exit' ? 'EXIT PRICE' : 'LTP'}
                   </span>
                   <span className={`text-sm font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>
                     {formatCurrency(trade.ltp || trade.price || 0)}
@@ -432,7 +432,9 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                   {/* LTP */}
                   {(isEditing || trade.ltp > 0) && (
                     <div>
-                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>LTP</span>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
+                        {type?.toLowerCase() === 'exit' ? 'Exit Price' : 'LTP'}
+                      </span>
                       {isEditing ? (
                         <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({...editData, ltp: e.target.value})} />
                       ) : (
