@@ -274,7 +274,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
               <div className="flex justify-between items-start pb-1.5">
                 <div>
                   <h1 className={`text-2xl font-black tracking-wider ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
-                    SHRILAXMI
+                    SHREELAXMI
                   </h1>
                   <div className={`text-[9px] font-bold tracking-[0.2em] uppercase mt-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
                     TRADERS PVT. LTD.
