@@ -27,13 +27,13 @@ const TradeReceiptR2 = ({
   
   let displayTotalPnl = 0;
   if (isExit) {
-    displayTotalPnl = trade.realizedPnl !== undefined ? trade.realizedPnl : (
+    displayTotalPnl = (!isEditing && trade.realizedPnl !== undefined) ? trade.realizedPnl : (
       isBuy 
-        ? ((displayLtp - displayPrice) * displayQty - displayBrokerage)
-        : ((displayPrice - displayLtp) * displayQty - displayBrokerage)
+        ? ((displayPrice - displayLtp) * displayQty - displayBrokerage)
+        : ((displayLtp - displayPrice) * displayQty - displayBrokerage)
     );
   } else {
-    if (trade.customUpnl !== undefined) {
+    if (!isEditing && trade.customUpnl !== undefined) {
       displayTotalPnl = trade.customUpnl;
     } else if (displayLtp > 0 && displayLtp !== displayPrice) {
       displayTotalPnl = isBuy 
@@ -187,7 +187,7 @@ const TradeReceiptR2 = ({
           {isEditing ? (
             <input type="number" className={inputClassName} value={editData.price} onChange={e => setEditData({ ...editData, price: e.target.value })} />
           ) : (
-            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(buyPrice)}</span>
+            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(displayPrice)}</span>
           )}
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
@@ -195,7 +195,7 @@ const TradeReceiptR2 = ({
           {isEditing ? (
             <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({ ...editData, ltp: e.target.value })} />
           ) : (
-            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(sellPrice)}</span>
+            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(displayLtp)}</span>
           )}
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
