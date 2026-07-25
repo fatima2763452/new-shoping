@@ -29,8 +29,8 @@ const TradeReceiptR2 = ({
   if (isExit) {
     displayTotalPnl = (!isEditing && trade.realizedPnl !== undefined) ? trade.realizedPnl : (
       isBuy 
-        ? ((displayPrice - displayLtp) * displayQty - displayBrokerage)
-        : ((displayLtp - displayPrice) * displayQty - displayBrokerage)
+        ? ((displayLtp - displayPrice) * displayQty - displayBrokerage)
+        : ((displayPrice - displayLtp) * displayQty - displayBrokerage)
     );
   } else {
     if (!isEditing && trade.customUpnl !== undefined) {

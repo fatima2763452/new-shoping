@@ -154,8 +154,8 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
   if (isExit) {
     calculatedPnl = (!isEditing && trade.realizedPnl !== undefined) ? trade.realizedPnl : (
       isBuy 
-        ? ((displayPrice - displayLtp) * displayQty - displayBrokerage)
-        : ((displayLtp - displayPrice) * displayQty - displayBrokerage)
+        ? ((displayLtp - displayPrice) * displayQty - displayBrokerage)
+        : ((displayPrice - displayLtp) * displayQty - displayBrokerage)
     );
   } else {
     if (!isEditing && trade.customUpnl !== undefined) {
