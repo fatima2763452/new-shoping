@@ -27,13 +27,13 @@ const TradeReceiptR2 = ({
   
   let displayTotalPnl = 0;
   if (isExit) {
-    displayTotalPnl = trade.realizedPnl !== undefined ? trade.realizedPnl : (
+    displayTotalPnl = (!isEditing && trade.realizedPnl !== undefined) ? trade.realizedPnl : (
       isBuy 
         ? ((displayLtp - displayPrice) * displayQty - displayBrokerage)
         : ((displayPrice - displayLtp) * displayQty - displayBrokerage)
     );
   } else {
-    if (trade.customUpnl !== undefined) {
+    if (!isEditing && trade.customUpnl !== undefined) {
       displayTotalPnl = trade.customUpnl;
     } else if (displayLtp > 0 && displayLtp !== displayPrice) {
       displayTotalPnl = isBuy 
@@ -153,13 +153,13 @@ const TradeReceiptR2 = ({
           <span className={`text-xs font-bold uppercase ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
             NET P&L
           </span>
-          <span className={`text-2xl font-black ${displayTotalPnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}`}>
+          <span className={`text-2xl font-black ${displayTotalPnl >= 0 ? 'text-emerald-400' : 'text-rose-505'}`}>
             {displayTotalPnl >= 0 ? '+' : ''}{formatCurrency(displayTotalPnl)}
           </span>
           <span className={`px-2 py-0.5 rounded text-xs font-bold border ${
             displayTotalPnl >= 0 
               ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-              : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+              : 'bg-rose-505/10 text-rose-400 border-rose-505/20'
           }`}>
             ({pnlPercent >= 0 ? '+' : ''}{pnlPercent.toFixed(2)}%)
           </span>
@@ -187,7 +187,7 @@ const TradeReceiptR2 = ({
           {isEditing ? (
             <input type="number" className={inputClassName} value={editData.price} onChange={e => setEditData({ ...editData, price: e.target.value })} />
           ) : (
-            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(buyPrice)}</span>
+            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(displayPrice)}</span>
           )}
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
@@ -195,7 +195,7 @@ const TradeReceiptR2 = ({
           {isEditing ? (
             <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({ ...editData, ltp: e.target.value })} />
           ) : (
-            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(sellPrice)}</span>
+            <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{formatCurrency(displayLtp)}</span>
           )}
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
@@ -325,7 +325,7 @@ const TradeReceiptR2 = ({
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>TOTAL SELL VALUE</span>
-          <span className={`text-base font-black whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-950'}`}>{formatCurrency(totalSellValue)}</span>
+          <span className={`text-base font-black whitespace-nowrap ${isDark ? 'text-white' : 'text-slate-955'}`}>{formatCurrency(totalSellValue)}</span>
         </div>
         <div className={`flex-1 min-w-0 pl-6 border-l ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
           <span className={`block text-[10px] font-bold uppercase tracking-wider mb-1 ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>TOTAL BROKERAGE</span>

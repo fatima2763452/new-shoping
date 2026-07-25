@@ -122,46 +122,55 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
   const productType = (trade.action || 'Unknown').toUpperCase();
   const isBuy = productType === 'BUY';
 
+  const displayQty = isEditing ? (parseFloat(editData.quantity) || 0) : (trade.quantity || 0);
+  const displayPrice = isEditing ? (parseFloat(editData.price) || 0) : (trade.price || trade.entryPrice || 0);
+  const displayLtp = isEditing ? (parseFloat(editData.ltp) || 0) : (trade.ltp || 0);
+  const displayBrokerage = isEditing ? (parseFloat(editData.brokerageFee) || 0) : (trade.brokerageFee || 0);
+
   let buyPrice = null;
   let sellPrice = null;
 
   if (isExit) {
     if (isBuy) { // Exiting a short
-      buyPrice = trade.ltp;
-      sellPrice = trade.price;
+      buyPrice = displayLtp;
+      sellPrice = displayPrice;
     } else { // Exiting a long
-      sellPrice = trade.ltp;
-      buyPrice = trade.price;
+      sellPrice = displayLtp;
+      buyPrice = displayPrice;
     }
   } else {
     if (isBuy) {
-      buyPrice = trade.price;
+      buyPrice = displayPrice;
     } else {
-      sellPrice = trade.price;
+      sellPrice = displayPrice;
     }
   }
 
-  const totalBuyValue = buyPrice !== null ? buyPrice * trade.quantity : null;
-  const totalSellValue = sellPrice !== null ? sellPrice * trade.quantity : null;
+  const totalBuyValue = buyPrice !== null ? buyPrice * displayQty : null;
+  const totalSellValue = sellPrice !== null ? sellPrice * displayQty : null;
   const isShortExit = trade.action.toLowerCase() === 'buy'; // Exiting a short position by buying
 
   let calculatedPnl = 0;
   if (isExit) {
-    calculatedPnl = trade.realizedPnl !== undefined ? trade.realizedPnl : 0;
+    calculatedPnl = (!isEditing && trade.realizedPnl !== undefined) ? trade.realizedPnl : (
+      isBuy 
+        ? ((displayLtp - displayPrice) * displayQty - displayBrokerage)
+        : ((displayPrice - displayLtp) * displayQty - displayBrokerage)
+    );
   } else {
-    if (trade.customUpnl !== undefined) {
+    if (!isEditing && trade.customUpnl !== undefined) {
       calculatedPnl = trade.customUpnl;
-    } else if (trade.ltp > 0 && trade.ltp !== (trade.price || trade.entryPrice)) {
+    } else if (displayLtp > 0 && displayLtp !== displayPrice) {
       calculatedPnl = isBuy 
-        ? ((trade.ltp - (trade.price || trade.entryPrice || 0)) * trade.quantity - (trade.brokerageFee || 0))
-        : (((trade.price || trade.entryPrice || 0) - trade.ltp) * trade.quantity - (trade.brokerageFee || 0));
+        ? ((displayLtp - displayPrice) * displayQty - displayBrokerage)
+        : ((displayPrice - displayLtp) * displayQty - displayBrokerage);
     } else {
       calculatedPnl = 0;
     }
   }
 
   const displayTotalPnl = calculatedPnl;
-  const costBasis = (trade.price || trade.entryPrice || 0) * (trade.quantity || 1);
+  const costBasis = displayPrice * displayQty;
   const pnlPercent = costBasis > 0 ? (displayTotalPnl / costBasis) * 100 : 0;
 
   const formatTime12Hr = (timeStr) => {
@@ -325,7 +334,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                     {type?.toLowerCase() === 'exit' ? 'EXIT PRICE' : 'LTP'}
                   </span>
                   <span className={`text-sm font-black ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>
-                    {formatCurrency(trade.ltp || trade.price || 0)}
+                    {formatCurrency(displayLtp)}
                   </span>
                 </div>
               </div>
@@ -336,7 +345,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
               }`}>
                 <div className="flex justify-between items-center mb-2">
                   <span className={`text-[10px] font-extrabold uppercase tracking-widest ${
-                    theme === 'dark' ? 'text-slate-400' : 'text-slate-500'
+                    theme === 'dark' ? 'text-slate-400' : 'text-slate-505'
                   }`}>
                     NET POSITION
                   </span>
@@ -356,7 +365,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                       QTY.
                     </span>
                     <span className={`text-xs sm:text-sm font-black `}>
-                      {trade.quantity} {trade.lot ? `(${trade.lot})` : ''}
+                      {displayQty} {trade.lot ? `(${trade.lot})` : ''}
                     </span>
                   </div>
 
@@ -379,7 +388,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                       AVG. PRICE
                     </span>
                     <span className={`text-xs sm:text-sm font-black ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
-                      {formatCurrency(trade.price || trade.entryPrice || 0)}
+                      {formatCurrency(displayPrice)}
                     </span>
                   </div>
                 </div>
@@ -401,7 +410,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                   {/* Trade Type */}
                   {productType && (
                     <div>
-                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Trade Type</span>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-505'}`}>Trade Type</span>
                       <span className={`text-xs font-bold inline-block px-1.5 py-0.5 rounded ${
                         isBuy 
                           ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
@@ -418,12 +427,12 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                       <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Buy Qty.</span>
                       {isEditing ? (
                         <div className="flex gap-2">
-                          <input type="number" className={inputClassName} value={editData.quantity} onChange={e => setEditData({...editData, quantity: e.target.value})} placeholder="Qty" />
-                          <input type="number" className={inputClassName} value={editData.lot} onChange={e => setEditData({...editData, lot: e.target.value})} placeholder="Lot" />
+                           <input type="number" className={inputClassName} value={editData.quantity} onChange={e => setEditData({...editData, quantity: e.target.value})} placeholder="Qty" />
+                           <input type="number" className={inputClassName} value={editData.lot} onChange={e => setEditData({...editData, lot: e.target.value})} placeholder="Lot" />
                         </div>
                       ) : (
                         <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
-                          {trade.quantity} {trade.lot ? `(${trade.lot})` : ''}
+                          {displayQty} {trade.lot ? `(${trade.lot})` : ''}
                         </span>
                       )}
                     </div>
@@ -439,7 +448,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                         <input type="number" className={inputClassName} value={editData.ltp} onChange={e => setEditData({...editData, ltp: e.target.value})} />
                       ) : (
                         <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
-                          {formatCurrency(trade.ltp || 0)}
+                          {formatCurrency(displayLtp)}
                         </span>
                       )}
                     </div>
@@ -453,28 +462,28 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                         <input type="number" className={inputClassName} value={editData.price} onChange={e => setEditData({...editData, price: e.target.value})} />
                       ) : (
                         <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
-                          {formatCurrency(trade.price || trade.entryPrice || 0)}
+                          {formatCurrency(displayPrice)}
                         </span>
                       )}
                     </div>
                   )}
 
                   {/* Brokerage */}
-                  {(!isEditing && trade.brokerageFee > 0) && (
+                  {(!isEditing && displayBrokerage > 0) && (
                     <div>
-                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Brokerage</span>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-505'}`}>Brokerage</span>
                       <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
-                        {formatCurrency(trade.brokerageFee)}
+                        {formatCurrency(displayBrokerage)}
                       </span>
                     </div>
                   )}
 
                   {/* Buy Value */}
-                  {(!isEditing && ((trade.price || trade.entryPrice || 0) * trade.quantity) > 0) && (
+                  {(!isEditing && (displayPrice * displayQty) > 0) && (
                     <div>
-                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>Buy Value</span>
+                      <span className={`text-[10px] font-medium block mb-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-505'}`}>Buy Value</span>
                       <span className={`text-xs font-semibold block ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
-                        {formatCurrency((trade.price || trade.entryPrice || 0) * trade.quantity)}
+                        {formatCurrency(displayPrice * displayQty)}
                       </span>
                     </div>
                   )}
@@ -497,7 +506,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
                         <span className={`text-xs font-semibold flex items-center gap-1.5 ${theme === 'dark' ? 'text-slate-200' : 'text-slate-900'}`}>
                           {(() => {
                             const marginRsVal = parseFloat(trade.marginRs) || 0;
-                            const totalVal = (trade.quantity || 0) * (trade.price || trade.entryPrice || 0);
+                            const totalVal = displayQty * displayPrice;
                             let marginPctVal = parseFloat(trade.marginPct) || 0;
                             if (marginRsVal <= 0) {
                               marginPctVal = 0;

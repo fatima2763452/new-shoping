@@ -56,9 +56,9 @@ const createTrade = async (req, res) => {
       // In Exit Form: 'price' is Entry Price, 'ltp' is Exit Price
       let realizedPnl = 0;
       if (action.toLowerCase() === 'sell') { // Exiting a Long position
-        realizedPnl = (parseFloat(ltp) - priceNum) * qtyNum;
-      } else if (action.toLowerCase() === 'buy') { // Exiting a Short position
         realizedPnl = (priceNum - parseFloat(ltp)) * qtyNum;
+      } else if (action.toLowerCase() === 'buy') { // Exiting a Short position
+        realizedPnl = (parseFloat(ltp) - priceNum) * qtyNum;
       }
       
       realizedPnl -= brokerageFee;
@@ -360,9 +360,9 @@ const editTrade = async (req, res) => {
     } else if (type === 'exit') {
       let realizedPnl = 0;
       if (action.toLowerCase() === 'sell') { 
-        realizedPnl = (parseFloat(ltp) - priceNum) * qtyNum;
-      } else if (action.toLowerCase() === 'buy') { 
         realizedPnl = (priceNum - parseFloat(ltp)) * qtyNum;
+      } else if (action.toLowerCase() === 'buy') { 
+        realizedPnl = (parseFloat(ltp) - priceNum) * qtyNum;
       }
       realizedPnl -= brokerageFee;
       tradeData.realizedPnl = realizedPnl;
