@@ -48,6 +48,9 @@ function Pavti() {
           });
         }
 
+        fetched.sort((a, b) => new Date(a.tradeDate) - new Date(b.tradeDate));
+
+
         setPavtiData(fetched);
 
         if (original.length) {

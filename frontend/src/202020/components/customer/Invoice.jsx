@@ -249,6 +249,13 @@ export default function Invoice() {
             return isDateInRange(fallbackDate, startDate, endDate);
         });
 
+        // Sort filtered orders by date in ascending order (older dates at top)
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.date || a.createdAt);
+            const dateB = new Date(b.date || b.createdAt);
+            return dateA - dateB;
+        });
+
         setFilterStats({
             total: orders.length,
             matched: filtered.length,
@@ -629,7 +636,7 @@ export default function Invoice() {
             pdf.setFontSize(7);
             pdf.setTextColor(148, 163, 184);
             pdf.text('1. Brokerage charged as per the agreed terms.', marginSize, cursorY + 10);
-            pdf.text('2. Payment to be made within T+1 settlement cycle.', marginSize, cursorY + 19);
+            pdf.text('2. All trades of this week are mentioned here, and holdings are not mentioned.', marginSize, cursorY + 19);
             pdf.text('3. This is a computer generated invoice, does not require physical signature.', marginSize, cursorY + 28);
 
             pdf.setFont(activeFont, 'bold');
@@ -1084,7 +1091,7 @@ export default function Invoice() {
                             <div className="text-[10px] text-slate-400 leading-relaxed font-semibold">
                                 <p className="text-slate-600 font-bold mb-1">Note:</p>
                                 <p>1. Brokerage charged as per the agreed terms.</p>
-                                <p>2. Payment to be made within T+1 settlement cycle.</p>
+                                <p>2. All trades of this week are mentioned here, and holdings are not mentioned.</p>
                                 <p>3. This is a computer generated invoice, does not require physical signature.</p>
                             </div>
                             {/* <p className="text-xs font-serif italic font-bold text-slate-800 uppercase tracking-wide">

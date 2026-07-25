@@ -52,6 +52,9 @@ function Pavti() {
 
         console.log(fetched)
 
+        fetched.sort((a, b) => new Date(a.tradeDate) - new Date(b.tradeDate));
+
+
         setPavtiData(fetched);
 
         if (original.length) {

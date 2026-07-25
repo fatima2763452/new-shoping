@@ -22,6 +22,12 @@ function Pavti() {
       const token = localStorage.getItem('authToken');
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/forms/getStocks/${token}/${idCode}`);
+        if (Array.isArray(res.data)) {
+
+          res.data.sort((a, b) => new Date(a.tradeDate) - new Date(b.tradeDate));
+
+        }
+
         setPavtiData(res.data);
 
         if (res.data.length) {

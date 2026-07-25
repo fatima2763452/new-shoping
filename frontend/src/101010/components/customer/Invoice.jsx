@@ -247,6 +247,13 @@ export default function Invoice() {
             return isDateInRange(fallbackDate, startDate, endDate);
         });
 
+        // Sort filtered orders by date in ascending order (older dates at top)
+        filtered.sort((a, b) => {
+            const dateA = new Date(a.date || a.createdAt);
+            const dateB = new Date(b.date || b.createdAt);
+            return dateA - dateB;
+        });
+
         setFilterStats({
             total: orders.length,
             matched: filtered.length,
