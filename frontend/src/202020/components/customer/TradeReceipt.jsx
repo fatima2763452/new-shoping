@@ -265,10 +265,10 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
               <div className="flex justify-between items-start pb-1.5">
                 <div>
                   <h1 className={`text-2xl font-black tracking-wider ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
-                    DHANLAXMI
+                    SHRILAXMI
                   </h1>
                   <div className={`text-[9px] font-bold tracking-[0.2em] uppercase mt-0.5 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
-                    CAPITAL PVT. LTD.
+                    TRADERS PVT. LTD.
                   </div>
                 </div>
                 <div className="text-right">
@@ -578,7 +578,7 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
               <div className="flex items-center my-3">
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
                 <span className={`mx-2.5 text-[9px] font-bold tracking-[0.2em] uppercase ${theme === 'dark' ? 'text-slate-500' : 'text-slate-400'} whitespace-nowrap`}>
-                  © DHANLAXMI CAPITAL PVT. LTD.
+                  © SHRILAXMI TRADERS PVT. LTD.
                 </span>
                 <div className={`flex-grow border-t ${theme === 'dark' ? 'border-slate-800/80' : 'border-slate-200'}`}></div>
               </div>

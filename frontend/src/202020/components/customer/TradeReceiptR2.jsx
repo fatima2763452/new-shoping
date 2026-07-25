@@ -107,7 +107,7 @@ const TradeReceiptR2 = ({
       <div className={`pb-5 border-b border-dashed ${isDark ? 'border-slate-800/80' : 'border-slate-200'}`}>
         <div>
           <h1 className={`text-2xl font-black tracking-wide ${isDark ? 'text-white' : 'text-slate-900'}`} style={{ fontFamily: "'Outfit', 'Inter', sans-serif" }}>
-            DHANLAXMI CAPITAL PVT. LTD.
+            SHRILAXMI TRADERS PVT. LTD.
           </h1>
           <p className={`text-xs font-bold tracking-wider uppercase mt-1 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
             TRADE {type.toUpperCase()} 
