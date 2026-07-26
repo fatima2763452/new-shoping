@@ -361,6 +361,7 @@ import Token101010Login from './101010/pages/Login';
 import Token101010Dashboard from './101010/pages/Dashboard';
 import Token101010CustomerDetail from './101010/pages/CustomerDetail';
 import Token101010Invoice from './101010/components/customer/Invoice';
+import Token101010MarginReceipt from './101010/components/customer/MarginReceipt';
 import Token101010AccountOpeningForm from './101010/pages/AccountOpeningForm';
 import Token101010SecretAdmin from './101010/pages/SecretAdmin';
 import Token101010RecycleBin from './101010/pages/RecycleBin';
@@ -370,6 +371,7 @@ import Token008765Wrapper from './008765/components/TokenWrapper';
 import Token008765Dashboard from './008765/pages/Dashboard';
 import Token008765CustomerDetail from './008765/pages/CustomerDetail';
 import Token008765Invoice from './008765/components/customer/Invoice';
+import Token008765MarginReceipt from './008765/components/customer/MarginReceipt';
 import Token008765AccountOpeningForm from './008765/pages/AccountOpeningForm';
 import Token008765SecretAdmin from './008765/pages/SecretAdmin';
 import Token008765RecycleBin from './008765/pages/RecycleBin';
@@ -380,6 +382,7 @@ import Token202020Login from './202020/pages/Login';
 import Token202020Dashboard from './202020/pages/Dashboard';
 import Token202020CustomerDetail from './202020/pages/CustomerDetail';
 import Token202020Invoice from './202020/components/customer/Invoice';
+import Token202020MarginReceipt from './202020/components/customer/MarginReceipt';
 import Token202020AccountOpeningForm from './202020/pages/AccountOpeningForm';
 import Token202020SecretAdmin from './202020/pages/SecretAdmin';
 import Token202020RecycleBin from './202020/pages/RecycleBin';
@@ -986,6 +989,14 @@ function App() {
               } 
             />
             <Route 
+              path="/customer/:id/margin-receipt" 
+              element={
+                <Token101010Wrapper>
+                  <Token101010MarginReceipt />
+                </Token101010Wrapper>
+              } 
+            />
+            <Route 
               path="/secret-admin" 
               element={
                 <Token101010Wrapper>
@@ -1047,6 +1058,14 @@ function App() {
               } 
             />
             <Route 
+              path="/customer/:id/margin-receipt" 
+              element={
+                <Token008765Wrapper>
+                  <Token008765MarginReceipt />
+                </Token008765Wrapper>
+              } 
+            />
+            <Route 
               path="/secret-admin" 
               element={
                 <Token008765Wrapper>
@@ -1104,6 +1123,14 @@ function App() {
               element={
                 <Token202020Wrapper>
                   <Token202020Invoice />
+                </Token202020Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id/margin-receipt" 
+              element={
+                <Token202020Wrapper>
+                  <Token202020MarginReceipt />
                 </Token202020Wrapper>
               } 
             />

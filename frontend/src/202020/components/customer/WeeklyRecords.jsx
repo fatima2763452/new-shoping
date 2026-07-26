@@ -108,13 +108,22 @@ const WeeklyRecords = ({ customer, onEditRequest }) => {
               </div>
             </div>
 
-            <button 
-              onClick={() => navigate(`/customer/${customer._id}/invoice`)}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 shadow-lg shadow-blue-900/20"
-            >
-              <span className="material-symbols-outlined text-[16px]">receipt_long</span>
-              INVOICE
-            </button>
+            <div className="flex flex-col gap-2 shrink-0">
+              <button 
+                onClick={() => navigate(`/customer/${customer._id}/invoice`)}
+                className="bg-blue-600 hover:bg-blue-500 text-white px-1.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 shadow-lg shadow-blue-900/20 justify-center"
+              >
+                <span className="material-symbols-outlined text-[16px]">receipt_long</span>
+                INVOICE
+              </button>
+              <button 
+                onClick={() => navigate(`/customer/${customer._id}/margin-receipt`)}
+                className="bg-[#00B050] hover:bg-[#009040] text-white px-1.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 shadow-lg shadow-green-900/20 justify-center"
+              >
+                <span className="material-symbols-outlined text-[12px]">payments</span>
+                MARGIN RECEIPT
+              </button>
+            </div>
           </div>
         </div>
 
