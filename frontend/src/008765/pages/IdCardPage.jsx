@@ -1,9 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';
+import logo from '../assets/logo.jpeg';
 import dhanlaxmiBlueStamp from '../assets/dhanlaxmi_blue_stamp.png';
-import ashokStambhImg from '../assets/ashok_stambh.png';
+
+const formatDateDisplay = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    const day = date.getDate().toString().padStart(2, '0');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} - ${month} - ${year}`;
+};
 
 const IdCardPage = () => {
   const navigate = useNavigate();
@@ -13,11 +24,30 @@ const IdCardPage = () => {
   
   const [formData, setFormData] = useState({
     name: '',
+    idNumber: '',
+    designation: '',
     phone: '',
-    address: '',
     email: '',
-    idNumber: ''
+    address: '',
+    issuedDate: '',
+    expiresDate: '',
+    isStockBroker: false
   });
+
+  useEffect(() => {
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    
+    const nextYear = new Date();
+    nextYear.setFullYear(today.getFullYear() + 1);
+    const nextYearStr = nextYear.toISOString().split('T')[0];
+    
+    setFormData(prev => ({
+      ...prev,
+      issuedDate: prev.issuedDate || todayStr,
+      expiresDate: prev.expiresDate || nextYearStr
+    }));
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -28,11 +58,14 @@ const IdCardPage = () => {
       if (name === 'name') {
         const initials = value
           .split(' ')
+          .filter(word => word.length > 0)
           .map(word => word[0])
           .join('')
           .toUpperCase()
           .slice(0, 3);
-        updated.idNumber = `ID-${initials || 'AL'}${new Date().getFullYear() - 35}`;
+        const hash = value.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const num = (hash * 123) % 90000 + 10000;
+        updated.idNumber = initials ? `${initials}${num}` : '';
       }
       
       return updated;
@@ -56,21 +89,15 @@ const IdCardPage = () => {
     
     try {
       const el = idCardRef.current;
-      
-      // Force exact compact dimensions for capturing (420px x 250px)
       const width = 420;
       const height = 250;
 
       const dataUrl = await toPng(el, {
-        backgroundColor: '#7d1c99',
+        backgroundColor: '#ffffff',
         width: width,
         height: height,
-        pixelRatio: 2,
-        cacheBust: false,
-        style: {
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
-        }
+        pixelRatio: 3, // High DPI capture
+        cacheBust: true
       });
 
       const pdf = new jsPDF({
@@ -89,6 +116,266 @@ const IdCardPage = () => {
     }
   };
 
+  const cardJSX = (
+    <>
+      {/* Outer Line Border Accent */}
+      <div 
+        style={{
+          position: 'absolute',
+          inset: '6px',
+          border: '1.5px solid #2563eb',
+          borderRadius: '8px',
+          pointerEvents: 'none',
+          zIndex: 5
+        }} 
+      />
+
+      {/* Top Right Geometric Banner Accent */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '190px',
+          height: '42px',
+          background: '#002c5c',
+          clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 0 100%)',
+          zIndex: 2
+        }} 
+      />
+      <div 
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '210px',
+          height: '32px',
+          background: '#2563eb',
+          clipPath: 'polygon(20px 0, 100% 0, 100% 100%, 0 100%)',
+          zIndex: 1
+        }} 
+      />
+
+      {/* Bottom Left Geometric Banner Accent */}
+      <div 
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '140px',
+          height: '24px',
+          background: '#002c5c',
+          clipPath: 'polygon(0 0, 100% 0, 85% 100%, 0 100%)',
+          zIndex: 2
+        }} 
+      />
+      <div 
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '160px',
+          height: '16px',
+          background: '#2563eb',
+          clipPath: 'polygon(0 0, 100% 0, 88% 100%, 0 100%)',
+          zIndex: 1
+        }} 
+      />
+
+      {/* Top Header Section */}
+      <div 
+        style={{
+          width: '100%',
+          height: '40px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '4px 12px 0 12px',
+          position: 'relative',
+          zIndex: 10,
+          boxSizing: 'border-box'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+          <img 
+            src={logo} 
+            alt="Dhanlaxmi Logo" 
+            style={{ height: '46px', width: 'auto', objectFit: 'contain', borderRadius: '2px' }} 
+          />
+        </div>
+      </div>
+
+      {/* Card Body Section - Photo on LEFT, Details on RIGHT */}
+      <div 
+        style={{
+          width: '100%',
+          height: '185px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          position: 'relative',
+          zIndex: 10,
+          padding: '0 16px',
+          boxSizing: 'border-box',
+          marginTop: '-4px' // Pulled up to reduce vertical gap
+        }}
+      >
+        {/* Left Column: Photo Container */}
+        <div style={{ position: 'relative', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div 
+            style={{
+              width: '92px',
+              height: '108px',
+              backgroundColor: '#e2e8f0',
+              border: '2px solid #002c5c',
+              borderRadius: '6px',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            }}
+          >
+            {photoPreview ? (
+              <img src={photoPreview} alt="Client Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <span className="material-symbols-outlined" style={{ fontSize: '36px', color: '#94a3b8' }}>person</span>
+            )}
+          </div>
+
+          {/* Dhanlaxmi Circular Blue Stamp Overlay */}
+          <div 
+            style={{
+              position: 'absolute',
+              left: '-14px',
+              bottom: formData.isStockBroker ? '6px' : '-12px',
+              width: '56px',
+              height: '56px',
+              opacity: 0.9,
+              pointerEvents: 'none',
+              transform: 'rotate(-6deg)',
+              zIndex: 20
+            }}
+          >
+            <img 
+              src={dhanlaxmiBlueStamp} 
+              alt="Dhanlaxmi Blue Stamp" 
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
+            />
+          </div>
+
+          {/* Stock Broker Tag below photo */}
+          {formData.isStockBroker && (
+            <div 
+              style={{
+                marginTop: '5px',
+             
+                backgroundColor: '#ffffff',
+                color: '#002c5c',
+                fontSize: '8.5px',
+                fontWeight: '900',
+                padding: '1px 4px',
+                borderRadius: '3px',
+                textAlign: 'center',
+                width: '92px',
+                boxSizing: 'border-box',
+                letterSpacing: '0.2px',
+                zIndex: 25,
+                position: 'relative'
+              }}
+            >
+              STOCK BROKER
+            </div>
+          )}
+        </div>
+
+        {/* Right Column: Client Details List */}
+        <div 
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            marginLeft: '18px',
+            flexGrow: 1,
+            justifyContent: 'center'
+          }}
+        >
+          {/* Name Row */}
+          <div style={{ display: 'flex', alignItems: 'center', fontSize: '10px', color: '#334155' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Name</span>
+            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
+            <span style={{ fontWeight: '850', color: '#0f172a', fontSize: '11px', textTransform: 'capitalize' }}>
+              {formData.name || 'Johnathan Doe'}
+            </span>
+          </div>
+
+          {/* ID Number Row */}
+          <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>ID No</span>
+            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
+            <span style={{ color: '#0f172a', fontWeight: '700', fontFamily: 'monospace', fontSize: '10px' }}>
+              {formData.idNumber || '123456789'}
+            </span>
+          </div>
+
+          {/* Designation Row */}
+          {/* <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Desig</span>
+            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
+            <span style={{ color: '#475569', fontWeight: '600' }}>
+              {formData.designation || 'Production Manager'}
+            </span>
+          </div> */}
+
+          {/* Phone Row */}
+          <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Phone</span>
+            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
+            <span style={{ color: '#475569', fontWeight: '600', fontFamily: 'monospace' }}>
+              {formData.phone || '9876543210'}
+            </span>
+          </div>
+
+          {/* Email Row */}
+          <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>E-mail</span>
+            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
+            <span style={{ color: '#475569', fontWeight: '600', fontSize: '8.5px', wordBreak: 'break-all' }}>
+              {formData.email || 'info@dhanlaxmi.com'}
+            </span>
+          </div>
+
+          {/* Address Row */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '9px', color: '#334155' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Address</span>
+            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
+            <span style={{ color: '#475569', fontWeight: '600', fontSize: '8px', lineHeight: '10px' }}>
+              {formData.address || 'Mumbai, Maharashtra'}
+            </span>
+          </div>
+
+          {/* Issued Date Row */}
+          {/* <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Issued</span>
+            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
+            <span style={{ color: '#475569', fontWeight: '600' }}>
+              {formatDateDisplay(formData.issuedDate) || '26 - Jul - 2026'}
+            </span>
+          </div> */}
+
+          {/* Expires Date Row */}
+          {/* <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Expires</span>
+            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
+            <span style={{ color: '#475569', fontWeight: '600' }}>
+              {formatDateDisplay(formData.expiresDate) || '26 - Jul - 2027'}
+            </span>
+          </div> */}
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="bg-slate-950 text-slate-200 min-h-screen flex flex-col font-sans antialiased relative">
       {/* Header */}
@@ -105,11 +392,34 @@ const IdCardPage = () => {
       {/* Main Content Area */}
       <main className="flex-1 p-4 md:p-8 max-w-xl mx-auto w-full pb-24">
         
-        {/* Form Container (No Live Preview Shown On-Screen) */}
+        {/* On-Screen Live Preview */}
+        <div className="mb-8 flex flex-col items-center">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Live Preview</span>
+          <div 
+            className="rounded-xl relative overflow-hidden select-none shadow-2xl border border-slate-800"
+            style={{
+              width: '420px',
+              height: '250px',
+              minWidth: '420px',
+              minHeight: '250px',
+              maxWidth: '420px',
+              maxHeight: '250px',
+              background: '#f8fafc',
+              color: '#0f172a',
+              fontFamily: "'Outfit', 'Inter', sans-serif",
+              boxSizing: 'border-box',
+              padding: '12px'
+            }}
+          >
+            {cardJSX}
+          </div>
+        </div>
+
+        {/* Form Container */}
         <div className="bg-slate-900/40 border border-slate-800/80 backdrop-blur-md rounded-2xl p-6 shadow-xl">
-          <h2 className="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
-            <span className="material-symbols-outlined text-violet-400">badge</span>
-            Generate Client ID Card
+          <h2 className="text-sm font-bold text-slate-100 mb-6 flex items-center gap-2 uppercase tracking-wide">
+            <span className="material-symbols-outlined text-violet-400 text-[18px]">badge</span>
+            ID Card Information
           </h2>
           
           <div className="space-y-4">
@@ -121,10 +431,36 @@ const IdCardPage = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700"
-                placeholder="Anil Bharat Lokhande"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700 font-semibold"
+                placeholder="e.g. Johnathan Doe"
               />
             </div>
+
+            {/* Custom ID Input */}
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Employee ID / ID Number</label>
+              <input
+                type="text"
+                name="idNumber"
+                value={formData.idNumber}
+                onChange={handleInputChange}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700 font-mono"
+                placeholder="e.g. JD10243"
+              />
+            </div>
+
+            {/* Designation Input */}
+            {/* <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Designation</label>
+              <input
+                type="text"
+                name="designation"
+                value={formData.designation}
+                onChange={handleInputChange}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700"
+                placeholder="e.g. Production Manager"
+              />
+            </div> */}
 
             {/* Phone Input */}
             <div>
@@ -135,7 +471,20 @@ const IdCardPage = () => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700"
-                placeholder="e.g. 60*****82 or full number"
+                placeholder="e.g. 9876543210"
+              />
+            </div>
+
+            {/* Email Input */}
+            <div>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">E-mail</label>
+              <input
+                type="text"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700"
+                placeholder="e.g. info@dhanlaxmi.com"
               />
             </div>
 
@@ -146,36 +495,49 @@ const IdCardPage = () => {
                 name="address"
                 value={formData.address}
                 onChange={handleInputChange}
-                rows="3"
+                rows="2"
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700 resize-none leading-relaxed"
-                placeholder="2Bijwadi, Tal-indapur, Bijwadi Pune, Maharashtra-413106"
+                placeholder="e.g. Mumbai, Maharashtra"
               />
             </div>
 
-            {/* Email Input */}
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">E-mail / Website</label>
-              <input
-                type="text"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700"
-                placeholder="www.Abbotwealthsher.com"
-              />
-            </div>
+            {/* Dates grid */}
+            {/* <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Issued Date</label>
+                <input
+                  type="date"
+                  name="issuedDate"
+                  value={formData.issuedDate}
+                  onChange={handleInputChange}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all text-slate-300"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Expires Date</label>
+                <input
+                  type="date"
+                  name="expiresDate"
+                  value={formData.expiresDate}
+                  onChange={handleInputChange}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all text-slate-300"
+                />
+              </div>
+            </div> */}
 
-            {/* Custom ID Input */}
-            <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">ID Number</label>
+            {/* Stock Broker Checkbox */}
+            <div className="flex items-center gap-2 pt-2">
               <input
-                type="text"
-                name="idNumber"
-                value={formData.idNumber}
-                onChange={handleInputChange}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none transition-all placeholder:text-slate-700"
-                placeholder="ID-AL1991"
+                type="checkbox"
+                name="isStockBroker"
+                id="isStockBroker"
+                checked={formData.isStockBroker}
+                onChange={(e) => setFormData(prev => ({ ...prev, isStockBroker: e.target.checked }))}
+                className="w-4 h-4 rounded border-slate-800 bg-slate-950 text-violet-600 focus:ring-violet-500 focus:ring-offset-slate-900 cursor-pointer"
               />
+              <label htmlFor="isStockBroker" className="text-xs font-bold text-slate-400 uppercase tracking-wider cursor-pointer select-none">
+                Mark as Stock Broker
+              </label>
             </div>
 
             {/* Photo Input */}
@@ -194,7 +556,7 @@ const IdCardPage = () => {
                   className="w-full bg-slate-950 border border-slate-800 border-dashed rounded-xl px-3.5 py-4 text-xs font-semibold text-center block cursor-pointer hover:border-violet-500 hover:bg-slate-900/20 transition-all text-slate-400"
                 >
                   <span className="material-symbols-outlined text-[20px] align-middle mr-1.5 text-violet-400">upload_file</span>
-                  {photoPreview ? 'Change Photo' : 'Select Client Image'}
+                  {photoPreview ? 'Change Photo' : 'Select Profile Image'}
                 </label>
               </div>
             </div>
@@ -203,12 +565,12 @@ const IdCardPage = () => {
             <button
               onClick={handleDownload}
               disabled={isDownloading}
-              className="w-full mt-6 bg-gradient-to-tr from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white font-bold py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 disabled:opacity-50 shadow-lg shadow-violet-600/20 active:scale-95 duration-100"
+              className="w-full mt-6 bg-gradient-to-tr from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white font-bold py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 disabled:opacity-50 shadow-lg shadow-violet-600/20 active:scale-95 duration-100 text-sm"
             >
               {isDownloading ? (
                 <>
                   <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-1"></span>
-                  Downloading...
+                  Generating PDF...
                 </>
               ) : (
                 <>
@@ -220,12 +582,12 @@ const IdCardPage = () => {
           </div>
         </div>
 
-        {/* Hidden Preview Container (Compact dimensions: 420px x 250px) */}
+        {/* Hidden Preview Container (Used strictly for high-fidelity export) */}
         <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', width: '420px', height: '250px' }}>
           <div 
             ref={idCardRef}
             id="id-card-capture-target"
-            className="rounded-xl relative overflow-hidden select-none"
+            className="relative overflow-hidden select-none"
             style={{
               width: '420px',
               height: '250px',
@@ -233,240 +595,14 @@ const IdCardPage = () => {
               minHeight: '250px',
               maxWidth: '420px',
               maxHeight: '250px',
-              background: 'linear-gradient(135deg, #7d1c99 0%, #4b0e5d 100%)',
-              color: '#ffffff',
+              background: '#f8fafc',
+              color: '#0f172a',
               fontFamily: "'Outfit', 'Inter', sans-serif",
               boxSizing: 'border-box',
               padding: '12px'
             }}
           >
-            {/* Background watermark stock chart (subtle background element) */}
-            <div 
-              style={{ 
-                position: 'absolute', 
-                right: '12px', 
-                bottom: '10px', 
-                opacity: 0.08, 
-                pointerEvents: 'none', 
-                zIndex: 0 
-              }}
-            >
-              <svg width="220" height="110" viewBox="0 0 220 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="10" y="70" width="16" height="30" rx="3" fill="#ffffff" />
-                <rect x="30" y="60" width="16" height="40" rx="3" fill="#ffffff" />
-                <rect x="50" y="30" width="16" height="70" rx="3" fill="#ffffff" />
-                <rect x="70" y="45" width="16" height="55" rx="3" fill="#ffffff" />
-                <rect x="90" y="20" width="16" height="80" rx="3" fill="#ffffff" />
-                <rect x="110" y="10" width="16" height="90" rx="3" fill="#ffffff" />
-                <rect x="130" y="35" width="16" height="65" rx="3" fill="#ffffff" />
-                <rect x="150" y="5" width="16" height="95" rx="3" fill="#ffffff" />
-                <path d="M 10,80 Q 90,45 180,15 L 165,10 M 180,15 L 175,30" stroke="#f472b6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-
-            {/* Top Header Section */}
-            <div 
-              style={{
-                width: '100%',
-                height: '38px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'between',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-                paddingBottom: '5px',
-                position: 'relative',
-                zIndex: 10
-              }}
-            >
-              {/* Left Ashok Stambh Logo Image */}
-              <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                <img 
-                  src={ashokStambhImg} 
-                  alt="Ashok Stambh" 
-                  style={{ height: '32px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1) drop-shadow(0px 1px 2px rgba(0,0,0,0.5))' }} 
-                />
-              </div>
-
-              {/* Company Name */}
-              <div style={{ flexGrow: 1, textAlign: 'center', margin: '0 5px' }}>
-                <h1 
-                  style={{ 
-                    fontSize: '12.5px', 
-                    fontWeight: 900, 
-                    color: '#ffeb3b',
-                    margin: 0,
-                    padding: 0,
-                    letterSpacing: '-0.2px',
-                    textShadow: '1px 1px 2px rgba(0,0,0,0.6)'
-                  }}
-                >
-                  DHANLAXMI CAPITAL PVT. LTD.
-                </h1>
-              </div>
-
-              {/* Right Ashok Stambh Logo Image */}
-              <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                <img 
-                  src={ashokStambhImg} 
-                  alt="Ashok Stambh" 
-                  style={{ height: '32px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1) drop-shadow(0px 1px 2px rgba(0,0,0,0.5))' }} 
-                />
-              </div>
-            </div>
-
-            {/* Card Body Section - Photo on LEFT, Details on RIGHT */}
-            <div 
-              style={{
-                width: '100%',
-                height: '190px',
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                position: 'relative',
-                zIndex: 10,
-                marginTop: '10px'
-              }}
-            >
-              
-              {/* Left Column: Photo & ID Number - Width: 120px */}
-              <div 
-                style={{
-                  width: '120px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  position: 'relative',
-                  marginTop: '4px'
-                }}
-              >
-                {/* Photo Container */}
-                <div 
-                  style={{
-                    width: '85px',
-                    height: '85px',
-                    minWidth: '85px',
-                    minHeight: '85px',
-                    backgroundColor: '#0f172a',
-                    border: '2px solid #00ffff',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.3)',
-                    borderRadius: '4px'
-                  }}
-                >
-                  {photoPreview ? (
-                    <img src={photoPreview} alt="Client Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <span className="material-symbols-outlined" style={{ fontSize: '38px', color: '#475569' }}>person</span>
-                  )}
-                </div>
-
-                {/* ID Code below photo */}
-                {formData.idNumber && (
-                  <div style={{ marginTop: '8px' }}>
-                    <span 
-                      style={{
-                        fontSize: '9.5px',
-                        fontWeight: 800,
-                        color: '#ffeb3b',
-                        letterSpacing: '0.5px',
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        padding: '1.5px 6px',
-                        borderRadius: '3px',
-                        fontFamily: "monospace"
-                      }}
-                    >
-                      {formData.idNumber}
-                    </span>
-                  </div>
-                )}
-
-                {/* Dhanlaxmi Circular Blue Stamp Overlay */}
-                <div 
-                  style={{
-                    position: 'absolute',
-                    left: '2px',
-                    top: '52px',
-                    width: '56px',
-                    height: '56px',
-                    opacity: 0.95,
-                    pointerEvents: 'none',
-                    transform: 'rotate(-4deg)',
-                    zIndex: 20
-                  }}
-                >
-                  <img 
-                    src={dhanlaxmiBlueStamp} 
-                    alt="Dhanlaxmi Blue Stamp" 
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
-                  />
-                </div>
-              </div>
-
-              {/* Right Column: Client Details - Width: 280px */}
-              <div 
-                style={{
-                  width: '280px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  paddingLeft: '10px',
-                  boxSizing: 'border-box'
-                }}
-              >
-                {/* Details Container - Level/Aligned with Photo (starting at top: 4px) */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '4px' }}>
-                  
-                  {/* Name Row */}
-                  {formData.name && (
-                    <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '11.5px' }}>
-                      <span style={{ fontWeight: 'bold', width: '55px', flexShrink: 0, color: '#ffffff' }}>Name</span>
-                      <span style={{ width: '10px', flexShrink: 0, color: '#ffffff' }}>:</span>
-                      <span style={{ color: '#ffeb3b', fontWeight: 900, letterSpacing: '0.1px', lineHeight: 1.2 }}>
-                        {formData.name}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Phone Row */}
-                  {formData.phone && (
-                    <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '11.5px' }}>
-                      <span style={{ fontWeight: 'bold', width: '55px', flexShrink: 0, color: '#ffffff' }}>Phone</span>
-                      <span style={{ width: '10px', flexShrink: 0, color: '#ffffff' }}>:</span>
-                      <span style={{ color: '#ffeb3b', fontWeight: 800, fontFamily: 'monospace' }}>
-                        {formData.phone}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Address Row */}
-                  {formData.address && (
-                    <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '11.5px' }}>
-                      <span style={{ fontWeight: 'bold', width: '55px', flexShrink: 0, color: '#ffffff' }}>Address</span>
-                      <span style={{ width: '10px', flexShrink: 0, color: '#ffffff' }}>:</span>
-                      <span style={{ color: '#ffeb3b', fontWeight: 700, fontSize: '10.5px', lineHeight: '14px' }}>
-                        {formData.address}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Email Row */}
-                  {formData.email && (
-                    <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '11.5px' }}>
-                      <span style={{ fontWeight: 'bold', width: '55px', flexShrink: 0, color: '#ffffff' }}>E-mail</span>
-                      <span style={{ width: '10px', flexShrink: 0, color: '#ffffff' }}>:</span>
-                      <span style={{ color: '#ffeb3b', fontWeight: 800, fontSize: '11px', wordBreak: 'break-all' }}>
-                        {formData.email}
-                      </span>
-                    </div>
-                  )}
-                  
-                </div>
-              </div>
-
-            </div>
+            {cardJSX}
           </div>
         </div>
 
