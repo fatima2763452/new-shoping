@@ -377,6 +377,16 @@ import Token008765SecretAdmin from './008765/pages/SecretAdmin';
 import Token008765RecycleBin from './008765/pages/RecycleBin';
 import Token008765IdCardPage from './008765/pages/IdCardPage';
 
+import Token005432Wrapper from './005432/components/TokenWrapper';
+import Token005432Dashboard from './005432/pages/Dashboard';
+import Token005432CustomerDetail from './005432/pages/CustomerDetail';
+import Token005432Invoice from './005432/components/customer/Invoice';
+import Token005432MarginReceipt from './005432/components/customer/MarginReceipt';
+import Token005432AccountOpeningForm from './005432/pages/AccountOpeningForm';
+import Token005432SecretAdmin from './005432/pages/SecretAdmin';
+import Token005432RecycleBin from './005432/pages/RecycleBin';
+import Token005432IdCardPage from './005432/pages/IdCardPage';
+
 import Token202020Wrapper from './202020/components/TokenWrapper';
 import Token202020Login from './202020/pages/Login';
 import Token202020Dashboard from './202020/pages/Dashboard';
@@ -400,7 +410,7 @@ function App() {
   const token = localStorage.getItem('authToken') || localStorage.getItem('token'); // Token to identify admin
 
   React.useEffect(() => {
-    if (token !== '101010' && token !== '202020' && token !== '008765') {
+    if (token !== '101010' && token !== '202020' && token !== '008765' && token !== '005432') {
       // Load Bootstrap CSS
       let bootstrapCSS = document.getElementById('bootstrap-css-cdn');
       if (!bootstrapCSS) {
@@ -428,7 +438,7 @@ function App() {
         document.body.appendChild(bootstrapJS);
       }
     } else {
-      // Remove Bootstrap elements to completely isolate 101010, 202020 and 008765 styling
+      // Remove Bootstrap elements to completely isolate 101010, 202020, 008765 and 005432 styling
       const bootstrapCSS = document.getElementById('bootstrap-css-cdn');
       if (bootstrapCSS) {
         bootstrapCSS.remove();
@@ -1079,6 +1089,75 @@ function App() {
                 <Token008765Wrapper>
                   <Token008765IdCardPage />
                 </Token008765Wrapper>
+              } 
+            />
+          </>
+        )}
+
+        {token === '005432' && (
+          <>
+            <Route 
+              path="/form" 
+              element={
+                <Token005432Wrapper>
+                  <Token005432Dashboard />
+                </Token005432Wrapper>
+              } 
+            />
+            <Route 
+              path="/recycle-bin" 
+              element={
+                <Token005432Wrapper>
+                  <Token005432RecycleBin />
+                </Token005432Wrapper>
+              } 
+            />
+            <Route 
+              path="/account-opening" 
+              element={
+                <Token005432Wrapper>
+                  <Token005432AccountOpeningForm />
+                </Token005432Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id" 
+              element={
+                <Token005432Wrapper>
+                  <Token005432CustomerDetail />
+                </Token005432Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id/invoice" 
+              element={
+                <Token005432Wrapper>
+                  <Token005432Invoice />
+                </Token005432Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id/margin-receipt" 
+              element={
+                <Token005432Wrapper>
+                  <Token005432MarginReceipt />
+                </Token005432Wrapper>
+              } 
+            />
+            <Route 
+              path="/secret-admin" 
+              element={
+                <Token005432Wrapper>
+                  <Token005432SecretAdmin />
+                </Token005432Wrapper>
+              } 
+            />
+            <Route 
+              path="/id-card" 
+              element={
+                <Token005432Wrapper>
+                  <Token005432IdCardPage />
+                </Token005432Wrapper>
               } 
             />
           </>
