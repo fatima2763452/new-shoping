@@ -190,9 +190,10 @@ export default function Invoice() {
     };
 
     useEffect(() => {
-        // Set default dates (start of month to today)
+        // Set default dates (30 days ago to today)
         const now = new Date();
-        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        const start = new Date();
+        start.setDate(now.getDate() - 30);
         setStartDate(start.toISOString().split('T')[0]);
         setEndDate(now.toISOString().split('T')[0]);
 
