@@ -139,49 +139,44 @@ function Pavti() {
     clone.style.zIndex = '-1';
 
     // --- HEADER FLEX FIX FOR PDF ---
+    const headerRow = clone.querySelector('.header-row');
+    if (headerRow) {
+      headerRow.style.display = 'flex';
+      headerRow.style.flexDirection = 'row';
+      headerRow.style.alignItems = 'center';
+      headerRow.style.justifyContent = 'space-between';
+      headerRow.style.width = '90%';
+      headerRow.style.marginTop = '20px';
+      headerRow.style.marginBottom = '10px';
+      headerRow.style.padding = '0 20px';
 
-// --- HEADER FLEX FIX FOR PDF ---
-// --- HEADER FLEX FIX FOR PDF ---
-const headerRow = clone.querySelector('.d-flex.flex-column.align-items-center.mb-2');
-if (headerRow) {
-  headerRow.style.display = 'flex';
-  headerRow.style.flexDirection = 'row';
-  headerRow.style.alignItems = 'center';
-  headerRow.style.justifyContent = 'space-between'; // space between for left + center
-  headerRow.style.marginTop = '20px';
-  headerRow.style.marginBottom = '10px';
+      // Left: Name logo
+      const nameLogoImg = headerRow.querySelector('img[alt="DEVAKI"]');
+      if (nameLogoImg) {
+        nameLogoImg.style.position = 'static';
+        nameLogoImg.style.width = '190px';
+        nameLogoImg.style.height = 'auto';
+        nameLogoImg.style.marginLeft = '-20px';
+        nameLogoImg.style.marginRight = 'auto';
+        nameLogoImg.style.marginBottom = '0';
+      }
 
-  // Left: Name logo
-  const nameLogoImg = headerRow.querySelector('img[alt="DEVAKI"]');
-  // if (nameLogoImg) {
-  //   nameLogoImg.style.position = 'static';
-  //   nameLogoImg.style.width = '160px';
-  //   nameLogoImg.style.height = 'auto';
-  //   nameLogoImg.style.marginLeft = '10px';
-  //   nameLogoImg.style.marginRight = 'auto'; // push org name center
-  //   nameLogoImg.style.marginBottom = '0';
-  //   nameLogoImg.style.maxWidth = '40vw';
-  //   nameLogoImg.style.minWidth = '80px';
-  // }
-
-  // Center: Org name
-  const orgDiv = headerRow.querySelector('div');
-  if (orgDiv) {
-    orgDiv.style.flex = '1';                // take full space
-    orgDiv.style.textAlign = 'center';      // center text
-    orgDiv.style.fontSize = '1.2em';
-    orgDiv.style.letterSpacing = '2px';
-    orgDiv.style.fontWeight = '500';
-    orgDiv.style.wordBreak = 'break-word';
-    orgDiv.style.maxWidth = '220px';
-    orgDiv.style.margin = '0 auto';
-    orgDiv.style.marginTop = '29px';
-
-    orgDiv.style.display = 'block';
-    orgDiv.style.position = 'relative'; 
-    orgDiv.style.bottom = '50px'; // space from right edge
-  }
-}
+      // Right: Org name
+      const orgDiv = headerRow.querySelector('div');
+      if (orgDiv) {
+        orgDiv.style.flex = 'unset';
+        orgDiv.style.textAlign = 'right';
+        orgDiv.style.fontSize = '1.4em';
+        // orgDiv.style.letterSpacing = '2px';
+        orgDiv.style.fontWeight = '500';
+        orgDiv.style.wordBreak = 'break-word';
+        orgDiv.style.maxWidth = '350px';
+        orgDiv.style.margin = '0';
+        orgDiv.style.marginTop = '0';
+        orgDiv.style.display = 'block';
+        orgDiv.style.position = 'static';
+      }
+    }
 
 
     // --- END HEADER FLEX FIX ---
@@ -271,33 +266,32 @@ if (headerRow) {
                     />
                   </div> */}
 
-                {/* Header */}
                 <div
-                  className="d-flex flex-column align-items-center mb-2"
-                  style={{ marginTop: 20, marginBottom: 10 }}
+                  className="header-row d-flex align-items-center justify-content-between mb-2"
+                  style={{ marginTop: 20, marginBottom: 10, width: '100%', paddingLeft: '20px', paddingRight: '20px' }}
                 >
-                  {/* Top: Name Logo */}
+                  {/* Left: Name Logo */}
                   <img
                     src={logo}
                     alt="DEVAKI"
                     style={{
-                      width: '160px',
+                      width: '190px',
                       height: 'auto',
                       background: 'transparent',
-                      marginBottom: 8,
-                      minWidth: 80,
-                      maxWidth: '40vw',
+                      minWidth: 100,
+                      maxWidth: '50vw',
+                      marginLeft: '-20px',
                     }}
                   />
-                  {/* Bottom: Organization Name */}
+                  {/* Right: Organization Name */}
                   <div
                     style={{
-                      textAlign: 'center',
-                      fontSize: '1.2em',
+                      textAlign: 'right',
+                      fontSize: '1.4em',
                       letterSpacing: 2,
                       fontWeight: 500,
                       wordBreak: 'break-word',
-                      maxWidth: 220,
+                      maxWidth: '50%',
                     }}
                   >
                     <b>{pavtiData[0]?.orgnization}</b>
