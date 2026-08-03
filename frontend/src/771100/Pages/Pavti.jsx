@@ -154,7 +154,7 @@ function Pavti() {
       const nameLogoImg = headerRow.querySelector('img[alt="DEVAKI"]');
       if (nameLogoImg) {
         nameLogoImg.style.position = 'static';
-        nameLogoImg.style.width = '190px';
+        nameLogoImg.style.width = '220px';
         nameLogoImg.style.height = 'auto';
         nameLogoImg.style.marginLeft = '-20px';
         nameLogoImg.style.marginRight = 'auto';
@@ -275,7 +275,7 @@ function Pavti() {
                     src={logo}
                     alt="DEVAKI"
                     style={{
-                      width: '190px',
+                      width: '220px',
                       height: 'auto',
                       background: 'transparent',
                       minWidth: 100,
@@ -376,7 +376,7 @@ function Pavti() {
                     src={signature}
                     alt="signature"
                     className="img-fluid mb-2 col-6"
-                    style={{ maxWidth: '15em', objectFit: 'contain', display: 'block', margin: '0 auto' }}
+                    style={{ maxWidth: '11em', objectFit: 'contain', display: 'block', margin: '0 auto' }}
                   />
                 </div>
 
