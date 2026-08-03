@@ -356,6 +356,17 @@ import Admin31AverageCalce from './444444/Pages/AverageCalce';
 import Admin31InvestForm from './444444/Pages/InvestForm';
 import Admin31InvestReceipt from './444444/Pages/InvestReceipt';
 
+import Admin32Holdings from './771100/Pages/Holdings';
+import Admin32Pavti from './771100/Pages/Pavti';
+import Admin32Receipt from './771100/Pages/Receipt';
+import Admin32PavtiForm from './771100/Pages/PavtiForm';
+import Admin32Form from './771100/Pages/Form';
+import Admin32FormTwo from './771100/Pages/FormTwo';
+import Admin32TredBuyReceipt from './771100/Pages/TredBuyReceipt';
+import Admin32AverageCalce from './771100/Pages/AverageCalce';
+import Admin32InvestForm from './771100/Pages/InvestForm';
+import Admin32InvestReceipt from './771100/Pages/InvestReceipt';
+
 import Token101010Wrapper from './101010/components/TokenWrapper';
 import Token101010Login from './101010/pages/Login';
 import Token101010Dashboard from './101010/pages/Dashboard';
@@ -953,6 +964,21 @@ function App() {
             <Route path="/averageCalce" element={<Admin31AverageCalce />} />
             <Route path="/investForm" element={<Admin31InvestForm />} />
             <Route path="/investReceipt" element={<Admin31InvestReceipt />} />
+          </>
+        )}
+
+        {token === '771100' && (
+          <>
+            <Route path="/holdings" element={<Admin32Holdings />} />
+            <Route path="/pavti/:idCode" element={<Admin32Pavti />} />
+            <Route path="/receipt/:uniquckId" element={<Admin32Receipt />} />
+            <Route path="/pavti" element={<Admin32PavtiForm />} />
+            <Route path="/form" element={<Admin32Form />} />
+            <Route path="/formTwo" element={<Admin32FormTwo />} />
+            <Route path="/tredBuyReceipt" element={<Admin32TredBuyReceipt />} />
+            <Route path="/averageCalce" element={<Admin32AverageCalce />} />
+            <Route path="/investForm" element={<Admin32InvestForm />} />
+            <Route path="/investReceipt" element={<Admin32InvestReceipt />} />
           </>
         )}
 
