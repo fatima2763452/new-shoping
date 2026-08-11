@@ -170,7 +170,7 @@ const AccountOpeningForm = () => {
     generatePDF();
   };
 
-  const labelStyle = { fontSize: '8px', fontWeight: 'bold', color: '#1e293b', textTransform: 'uppercase', backgroundColor: '#f8fafc', padding: '4px 6px' };
+  const labelStyle = { fontSize: '8px', fontWeight: 'bold', color: '#1e293b', backgroundColor: '#f8fafc', padding: '4px 6px' };
   const valueStyle = { fontSize: '9px', fontWeight: 'bold', color: '#000000', padding: '4px 6px' };
 
   const englishSections = [
@@ -330,7 +330,7 @@ const AccountOpeningForm = () => {
 
       {/* Hidden PDF Template */}
       <div id="pdf-wrapper" style={{ display: 'none', position: 'absolute', top: 0, left: 0, zIndex: 9999, width: '800px', backgroundColor: '#ffffff' }}>
-        <div id="pdf-content" style={{ backgroundColor: '#ffffff', color: '#000000', fontFamily: 'sans-serif', width: '800px', boxSizing: 'border-box' }}>
+        <div id="pdf-content" style={{ backgroundColor: '#ffffff', color: '#000000', fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '0.05px', width: '800px', boxSizing: 'border-box' }}>
 
           {/* ================= PAGE 1 ================= */}
           <div id="pdf-page-1" style={{ padding: '30px', boxSizing: 'border-box' }}>
@@ -381,55 +381,55 @@ const AccountOpeningForm = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #a2b4cd', marginTop: '6px', marginBottom: '15px' }}>
               <tbody>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ width: '130px', borderRight: '1px solid #a2b4cd', ...labelStyle }}>Customer Name</td>
+                  <td style={{ width: '130px', borderRight: '1px solid #a2b4cd', ...labelStyle }}>CUSTOMER NAME</td>
                   <td style={{ ...valueStyle }}>{formData.customerName || ''}</td>
-                  <td style={{ width: '80px', borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>Date</td>
+                  <td style={{ width: '80px', borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>DATE</td>
                   <td style={{ width: '120px', ...valueStyle }}>{formData.applicationDate ? new Date(formData.applicationDate).toLocaleDateString('en-GB') : ''}</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Account Type</td>
+                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>ACCOUNT TYPE</td>
                   <td colSpan={3} style={{ ...valueStyle }}>
-                    <span style={{ marginRight: '16px' }}>☑ Individual</span>
+                    <span style={{ marginRight: '16px' }}>☑ INDIVIDUAL</span>
                     <span style={{ marginRight: '16px' }}>☐ HUF</span>
-                    <span style={{ marginRight: '16px' }}>☐ Corporate</span>
+                    <span style={{ marginRight: '16px' }}>☐ CORPORATE</span>
                     <span>☐ NRI</span>
                   </td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Customer ID</td>
+                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>CUSTOMER ID</td>
                   <td style={{ ...valueStyle }}>{formData.customerId || ''}</td>
                   <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>PAN</td>
                   <td style={{ ...valueStyle }}>XXXXXX{formData.panLast4.toUpperCase() || 'XXXX'}</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Gender</td>
+                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>GENDER</td>
                   <td style={{ ...valueStyle }}>{formData.gender || ''}</td>
-                  <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>Date of Birth</td>
+                  <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>DATE OF BIRTH</td>
                   <td style={{ ...valueStyle }}>{formData.dob ? new Date(formData.dob).toLocaleDateString('en-GB') : ''}</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Reference Name</td>
+                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>REFERENCE NAME</td>
                   <td style={{ ...valueStyle }}>{formData.refName || ''}</td>
-                  <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>Mobile No.</td>
+                  <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>MOBILE NO.</td>
                   <td style={{ ...valueStyle }}>XXXXXX{formData.mobileLast4 || ''}</td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Aadhaar No.</td>
+                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>AADHAAR NO.</td>
                   <td style={{ ...valueStyle }}>XXXXXXXX{formData.aadhaarLast4 || ''}</td>
-                  <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>Segment</td>
+                  <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>SEGMENT</td>
                   <td style={{ ...valueStyle }}>
                     <span style={{ marginRight: '16px' }}>{formData.segment.includes('F&O') ? '☑ F&O' : '☐ F&O'}</span>
                     <span>{formData.segment.includes('MCX') ? '☑ MCX' : '☐ MCX'}</span>
                   </td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Initial Deposit</td>
+                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>INITIAL DEPOSIT</td>
                   <td style={{ ...valueStyle }}>{formData.initialDeposit ? `Rs. ${formData.initialDeposit}` : ''}</td>
-                  <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>Status</td>
+                  <td style={{ borderLeft: '1px solid #a2b4cd', borderRight: '1px solid #a2b4cd', ...labelStyle }}>STATUS</td>
                   <td style={{ ...valueStyle }}>Active</td>
                 </tr>
                 <tr>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Address</td>
+                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>ADDRESS</td>
                   <td colSpan={3} style={{ ...valueStyle }}>123, Shakti Nagar, Navsari, Gujarat - 396445</td>
                 </tr>
               </tbody>
@@ -453,18 +453,18 @@ const AccountOpeningForm = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #a2b4cd', marginTop: '6px', marginBottom: '15px' }}>
               <tbody>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ width: '130px', borderRight: '1px solid #a2b4cd', ...labelStyle }}>Segment</td>
+                  <td style={{ width: '130px', borderRight: '1px solid #a2b4cd', ...labelStyle }}>SEGMENT</td>
                   <td style={{ ...valueStyle }}>
                     <span style={{ marginRight: '12px' }}>{formData.segment === 'F&O' ? '☑ F&O' : '☐ F&O'}</span>
                     <span>{formData.segment === 'MCX' ? '☑ MCX' : '☐ MCX'}</span>
                   </td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid #a2b4cd' }}>
-                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>Trading Frequency</td>
+                  <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>TRADING FREQUENCY</td>
                   <td style={{ ...valueStyle }}>
-                    <span style={{ marginRight: '16px' }}>☐ Low</span>
-                    <span style={{ marginRight: '16px' }}>☑ Medium</span>
-                    <span>☐ High</span>
+                    <span style={{ marginRight: '16px' }}>☐ LOW</span>
+                    <span style={{ marginRight: '16px' }}>☑ MEDIUM</span>
+                    <span>☐ HIGH</span>
                   </td>
                 </tr>
                
@@ -491,11 +491,11 @@ const AccountOpeningForm = () => {
                 <tr>
                   <td style={{ padding: '12px', ...valueStyle }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                      <div>☑ PAN Card</div>
-                      <div>☑ Income Proof (ITR / Form 16)</div>
-                      <div>☑ Aadhaar Card</div>
-                      <div>☑ Address Proof</div>
-                      <div>☑ Photograph</div>
+                      <div>☑ PAN CARD</div>
+                      <div>☑ INCOME PROOF (ITR / FORM 16)</div>
+                      <div>☑ AADHAAR CARD</div>
+                      <div>☑ ADDRESS PROOF</div>
+                      <div>☑ PHOTOGRAPH</div>
                     </div>
                   </td>
                 </tr>
@@ -518,10 +518,7 @@ const AccountOpeningForm = () => {
               4. DECLARATION
             </div>
             <div style={{ border: '1px solid #a2b4cd', padding: '15px', marginTop: '6px', fontSize: '10px', color: '#1e293b', lineHeight: '1.4' }}>
-              <p style={{ margin: '0 0 15px 0', color: '#dc2626', fontSize: '10px', fontWeight: '700', textAlign: 'center' }}>
-                <strong>Note:</strong> We are not registered with SEBI. High-leverage trading involves significant financial risk. Please trade at your own risk. The company shall not be responsible for any profit, loss, or financial consequences arising from your trading activities.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
                   <p style={{ margin: '0', fontSize: '11px', fontWeight: 'bold' }}>Name: <span style={{ textDecoration: 'underline' }}>{formData.customerName || '____________________'}</span></p>
                 </div>

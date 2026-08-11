@@ -423,7 +423,7 @@ export default function MarginReceipt() {
             pdf.setFont(activeFont, 'normal');
             pdf.setFontSize(6.5);
             pdf.setTextColor(100, 116, 139);
-            const disclaimerNote = "Note: margin has received, it will be block until trade exit, after trade exit it will be free";
+             const disclaimerNote = "Note: margin has received, it will be block until trade exit, after trade exit it will be free";
             const noteLines = pdf.splitTextToSize(disclaimerNote, pageW - 100);
             pdf.text(noteLines, 50, noteY + 11);
 

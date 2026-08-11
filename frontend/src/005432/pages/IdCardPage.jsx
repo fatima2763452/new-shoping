@@ -296,24 +296,25 @@ const IdCardPage = () => {
             flexDirection: 'column',
             gap: '4px',
             marginLeft: '18px',
+            width: '280px',
             flexGrow: 1,
             justifyContent: 'center'
           }}
         >
           {/* Name Row */}
-          <div style={{ display: 'flex', alignItems: 'center', fontSize: '10px', color: '#334155' }}>
-            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Name</span>
-            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
-            <span style={{ fontWeight: '850', color: '#0f172a', fontSize: '11px', textTransform: 'capitalize' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '10px', color: '#334155', lineHeight: '1.2' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block', flexShrink: 0 }}>Name</span>
+            <span style={{ margin: '0 4px', fontWeight: '700', flexShrink: 0 }}>:</span>
+            <span style={{ fontWeight: '850', color: '#0f172a', fontSize: '11px', textTransform: 'capitalize', display: 'inline-block', wordBreak: 'break-word', lineHeight: '1.2' }}>
               {formData.name || 'Johnathan Doe'}
             </span>
           </div>
 
           {/* ID Number Row */}
-          <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
-            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>ID No</span>
-            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
-            <span style={{ color: '#0f172a', fontWeight: '700', fontFamily: 'monospace', fontSize: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '9px', color: '#334155', lineHeight: '1.2' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block', flexShrink: 0 }}>ID No</span>
+            <span style={{ margin: '0 4px', fontWeight: '700', flexShrink: 0 }}>:</span>
+            <span style={{ color: '#0f172a', fontWeight: '700', fontFamily: 'monospace', fontSize: '10px', display: 'inline-block', wordBreak: 'break-word', lineHeight: '1.2' }}>
               {formData.idNumber || '123456789'}
             </span>
           </div>
@@ -328,31 +329,33 @@ const IdCardPage = () => {
           </div> */}
 
           {/* Phone Row */}
-          <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
-            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Phone</span>
-            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
-            <span style={{ color: '#475569', fontWeight: '600', fontFamily: 'monospace' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '9px', color: '#334155', lineHeight: '1.2' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block', flexShrink: 0 }}>Phone</span>
+            <span style={{ margin: '0 4px', fontWeight: '700', flexShrink: 0 }}>:</span>
+            <span style={{ color: '#475569', fontWeight: '600', fontFamily: 'monospace', display: 'inline-block', wordBreak: 'break-word', lineHeight: '1.2' }}>
               {formData.phone || '9876543210'}
             </span>
           </div>
 
           {/* Email Row */}
-          <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
-            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>E-mail</span>
-            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
-            <span style={{ color: '#475569', fontWeight: '600', fontSize: '8.5px', wordBreak: 'break-all' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '9px', color: '#334155', lineHeight: '1.2' }}>
+            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block', flexShrink: 0 }}>E-mail</span>
+            <span style={{ margin: '0 4px', fontWeight: '700', flexShrink: 0 }}>:</span>
+            <span style={{ color: '#475569', fontWeight: '600', fontSize: '8.5px', wordBreak: 'break-all', display: 'inline-block', lineHeight: '1.2' }}>
               {formData.email || 'info@dhanlaxmi.com'}
             </span>
           </div>
 
           {/* Address Row */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '9px', color: '#334155' }}>
-            <span style={{ fontWeight: '700', width: '52px', display: 'inline-block' }}>Address</span>
-            <span style={{ margin: '0 4px', fontWeight: '700' }}>:</span>
-            <span style={{ color: '#475569', fontWeight: '600', fontSize: '8px', lineHeight: '10px' }}>
-              {formData.address || 'Mumbai, Maharashtra'}
-            </span>
-          </div>
+          {formData.address && formData.address.trim() && (
+            <div style={{ display: 'flex', alignItems: 'flex-start', fontSize: '9px', color: '#334155', lineHeight: '1.2' }}>
+              <span style={{ fontWeight: '700', width: '52px', display: 'inline-block', flexShrink: 0 }}>Address</span>
+              <span style={{ margin: '0 4px', fontWeight: '700', flexShrink: 0 }}>:</span>
+              <span style={{ color: '#475569', fontWeight: '600', fontSize: '8px', lineHeight: '10px', display: 'inline-block', wordBreak: 'break-word' }}>
+                {formData.address}
+              </span>
+            </div>
+          )}
 
           {/* Issued Date Row */}
           {/* <div style={{ display: 'flex', alignItems: 'center', fontSize: '9px', color: '#334155' }}>
