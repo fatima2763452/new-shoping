@@ -18,6 +18,7 @@ const AccountOpeningForm = () => {
     panLast4: '',
     refName: '',
     initialDeposit: '',
+    address: '',
     applicationDate: new Date().toISOString().split('T')[0],
   });
 
@@ -315,6 +316,11 @@ const AccountOpeningForm = () => {
             </div>
 
             <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Address</label>
+              <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 focus:border-blue-500 outline-none" placeholder="Enter customer address" />
+            </div>
+
+            <div className="md:col-span-2">
               <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Upload Photo</label>
               <input type="file" accept="image/*" onChange={handlePhotoUpload} className="w-full text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-900 file:text-blue-200 hover:file:bg-blue-800" />
             </div>
@@ -430,7 +436,7 @@ const AccountOpeningForm = () => {
                 </tr>
                 <tr>
                   <td style={{ borderRight: '1px solid #a2b4cd', ...labelStyle }}>ADDRESS</td>
-                  <td colSpan={3} style={{ ...valueStyle }}>123, Shakti Nagar, Navsari, Gujarat - 396445</td>
+                  <td colSpan={3} style={{ ...valueStyle }}>{formData.address || ''}</td>
                 </tr>
               </tbody>
             </table>
