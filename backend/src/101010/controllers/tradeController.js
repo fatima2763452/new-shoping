@@ -311,11 +311,40 @@ const deleteExit = async (req, res) => {
 const editTrade = async (req, res) => {
   try {
     const { id } = req.params;
-    const { type, action, symbol, quantity, lot, price, ltp, marginRs, marginPct, date, time, exchange, tradeType, brokeragePct, brokerageFee: reqBrokerageFee, holdingDate, holdingTime } = req.body;
+    let { type, action, symbol, quantity, lot, price, ltp, marginRs, marginPct, date, time, exchange, tradeType, brokeragePct, brokerageFee: reqBrokerageFee, holdingDate, holdingTime } = req.body;
 
-    if (!id || !type || !action || !symbol || !quantity || !price || !ltp || !date) {
-      return res.status(400).json({ message: 'Please provide all required fields' });
+    if (!id) {
+      return res.status(400).json({ message: 'Trade ID is required' });
     }
+
+    let existingRecord = null;
+    if (type === 'exit') {
+      existingRecord = await Exit.findById(id);
+    } else if (type === 'entry') {
+      existingRecord = await Entry.findById(id);
+    } else {
+      existingRecord = await Exit.findById(id);
+      if (existingRecord) {
+        type = 'exit';
+      } else {
+        existingRecord = await Entry.findById(id);
+        if (existingRecord) {
+          type = 'entry';
+        }
+      }
+    }
+
+    if (!existingRecord) {
+      return res.status(404).json({ message: 'Trade record not found' });
+    }
+
+    if (!type) type = 'exit';
+    if (!action) action = existingRecord.action || 'sell';
+    if (!symbol) symbol = existingRecord.symbol || '';
+    if (quantity === undefined || quantity === '') quantity = existingRecord.quantity;
+    if (price === undefined || price === '') price = existingRecord.price;
+    if (ltp === undefined || ltp === '') ltp = existingRecord.ltp;
+    if (!date) date = existingRecord.date;
 
     const qtyNum = parseFloat(quantity) || 0;
     const priceNum = parseFloat(price) || 0;
@@ -330,25 +359,25 @@ const editTrade = async (req, res) => {
       activeBrokeragePct = parseFloat(brokeragePct);
       brokerageFee = (estimatedTotal * activeBrokeragePct) / 100;
     } else {
-      activeBrokeragePct = 0.01;
-      brokerageFee = (estimatedTotal * 0.01) / 100;
+      activeBrokeragePct = existingRecord.brokeragePct || 0.01;
+      brokerageFee = (estimatedTotal * activeBrokeragePct) / 100;
     }
 
     const tradeData = {
       action: action.toLowerCase(),
       symbol: symbol.toUpperCase(),
       quantity: qtyNum,
-      lot: parseFloat(lot) || 0,
+      lot: lot !== undefined && lot !== '' ? (parseFloat(lot) || 0) : (existingRecord.lot || 0),
       price: priceNum,
       ltp: parseFloat(ltp) || 0,
-      marginRs: parseFloat(marginRs) || (parseFloat(marginPct) > 0 ? (estimatedTotal * parseFloat(marginPct) / 100) : 0),
-      marginPct: parseFloat(marginPct) || 0,
+      marginRs: marginRs !== undefined && marginRs !== '' ? (parseFloat(marginRs) || 0) : (existingRecord.marginRs || 0),
+      marginPct: marginPct !== undefined && marginPct !== '' ? (parseFloat(marginPct) || 0) : (existingRecord.marginPct || 0),
       date,
-      time: time !== undefined ? time : '',
-      holdingDate: holdingDate !== undefined ? (holdingDate || null) : undefined,
-      holdingTime: holdingTime !== undefined ? holdingTime : '',
-      exchange: exchange || 'NSE',
-      tradeType: tradeType || 'INTRADAY',
+      time: time !== undefined ? time : (existingRecord.time || ''),
+      holdingDate: holdingDate !== undefined ? (holdingDate || null) : (existingRecord.holdingDate || undefined),
+      holdingTime: holdingTime !== undefined ? holdingTime : (existingRecord.holdingTime || ''),
+      exchange: exchange || existingRecord.exchange || 'NSE',
+      tradeType: tradeType || existingRecord.tradeType || 'INTRADAY',
       brokeragePct: activeBrokeragePct,
       brokerageFee,
       estimatedTotal
@@ -368,12 +397,6 @@ const editTrade = async (req, res) => {
       tradeData.realizedPnl = realizedPnl;
 
       updatedTrade = await Exit.findByIdAndUpdate(id, tradeData, { new: true });
-    } else {
-      return res.status(400).json({ message: 'Invalid trade type' });
-    }
-
-    if (!updatedTrade) {
-      return res.status(404).json({ message: 'Trade not found' });
     }
 
     res.json(updatedTrade);
@@ -384,23 +407,21 @@ const editTrade = async (req, res) => {
 
 const bulkDeleteEntries = async (req, res) => {
   try {
-    const { ids } = req.body;
-    if (!ids || !Array.isArray(ids) || ids.length === 0) {
-      return res.status(400).json({ message: 'No IDs provided for deletion' });
-    }
-    
-    // In holdings we delete by symbol, wait, holdings aren't specific entry IDs.
-    // Holdings are aggregated by symbol. So bulk delete in holdings means deleting all entries/exits for multiple SYMBOLS.
-    // Let's implement bulk delete for symbols.
-    const { customerId, symbols } = req.body;
-    if (customerId && symbols && Array.isArray(symbols)) {
+    const { ids, customerId, symbols } = req.body;
+
+    if (customerId && symbols && Array.isArray(symbols) && symbols.length > 0) {
       const upperSymbols = symbols.map(s => s.toUpperCase());
       await Entry.deleteMany({ customerId, symbol: { $in: upperSymbols } });
       await Exit.deleteMany({ customerId, symbol: { $in: upperSymbols } });
       return res.json({ message: 'Holdings deleted successfully' });
     }
-    
-    res.status(400).json({ message: 'Invalid payload for bulk delete' });
+
+    if (ids && Array.isArray(ids) && ids.length > 0) {
+      await Entry.deleteMany({ _id: { $in: ids } });
+      return res.json({ message: 'Entries deleted successfully' });
+    }
+
+    return res.status(400).json({ message: 'Invalid payload for bulk delete: customerId & symbols or ids required' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

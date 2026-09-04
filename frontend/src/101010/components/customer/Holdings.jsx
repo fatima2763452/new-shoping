@@ -78,6 +78,7 @@ const Holdings = ({ customer, onEditRequest }) => {
     try {
       await api.post(`/trades/holdings/bulk-delete`, { customerId: customer._id, symbols: selectedSymbols });
       setSelectedSymbols([]);
+      setIsSelectionMode(false);
       fetchHoldings();
     } catch (err) {
       console.error(err);

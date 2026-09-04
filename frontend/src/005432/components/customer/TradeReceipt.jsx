@@ -16,8 +16,11 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
   useEffect(() => {
     if (trade && !isEditing) {
       setEditData({
-        quantity: trade.quantity || '',
-        lot: trade.lot || '',
+        type: type || trade.type || 'exit',
+        action: trade.action || 'sell',
+        symbol: trade.symbol || '',
+        quantity: trade.quantity !== undefined ? trade.quantity : '',
+        lot: trade.lot !== undefined ? trade.lot : '',
         price: type === 'exit' ? trade.price : (trade.entryPrice || trade.price || ''),
         ltp: type === 'exit' ? trade.ltp : (trade.ltp || ''),
         marginRs: trade.marginRs !== undefined ? trade.marginRs : '',
