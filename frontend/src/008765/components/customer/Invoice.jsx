@@ -521,7 +521,7 @@ export default function Invoice() {
             };
 
             // Summary Footer Cards (MARGIN DETAILS on Left, PAYMENT SUMMARY on Right)
-            ensureSpace(125);
+            ensureSpace(145);
 
             const summaryCardW = (contentW - 15) / 2;
 
@@ -532,7 +532,7 @@ export default function Invoice() {
 
             pdf.setDrawColor(226, 232, 240);
             pdf.setFillColor(248, 250, 252);
-            pdf.roundedRect(marginSize, cursorY, summaryCardW, 115, 6, 6, 'FD');
+            pdf.roundedRect(marginSize, cursorY, summaryCardW, 135, 6, 6, 'FD');
 
             pdf.setFont(activeFont, 'bold');
             pdf.setFontSize(8);
@@ -557,7 +557,7 @@ export default function Invoice() {
             const rightCardX = marginSize + summaryCardW + 15;
             pdf.setDrawColor(226, 232, 240);
             pdf.setFillColor(248, 250, 252);
-            pdf.roundedRect(rightCardX, cursorY, summaryCardW, 115, 6, 6, 'FD');
+            pdf.roundedRect(rightCardX, cursorY, summaryCardW, 135, 6, 6, 'FD');
 
             pdf.setFont(activeFont, 'bold');
             pdf.setFontSize(8);
@@ -569,35 +569,45 @@ export default function Invoice() {
 
             pdf.setFontSize(7.5);
             pdf.setTextColor(100, 116, 139);
-            pdf.text('Total Buy Value', rightCardX + 10, cursorY + 32);
-            pdf.text('Total Sell Value', rightCardX + 10, cursorY + 44);
-            pdf.text('Gross Profit', rightCardX + 10, cursorY + 56);
+            pdf.text('Total Buy Value', rightCardX + 10, cursorY + 30);
+            pdf.text('Total Sell Value', rightCardX + 10, cursorY + 42);
+            pdf.text('Total Profit', rightCardX + 10, cursorY + 54);
+            pdf.text('Total Loss', rightCardX + 10, cursorY + 66);
+            pdf.text('Total Brokerage', rightCardX + 10, cursorY + 78);
 
             pdf.setTextColor(15, 23, 42);
-            pdf.text(`Rs. ${formatPDFNumber(totalBuyValueSum)}`, rightCardX + summaryCardW - 10, cursorY + 32, { align: 'right' });
-            pdf.text(`Rs. ${formatPDFNumber(totalSellValueSum)}`, rightCardX + summaryCardW - 10, cursorY + 44, { align: 'right' });
+            pdf.setFont(activeFont, 'normal');
+            pdf.text(`Rs. ${formatPDFNumber(totalBuyValueSum)}`, rightCardX + summaryCardW - 10, cursorY + 30, { align: 'right' });
+            pdf.text(`Rs. ${formatPDFNumber(totalSellValueSum)}`, rightCardX + summaryCardW - 10, cursorY + 42, { align: 'right' });
 
-            const grossProfitVal = summary.netPnl + summary.totalBrokerage;
             pdf.setFont(activeFont, 'bold');
-            pdf.setTextColor(grossProfitVal >= 0 ? 0 : 239, grossProfitVal >= 0 ? 176 : 68, grossProfitVal >= 0 ? 80 : 68);
-            pdf.text(`Rs. ${formatPDFNumber(grossProfitVal)}`, rightCardX + summaryCardW - 10, cursorY + 56, { align: 'right' });
+            pdf.setTextColor(0, 176, 80);
+            pdf.text(`Rs. ${formatPDFNumber(summary.totalProfit)}`, rightCardX + summaryCardW - 10, cursorY + 54, { align: 'right' });
+
+            pdf.setTextColor(239, 68, 68);
+            pdf.text(`Rs. ${summary.totalLoss > 0 ? '-' : ''}${formatPDFNumber(summary.totalLoss)}`, rightCardX + summaryCardW - 10, cursorY + 66, { align: 'right' });
+
+            pdf.setFont(activeFont, 'normal');
+            pdf.setTextColor(15, 23, 42);
+            pdf.text(`Rs. ${formatPDFNumber(summary.totalBrokerage)}`, rightCardX + summaryCardW - 10, cursorY + 78, { align: 'right' });
 
             pdf.setDrawColor(226, 232, 240);
-            pdf.line(rightCardX + 10, cursorY + 86, rightCardX + summaryCardW - 10, cursorY + 86);
+            pdf.line(rightCardX + 10, cursorY + 90, rightCardX + summaryCardW - 10, cursorY + 90);
 
-            const netPayableVal = summary.netPnl - (summary.totalBrokerage * 0.18);
-            pdf.setFillColor(236, 253, 245);
-            pdf.setDrawColor(167, 243, 208);
-            pdf.roundedRect(rightCardX + 8, cursorY + 92, summaryCardW - 16, 18, 3, 3, 'FD');
+            const isNetProfit = summary.netPnl >= 0;
+            pdf.setFillColor(255, 255, 255);
+            pdf.setDrawColor(0, 0, 0);
+            pdf.roundedRect(rightCardX + 8, cursorY + 96, summaryCardW - 16, 20, 3, 3, 'FD');
 
             pdf.setFont(activeFont, 'bold');
             pdf.setFontSize(7.5);
-            pdf.setTextColor(6, 95, 70);
-            pdf.text('Net Payable / Receivable', rightCardX + 14, cursorY + 104);
+            pdf.setTextColor(15, 23, 42);
+            pdf.text('Total Profit / Loss', rightCardX + 14, cursorY + 109);
             pdf.setFontSize(8.5);
-            pdf.text(`Rs. ${formatPDFNumber(netPayableVal)}`, rightCardX + summaryCardW - 14, cursorY + 104, { align: 'right' });
+            pdf.setTextColor(isNetProfit ? 0 : 239, isNetProfit ? 176 : 68, isNetProfit ? 80 : 68);
+            pdf.text(`Rs. ${summary.netPnl < 0 ? '-' : ''}${formatPDFNumber(Math.abs(summary.netPnl))}`, rightCardX + summaryCardW - 14, cursorY + 109, { align: 'right' });
 
-            cursorY += 130;
+            cursorY += 150;
 
             // Real Stamp & Signature block
             ensureSpace(70);
@@ -968,56 +978,41 @@ export default function Invoice() {
                     {/* Summary Footer / Cards */}
                     <div className="flex justify-between mb-6 gap-3">
 
-                        <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 w-full max-w-md">
-                            <div className="flex items-center gap-2 border-b border-slate-200 pb-2 mb-3">
-                                <span className="material-symbols-outlined text-blue-600 text-sm">assessment</span>
-                                <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">MARGIN DETAILS</h4>
-                            </div>
-                            <div className="space-y-2.5 text-xs font-semibold text-slate-700">
-                                <div className="flex justify-between pb-2">
-                                    <span className="text-slate-400">Free Margin</span>
-                                    <span className="text-slate-900">
-                                        {formatIndianCurrency(freeMargin !== '' && freeMargin !== null && !isNaN(parseFloat(freeMargin)) ? parseFloat(freeMargin) : 0)}
-                                    </span>
+                        <div className="border border-slate-200 rounded-xl p-5 bg-slate-50/50 w-full max-w-md flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-center gap-2 border-b border-slate-200 pb-2 mb-3">
+                                    <span className="material-symbols-outlined text-blue-600 text-sm">assessment</span>
+                                    <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">MARGIN DETAILS</h4>
                                 </div>
-                                <div className="flex justify-between pb-2">
-                                    <span className="text-slate-400">Hold Margin</span>
-                                    <span className="text-slate-900">
-                                        {formatIndianCurrency(holdMargin !== '' && holdMargin !== null && !isNaN(parseFloat(holdMargin)) ? parseFloat(holdMargin) : 0)}
-                                    </span>
+                                <div className="space-y-2.5 text-xs font-semibold text-slate-700">
+                                    <div className="flex justify-between pb-2">
+                                        <span className="text-slate-400">Free Margin</span>
+                                        <span className="text-slate-900">
+                                            {formatIndianCurrency(freeMargin !== '' && freeMargin !== null && !isNaN(parseFloat(freeMargin)) ? parseFloat(freeMargin) : 0)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pb-2">
+                                        <span className="text-slate-400">Hold Margin</span>
+                                        <span className="text-slate-900">
+                                            {formatIndianCurrency(holdMargin !== '' && holdMargin !== null && !isNaN(parseFloat(holdMargin)) ? parseFloat(holdMargin) : 0)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between pb-2">
+                                        <span className="text-slate-400">Total Margin</span>
+                                        <span className="text-slate-900">
+                                            {formatIndianCurrency(totalMargin !== '' && totalMargin !== null && !isNaN(parseFloat(totalMargin)) ? parseFloat(totalMargin) : 0)}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="flex justify-between pb-2">
-                                    <span className="text-slate-400">Total Margin</span>
-                                    <span className="text-slate-900">
-                                        {formatIndianCurrency(totalMargin !== '' && totalMargin !== null && !isNaN(parseFloat(totalMargin)) ? parseFloat(totalMargin) : 0)}
-                                    </span>
-                                </div>
-
-                              
-                                {/* <div className="flex justify-between">
-                                    <span className="text-slate-400">Gross Profit</span>
-                                    <span className={`font-bold ${summary.netPnl >= 0 ? 'text-[#00B050]' : 'text-[#ef4444]'}`}>
-                                        {formatIndianCurrency(summary.netPnl + summary.totalBrokerage)}
-                                    </span>
-                                </div>
-                                 */}
-                                {/* <div className="border-t border-dashed border-slate-200 my-2"></div> */}
-                                
-                                {/* <div className="flex justify-between items-center bg-emerald-50 text-emerald-800 p-2.5 rounded-lg border border-emerald-100">
-                                    <span className="font-bold uppercase tracking-wider">Net Payable / Receivable</span>
-                                    <span className="text-sm font-black whitespace-nowrap">
-                                        {formatIndianCurrency(summary.netPnl - (summary.totalBrokerage * 0.18))}
-                                    </span>
-                                </div> */}
                             </div>
                         </div>
                         {/* PAYMENT SUMMARY - Aligned to Right, occupying 50% width equivalent */}
-                        <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 w-full max-w-md">
-                            <div className="flex items-center gap-2 border-b border-slate-200 pb-2 mb-3">
+                        <div className="border border-slate-200 rounded-xl p-4 pb-6 bg-slate-50/50 w-full max-w-md overflow-visible">
+                            <div className="flex items-center gap-2 border-b border-slate-200 pb-2 mb-2.5">
                                 <span className="material-symbols-outlined text-blue-600 text-sm">assessment</span>
                                 <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">PAYMENT SUMMARY</h4>
                             </div>
-                            <div className="space-y-2.5 text-xs font-semibold text-slate-700">
+                            <div className="space-y-2 text-xs font-semibold text-slate-700">
                                 <div className="flex justify-between">
                                     <span className="text-slate-400">Total Buy Value</span>
                                     <span className="text-slate-900">{formatIndianCurrency(totalBuyValueSum)}</span>
@@ -1027,20 +1022,27 @@ export default function Invoice() {
                                     <span className="text-slate-900">{formatIndianCurrency(totalSellValueSum)}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-400">Gross Profit</span>
-                                    <span className={`font-bold ${summary.netPnl >= 0 ? 'text-[#00B050]' : 'text-[#ef4444]'}`}>
-                                        {formatIndianCurrency(summary.netPnl + summary.totalBrokerage)}
+                                    <span className="text-slate-400">Total Profit</span>
+                                    <span className="font-bold text-[#00B050]">
+                                        {formatIndianCurrency(summary.totalProfit)}
                                     </span>
                                 </div>
-                                
-                                <div className="border-t border-dashed border-slate-200 my-2"></div>
-                                
-                                <div className="flex justify-between items-center bg-emerald-50 text-emerald-800 p-2.5 rounded-lg border border-emerald-100">
-                                    <span className="font-bold uppercase tracking-wider">Net Payable / Receivable</span>
-                                    <span className="text-sm font-black whitespace-nowrap">
-                                        {formatIndianCurrency(summary.netPnl - (summary.totalBrokerage * 0.18))}
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Total Loss</span>
+                                    <span className="font-bold text-[#ef4444]">
+                                        {summary.totalLoss > 0 ? `-${formatIndianCurrency(summary.totalLoss)}` : formatIndianCurrency(0)}
                                     </span>
                                 </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-400">Total Brokerage</span>
+                                    <span className="text-slate-900">{formatIndianCurrency(summary.totalBrokerage)}</span>
+                                </div>
+                            </div>
+                            <div className="mt-3 mb-1 flex justify-between items-center p-3 bg-white" style={{ border: '2px solid #000000' }}>
+                                <span className="font-bold uppercase tracking-wider text-slate-900 text-xs">Total Profit / Loss</span>
+                                <span className={`text-sm font-black whitespace-nowrap ${summary.netPnl >= 0 ? 'text-[#00B050]' : 'text-[#ef4444]'}`}>
+                                    {summary.netPnl >= 0 ? formatIndianCurrency(summary.netPnl) : `-${formatIndianCurrency(Math.abs(summary.netPnl))}`}
+                                </span>
                             </div>
                         </div>
                     </div>

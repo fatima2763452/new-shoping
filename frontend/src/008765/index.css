@@ -40,12 +40,7 @@
   border-left-width: 1px !important;
   border-left-style: solid !important;
 }
-/* Wipe out any default browser/Bootstrap white bottom borders inside token 008765 */
-#token-008765-root *,
-#token-008765-root *::before,
-#token-008765-root *::after {
-  border-bottom-color: transparent !important;
-}
+
 
 /* Specific Border Color Overrides using safe attribute selectors (bypasses Vite/PostCSS slash escaping issues) */
 #token-008765-root [class*="border-slate-800"] {
