@@ -388,6 +388,16 @@ import Token008765SecretAdmin from './008765/pages/SecretAdmin';
 import Token008765RecycleBin from './008765/pages/RecycleBin';
 import Token008765IdCardPage from './008765/pages/IdCardPage';
 
+import Token567890Wrapper from './567890/components/TokenWrapper';
+import Token567890Dashboard from './567890/pages/Dashboard';
+import Token567890CustomerDetail from './567890/pages/CustomerDetail';
+import Token567890Invoice from './567890/components/customer/Invoice';
+import Token567890MarginReceipt from './567890/components/customer/MarginReceipt';
+import Token567890AccountOpeningForm from './567890/pages/AccountOpeningForm';
+import Token567890SecretAdmin from './567890/pages/SecretAdmin';
+import Token567890RecycleBin from './567890/pages/RecycleBin';
+import Token567890IdCardPage from './567890/pages/IdCardPage';
+
 import Token005432Wrapper from './005432/components/TokenWrapper';
 import Token005432Dashboard from './005432/pages/Dashboard';
 import Token005432CustomerDetail from './005432/pages/CustomerDetail';
@@ -421,7 +431,7 @@ function App() {
   const token = localStorage.getItem('authToken') || localStorage.getItem('token'); // Token to identify admin
 
   React.useEffect(() => {
-    if (token !== '101010' && token !== '202020' && token !== '008765' && token !== '005432') {
+    if (token !== '101010' && token !== '202020' && token !== '008765' && token !== '005432' && token !== '567890') {
       // Load Bootstrap CSS
       let bootstrapCSS = document.getElementById('bootstrap-css-cdn');
       if (!bootstrapCSS) {
@@ -1115,6 +1125,75 @@ function App() {
                 <Token008765Wrapper>
                   <Token008765IdCardPage />
                 </Token008765Wrapper>
+              } 
+            />
+          </>
+        )}
+
+        {token === '567890' && (
+          <>
+            <Route 
+              path="/form" 
+              element={
+                <Token567890Wrapper>
+                  <Token567890Dashboard />
+                </Token567890Wrapper>
+              } 
+            />
+            <Route 
+              path="/recycle-bin" 
+              element={
+                <Token567890Wrapper>
+                  <Token567890RecycleBin />
+                </Token567890Wrapper>
+              } 
+            />
+            <Route 
+              path="/account-opening" 
+              element={
+                <Token567890Wrapper>
+                  <Token567890AccountOpeningForm />
+                </Token567890Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id" 
+              element={
+                <Token567890Wrapper>
+                  <Token567890CustomerDetail />
+                </Token567890Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id/invoice" 
+              element={
+                <Token567890Wrapper>
+                  <Token567890Invoice />
+                </Token567890Wrapper>
+              } 
+            />
+            <Route 
+              path="/customer/:id/margin-receipt" 
+              element={
+                <Token567890Wrapper>
+                  <Token567890MarginReceipt />
+                </Token567890Wrapper>
+              } 
+            />
+            <Route 
+              path="/secret-admin" 
+              element={
+                <Token567890Wrapper>
+                  <Token567890SecretAdmin />
+                </Token567890Wrapper>
+              } 
+            />
+            <Route 
+              path="/id-card" 
+              element={
+                <Token567890Wrapper>
+                  <Token567890IdCardPage />
+                </Token567890Wrapper>
               } 
             />
           </>
