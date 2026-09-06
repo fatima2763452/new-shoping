@@ -61,9 +61,12 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
+  const [isDownloading, setIsDownloading] = useState(false);
+
   const handleDownload = async () => {
     const el = receiptRef.current;
-    if (!el) return;
+    if (!el || isDownloading) return;
+    setIsDownloading(true);
     try {
       const filter = (node) => {
         // Exclude external stylesheets to prevent CORS SecurityError
@@ -82,6 +85,9 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
       el.style.width = printWidth;
       el.style.maxWidth = printWidth;
 
+      // Small delay to ensure browser reflow and repaint before capturing snapshot
+      await new Promise((res) => setTimeout(res, 60));
+
       // Get the exact width and height of the receipt card with forced dimensions
       const width = el.offsetWidth;
       const height = el.offsetHeight;
@@ -92,6 +98,8 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
         height: height,
         pixelRatio: 2,
         cacheBust: false,
+        skipFonts: true,
+        fontEmbedCSS: '',
         filter: filter,
         style: {
           transform: 'scale(1)',
@@ -117,6 +125,8 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
     } catch (error) {
       console.error('Failed to generate receipt PDF:', error);
       alert('Error generating PDF: ' + error.message);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -643,10 +653,20 @@ const TradeReceipt = ({ trade, customer, type, onClose, onEdit }) => {
           )}
           <button 
             onClick={handleDownload}
-            className="flex-1 py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/10"
+            disabled={isDownloading}
+            className="flex-1 py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 transition-colors shadow-lg shadow-blue-600/10"
           >
-            <FileText size={18} />
-            SAVE PDF
+            {isDownloading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                DOWNLOADING...
+              </>
+            ) : (
+              <>
+                <FileText size={18} />
+                SAVE PDF
+              </>
+            )}
           </button>
         </div>
       </div>

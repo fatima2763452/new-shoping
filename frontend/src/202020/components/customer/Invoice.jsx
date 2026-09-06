@@ -321,6 +321,9 @@ export default function Invoice() {
         try {
             setLoading(true);
 
+            const totalBuyValueSum = invoiceData.reduce((acc, item) => acc + (item.entryPrice * item.qty), 0);
+            const totalSellValueSum = invoiceData.reduce((acc, item) => acc + (item.exitPrice * item.qty), 0);
+
             const pdf = new jsPDF('p', 'pt', 'a4');
             const activeFont = 'helvetica';
             pdf.setFont(activeFont, 'normal');
@@ -817,8 +820,17 @@ export default function Invoice() {
                 </button>
                 <div className="flex gap-2">
                     {/* Manual PDF Download Button */}
-                    <button onClick={handleDownloadPDF} disabled={loading} className="flex items-center gap-2 bg-[#00B050] text-white px-5 py-2.5 rounded-lg hover:bg-[#009040] font-bold shadow-lg shadow-green-500/10 transition-all">
-                        <Download className="w-4 h-4" /> {loading ? 'Downloading...' : 'Download PDF'}
+                    <button onClick={handleDownloadPDF} disabled={loading} className="flex items-center gap-2 bg-[#00B050] text-white px-5 py-2.5 rounded-lg hover:bg-[#009040] disabled:opacity-50 font-bold shadow-lg shadow-green-500/10 transition-all">
+                        {loading ? (
+                            <>
+                                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                Downloading...
+                            </>
+                        ) : (
+                            <>
+                                <Download className="w-4 h-4" /> Download PDF
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
