@@ -26,6 +26,12 @@ const WeeklyRecords = ({ customer, onEditRequest }) => {
   const [expandedCard, setExpandedCard] = useState(null);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, type = 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     fetchExits();
@@ -50,9 +56,10 @@ const WeeklyRecords = ({ customer, onEditRequest }) => {
     try {
       await api.delete(`/trades/weekly/${id}`);
       fetchExits();
+      showToast('Exit record deleted successfully', 'success');
     } catch (err) {
       console.error(err);
-      alert('Failed to delete exit record');
+      showToast(err.response?.data?.message || 'Failed to delete exit record', 'error');
     }
   };
 
@@ -77,7 +84,7 @@ const WeeklyRecords = ({ customer, onEditRequest }) => {
       fetchExits();
     } catch (err) {
       console.error(err);
-      alert('Failed to delete records');
+      showToast('Failed to delete records', 'error');
     }
   };
 
@@ -87,6 +94,14 @@ const WeeklyRecords = ({ customer, onEditRequest }) => {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
+      
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-[200] flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg border animate-in slide-in-from-top-2 fade-in ${toast.type === 'error' ? 'bg-rose-950/90 border-rose-900/50 text-rose-200' : 'bg-emerald-950/90 border-emerald-900/50 text-emerald-200'}`}>
+          <span className="material-symbols-outlined text-[20px]">{toast.type === 'error' ? 'error' : 'check_circle'}</span>
+          <span className="text-sm font-bold">{toast.message}</span>
+        </div>
+      )}
       
       {/* Sticky Top Section */}
       <div className="sticky top-[-16px] pt-4 bg-slate-950 z-20 pb-2 mb-2">
@@ -324,16 +339,14 @@ const WeeklyRecords = ({ customer, onEditRequest }) => {
           onClose={() => setSelectedReceipt(null)}
           onEdit={async (updatedData) => {
             try {
-              // The backend route is /trades/edit/:id
-              await api.put(`/trades/edit/${selectedReceipt._id}`, {
-                ...selectedReceipt,
-                ...updatedData
-              });
+              // Send only clean updatedData, not the raw MongoDB record
+              await api.put(`/trades/edit/${selectedReceipt._id}`, updatedData);
               fetchExits();
               setSelectedReceipt(null);
+              showToast('Record updated successfully', 'success');
             } catch (err) {
               console.error(err);
-              alert(err.response?.data?.message || 'Failed to update record');
+              showToast(err.response?.data?.message || 'Failed to update record', 'error');
             }
           }}
         />

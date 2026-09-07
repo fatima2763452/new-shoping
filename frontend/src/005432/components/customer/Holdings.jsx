@@ -12,7 +12,7 @@ const getAvatarColor = (symbol) => {
     { bg: 'bg-amber-600', border: 'border-l-amber-500' },
     { bg: 'bg-cyan-600', border: 'border-l-cyan-500' }
   ];
-  const charSum = symbol.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const charSum = (symbol || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return colors[charSum % colors.length];
 };
 
@@ -22,7 +22,7 @@ const Holdings = ({ customer, onEditRequest }) => {
   const [error, setError] = useState('');
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [expandedCard, setExpandedCard] = useState(null);
-  const [selectedSymbols, setSelectedSymbols] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [toast, setToast] = useState(null);
 
@@ -49,10 +49,10 @@ const Holdings = ({ customer, onEditRequest }) => {
     }
   };
 
-  const handleDelete = async (symbol) => {
-    if (!window.confirm(`Are you sure you want to delete all entries for ${symbol}?`)) return;
+  const handleDelete = async (id, symbol) => {
+    if (!window.confirm(`Are you sure you want to delete this entry for ${symbol}?`)) return;
     try {
-      await api.delete(`/trades/holdings/${customer._id}/${symbol}`);
+      await api.delete(`/trades/holdings/${customer._id}/${id}`);
       fetchHoldings();
     } catch (err) {
       console.error(err);
@@ -60,24 +60,24 @@ const Holdings = ({ customer, onEditRequest }) => {
     }
   };
 
-  const toggleSelection = (symbol) => {
-    setSelectedSymbols(prev => prev.includes(symbol) ? prev.filter(s => s !== symbol) : [...prev, symbol]);
+  const toggleSelection = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
   const toggleSelectAll = () => {
-    if (selectedSymbols.length === holdings.length && holdings.length > 0) {
-      setSelectedSymbols([]);
+    if (selectedIds.length === holdings.length && holdings.length > 0) {
+      setSelectedIds([]);
     } else {
-      setSelectedSymbols(holdings.map(h => h.symbol));
+      setSelectedIds(holdings.map(h => h._id));
     }
   };
 
   const handleBulkDelete = async () => {
-    if (selectedSymbols.length === 0) return;
-    if (!window.confirm(`Are you sure you want to delete holdings for ${selectedSymbols.length} symbols?`)) return;
+    if (selectedIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} trade entries?`)) return;
     try {
-      await api.post(`/trades/holdings/bulk-delete`, { customerId: customer._id, symbols: selectedSymbols });
-      setSelectedSymbols([]);
+      await api.post(`/trades/holdings/bulk-delete`, { ids: selectedIds });
+      setSelectedIds([]);
       setIsSelectionMode(false);
       fetchHoldings();
     } catch (err) {
@@ -134,20 +134,20 @@ const Holdings = ({ customer, onEditRequest }) => {
                   <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold text-slate-400 hover:text-slate-200">
                     <input 
                       type="checkbox" 
-                      checked={selectedSymbols.length === holdings.length && holdings.length > 0}
+                      checked={selectedIds.length === holdings.length && holdings.length > 0}
                       onChange={toggleSelectAll}
                       className="w-3.5 h-3.5 rounded border-slate-700 bg-slate-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900"
                     />
                     ALL
                   </label>
                 )}
-                {selectedSymbols.length > 0 ? (
+                {selectedIds.length > 0 ? (
                   <button onClick={handleBulkDelete} className="flex items-center gap-1 text-rose-400 hover:text-rose-300 transition-colors text-[11px] font-bold uppercase tracking-wider">
                     <span className="material-symbols-outlined text-[16px]">delete</span>
-                    DELETE ({selectedSymbols.length})
+                    DELETE ({selectedIds.length})
                   </button>
                 ) : (
-                  <button onClick={() => { setIsSelectionMode(false); setSelectedSymbols([]); }} className="flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider">
+                  <button onClick={() => { setIsSelectionMode(false); setSelectedIds([]); }} className="flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-[11px] font-bold uppercase tracking-wider">
                     <span className="material-symbols-outlined text-[16px]">close</span>
                     CANCEL
                   </button>
@@ -213,8 +213,8 @@ const Holdings = ({ customer, onEditRequest }) => {
           const color = getAvatarColor(item.symbol);
           return (
             <div 
-              key={item.symbol} 
-              onClick={() => setExpandedCard(expandedCard === item.symbol ? null : item.symbol)}
+              key={item._id} 
+              onClick={() => setExpandedCard(expandedCard === item._id ? null : item._id)}
               className={`bg-slate-900/50 border-y border-r border-slate-800 ${color.border} border-l-4 rounded-xl p-4 relative overflow-hidden group cursor-pointer hover:bg-slate-900/80 transition-all select-none`}
             >
               {idx === 0 && <div className="absolute inset-0 border border-dashed border-blue-500/10 rounded-xl pointer-events-none"></div>}
@@ -225,15 +225,15 @@ const Holdings = ({ customer, onEditRequest }) => {
                     <div onClick={(e) => e.stopPropagation()}>
                       <input 
                         type="checkbox" 
-                        checked={selectedSymbols.includes(item.symbol)}
-                        onChange={() => toggleSelection(item.symbol)}
+                        checked={selectedIds.includes(item._id)}
+                        onChange={() => toggleSelection(item._id)}
                         className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900"
                       />
                     </div>
                   )}
                   {/* Circle Avatar */}
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-lg ${color.bg} shrink-0`}>
-                    {item.symbol.charAt(0)}
+                    {(item.symbol || '').charAt(0)}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -245,7 +245,7 @@ const Holdings = ({ customer, onEditRequest }) => {
                       </span>
                     </div>
                     <div className="text-[10px] text-slate-400 mt-0.5">
-                      Qty {item.netQty.toLocaleString()}
+                      Qty {(item.netQty || 0).toLocaleString()}
                     </div>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ const Holdings = ({ customer, onEditRequest }) => {
                   </div>
                   {/* Chevron Right Button */}
                   <div className="ml-3 p-1.5 rounded-lg bg-slate-950/60 border border-slate-800/80 text-slate-400 group-hover:text-slate-200 transition-colors">
-                    <span className={`material-symbols-outlined text-[16px] flex items-center justify-center transition-transform duration-300 ${expandedCard === item.symbol ? 'rotate-90' : ''}`}>
+                    <span className={`material-symbols-outlined text-[16px] flex items-center justify-center transition-transform duration-300 ${expandedCard === item._id ? 'rotate-90' : ''}`}>
                       chevron_right
                     </span>
                   </div>
@@ -280,7 +280,7 @@ const Holdings = ({ customer, onEditRequest }) => {
               </div>
 
               {/* Smoothly Expandable Action Panel */}
-              <div className={`grid-animate transition-all duration-300 ease-in-out ${expandedCard === item.symbol ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+              <div className={`grid-animate transition-all duration-300 ease-in-out ${expandedCard === item._id ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
                 <div className="overflow-hidden">
                   <div className="flex gap-2 pt-3 border-t border-slate-800/80">
                     <button 
@@ -291,7 +291,7 @@ const Holdings = ({ customer, onEditRequest }) => {
                       RECEIPT
                     </button>
                     <button 
-                      onClick={(e) => { e.stopPropagation(); handleDelete(item.symbol); }}
+                      onClick={(e) => { e.stopPropagation(); handleDelete(item._id, item.symbol); }}
                       className="flex-grow bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition-colors text-xs font-bold whitespace-nowrap"
                     >
                       <span className="material-symbols-outlined text-[16px]">delete</span>
@@ -313,9 +313,11 @@ const Holdings = ({ customer, onEditRequest }) => {
           onClose={() => setSelectedReceipt(null)}
           onEdit={async (updatedData) => {
             try {
-              await api.put(`/trades/holdings/edit/${customer._id}/${selectedReceipt.symbol}`, updatedData);
+              await api.put(`/trades/holdings/edit/${customer._id}/${selectedReceipt.symbol}`, {
+                ...updatedData,
+                entryId: selectedReceipt._id
+              });
               fetchHoldings();
-              // Optionally close receipt, or leave it open to see changes. Let's close it for now.
               setSelectedReceipt(null);
             } catch (err) {
               console.error(err);

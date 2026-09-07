@@ -88,122 +88,52 @@ const getCustomerHoldings = async (req, res) => {
       return res.status(400).json({ message: 'Customer ID is required' });
     }
 
-    // Only fetch entries for Holdings tab as requested by user
-    const entries = await Entry.find({ customerId }).lean();
+    // Fetch entries for Holdings tab — return each trade entry individually so identical symbol names remain separate
+    const entries = await Entry.find({ customerId }).sort({ createdAt: -1, date: -1 }).lean();
     
-    const allTrades = [
-      ...entries.map(e => ({ ...e, type: 'entry' }))
-    ];
-
-    // Sort by date then createdAt
-    allTrades.sort((a, b) => new Date(a.date) - new Date(b.date) || new Date(a.createdAt) - new Date(b.createdAt));
-    
-    const holdingsMap = {};
-
-    allTrades.forEach(trade => {
-      if (!holdingsMap[trade.symbol]) {
-        holdingsMap[trade.symbol] = {
-          symbol: trade.symbol,
-          totalBuyQty: 0,
-          totalBuyCost: 0,
-          totalSellQty: 0,
-          totalSellCost: 0,
-          totalBrokerage: 0,
-          totalMargin: 0,
-          lastPrice: 0,
-          lot: 0,
-          exchange: 'NSE',
-          tradeType: 'INTRADAY',
-          date: trade.date,
-          time: trade.time || '',
-          _id: trade._id
-        };
-      }
-
-      const holding = holdingsMap[trade.symbol];
-      holding.lastPrice = trade.ltp || trade.price; // Fallback to price for older trades
-      if (trade.lot) holding.lot = trade.lot;
-      if (trade.exchange) holding.exchange = trade.exchange;
-      if (trade.tradeType) holding.tradeType = trade.tradeType;
-      if (trade.date) holding.date = trade.date;
-      if (trade.time) holding.time = trade.time;
-      if (trade.holdingDate) holding.holdingDate = trade.holdingDate;
-      if (trade.holdingTime) holding.holdingTime = trade.holdingTime;
-      if (trade._id) holding._id = trade._id;
-      if (trade.customInvested !== undefined) holding.customInvested = trade.customInvested;
-      if (trade.customUpnl !== undefined) holding.customUpnl = trade.customUpnl;
-      if (trade.customTotalPnl !== undefined) holding.customTotalPnl = trade.customTotalPnl;
-      holding.totalBrokerage += (trade.brokerageFee || 0); // Accumulate brokerage
-      holding.lastUpdated = new Date(trade.createdAt || trade.date); // Keep track of latest interaction
-      const effectiveMargin = trade.marginRs || (trade.marginPct ? (trade.estimatedTotal * trade.marginPct / 100) : 0);
-      holding.totalMargin += effectiveMargin; // Accumulate margin
-
-      if (trade.action === 'buy') {
-        holding.totalBuyQty += trade.quantity;
-        holding.totalBuyCost += (trade.quantity * trade.price);
-      } else if (trade.action === 'sell') {
-        // This is a Short position entry
-        holding.totalSellQty += trade.quantity;
-        holding.totalSellCost += (trade.quantity * trade.price);
-      }
-    });
-
-    const holdings = Object.values(holdingsMap).map(h => {
-      // Prevent slight floating point errors from leaving micro-positions open
-      if (Math.abs(h.totalBuyQty) < 0.0001) h.totalBuyQty = 0;
-      if (Math.abs(h.totalSellQty) < 0.0001) h.totalSellQty = 0;
-
-      const netQty = h.totalBuyQty - h.totalSellQty;
-      let type = '';
-      let avgCost = 0;
+    const holdings = entries.map(trade => {
+      const qtyNum = trade.quantity || 0;
+      const priceNum = trade.price || 0;
+      const ltpNum = trade.ltp !== undefined ? trade.ltp : priceNum;
+      const action = (trade.action || 'buy').toLowerCase();
+      const type = action === 'buy' ? 'Buy' : 'Sell';
       
-      if (netQty > 0) {
-        type = 'Buy';
-        avgCost = h.totalBuyQty > 0 ? h.totalBuyCost / h.totalBuyQty : 0;
-      } else if (netQty < 0) {
-        type = 'Sell';
-        avgCost = h.totalSellQty > 0 ? h.totalSellCost / h.totalSellQty : 0;
-      } else {
-        type = 'Closed';
-      }
-
-      // Unrealized P/L
       let upnl = 0;
-      const absoluteQty = Math.abs(netQty);
       if (type === 'Buy') {
-        upnl = (h.lastPrice - avgCost) * absoluteQty;
-      } else if (type === 'Sell') {
-        upnl = (avgCost - h.lastPrice) * absoluteQty; 
+        upnl = (ltpNum - priceNum) * qtyNum;
+      } else {
+        upnl = (priceNum - ltpNum) * qtyNum;
       }
       
-      // Deduct total accumulated brokerage from unrealized P/L
-      upnl -= h.totalBrokerage;
+      const brokerage = trade.brokerageFee || 0;
+      upnl -= brokerage;
+      
+      const effectiveMargin = trade.marginRs || (trade.marginPct ? (qtyNum * priceNum * trade.marginPct / 100) : 0);
 
       return {
-        _id: h._id,
-        symbol: h.symbol,
-        netQty: absoluteQty,
-        lot: h.lot,
+        _id: trade._id,
+        entryId: trade._id,
+        symbol: trade.symbol,
+        netQty: qtyNum,
+        lot: trade.lot || 0,
         type,
-        avgCost,
-        lastPrice: h.lastPrice,
-        exchange: h.exchange || 'NSE',
-        tradeType: h.tradeType || 'INTRADAY',
-        date: h.date,
-        time: h.time || '',
-        holdingDate: h.holdingDate,
-        holdingTime: h.holdingTime || '',
-        totalInvestment: h.customInvested !== undefined ? h.customInvested : absoluteQty * avgCost,
-        totalValue: absoluteQty * h.lastPrice,
-        totalBrokerage: h.totalBrokerage,
-        totalMargin: h.totalMargin,
-        upnl: h.customUpnl !== undefined ? h.customUpnl : upnl,
-        totalPnl: h.customTotalPnl !== undefined ? h.customTotalPnl : upnl,
-        lastUpdated: h.lastUpdated
+        avgCost: priceNum,
+        lastPrice: ltpNum,
+        exchange: trade.exchange || 'NSE',
+        tradeType: trade.tradeType || 'INTRADAY',
+        date: trade.date,
+        time: trade.time || '',
+        holdingDate: trade.holdingDate,
+        holdingTime: trade.holdingTime || '',
+        totalInvestment: trade.customInvested !== undefined ? trade.customInvested : qtyNum * priceNum,
+        totalValue: qtyNum * ltpNum,
+        totalBrokerage: brokerage,
+        totalMargin: effectiveMargin,
+        upnl: trade.customUpnl !== undefined ? trade.customUpnl : upnl,
+        totalPnl: trade.customTotalPnl !== undefined ? trade.customTotalPnl : upnl,
+        lastUpdated: trade.createdAt || trade.date
       };
-    })
-    .filter(h => h.type !== 'Closed') // Filter out fully exited positions
-    .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated)); // Sort by most recent activity descending (newest first)
+    });
 
     res.json(holdings);
   } catch (error) {
@@ -231,12 +161,16 @@ const deleteHolding = async (req, res) => {
     const { customerId, symbol } = req.params;
     
     if (!customerId || !symbol) {
-      return res.status(400).json({ message: 'Customer ID and Symbol are required' });
+      return res.status(400).json({ message: 'Customer ID and Symbol/ID are required' });
     }
 
-    // Delete all entries and exits for this symbol to wipe the holding completely
-    await Entry.deleteMany({ customerId, symbol: symbol.toUpperCase() });
-    await Exit.deleteMany({ customerId, symbol: symbol.toUpperCase() });
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(symbol);
+    if (isObjectId) {
+      await Entry.findByIdAndDelete(symbol);
+    } else {
+      await Entry.deleteMany({ customerId, symbol: symbol.toUpperCase() });
+      await Exit.deleteMany({ customerId, symbol: symbol.toUpperCase() });
+    }
     
     res.json({ message: 'Holding deleted successfully' });
   } catch (error) {
@@ -247,46 +181,56 @@ const deleteHolding = async (req, res) => {
 const editHolding = async (req, res) => {
   try {
     const { customerId, symbol } = req.params;
-    const { quantity, lot, price, ltp, marginRs, brokerageFee, invested, unrealisedPnl, totalPnl, exchange, tradeType, date, time, holdingDate, holdingTime } = req.body;
+    const { entryId, quantity, lot, price, ltp, marginRs, brokerageFee, invested, unrealisedPnl, totalPnl, exchange, tradeType, date, time, holdingDate, holdingTime } = req.body;
     
-    // Find the most recent entry for this holding
-    const entries = await Entry.find({ customerId, symbol: symbol.toUpperCase() }).sort({ createdAt: -1, date: -1 });
-    
-    if (entries.length === 0) {
-      return res.status(404).json({ message: 'No entries found for this holding' });
+    if (!customerId || !symbol) {
+      return res.status(400).json({ message: 'Customer ID and Symbol/ID are required' });
     }
 
-    const latestEntry = entries[0];
+    const targetId = entryId || (/^[0-9a-fA-F]{24}$/.test(symbol) ? symbol : null);
+    let targetEntry = null;
+
+    if (targetId) {
+      targetEntry = await Entry.findById(targetId);
+    }
     
-    if (quantity !== undefined) latestEntry.quantity = parseFloat(quantity) || 0;
-    if (lot !== undefined) latestEntry.lot = parseFloat(lot) || 0;
-    if (price !== undefined) latestEntry.price = parseFloat(price) || 0;
-    if (ltp !== undefined) latestEntry.ltp = parseFloat(ltp) || 0;
-    if (marginRs !== undefined) latestEntry.marginRs = parseFloat(marginRs) || 0;
-    if (exchange !== undefined) latestEntry.exchange = exchange;
-    if (tradeType !== undefined) latestEntry.tradeType = tradeType;
-    if (date !== undefined) latestEntry.date = date;
-    if (time !== undefined) latestEntry.time = time;
-    if (holdingDate !== undefined) latestEntry.holdingDate = holdingDate;
-    if (holdingTime !== undefined) latestEntry.holdingTime = holdingTime;
+    if (!targetEntry) {
+      const entries = await Entry.find({ customerId, symbol: symbol.toUpperCase() }).sort({ createdAt: -1, date: -1 });
+      if (entries.length === 0) {
+        return res.status(404).json({ message: 'No entry found for this holding' });
+      }
+      targetEntry = entries[0];
+    }
+
+    if (quantity !== undefined) targetEntry.quantity = parseFloat(quantity) || 0;
+    if (lot !== undefined) targetEntry.lot = parseFloat(lot) || 0;
+    if (price !== undefined) targetEntry.price = parseFloat(price) || 0;
+    if (ltp !== undefined) targetEntry.ltp = parseFloat(ltp) || 0;
+    if (marginRs !== undefined) targetEntry.marginRs = parseFloat(marginRs) || 0;
+    if (exchange !== undefined) targetEntry.exchange = exchange;
+    if (tradeType !== undefined) targetEntry.tradeType = tradeType;
+    if (date !== undefined) targetEntry.date = date;
+    if (time !== undefined) targetEntry.time = time;
+    if (holdingDate !== undefined) targetEntry.holdingDate = holdingDate;
+    if (holdingTime !== undefined) targetEntry.holdingTime = holdingTime;
     
     // Custom overrides for display
-    if (invested !== undefined) latestEntry.customInvested = parseFloat(invested) || 0;
-    if (unrealisedPnl !== undefined) latestEntry.customUpnl = parseFloat(unrealisedPnl) || 0;
-    if (totalPnl !== undefined) latestEntry.customTotalPnl = parseFloat(totalPnl) || 0;
+    if (invested !== undefined) targetEntry.customInvested = parseFloat(invested) || 0;
+    if (unrealisedPnl !== undefined) targetEntry.customUpnl = parseFloat(unrealisedPnl) || 0;
+    if (totalPnl !== undefined) targetEntry.customTotalPnl = parseFloat(totalPnl) || 0;
     
-    latestEntry.estimatedTotal = latestEntry.quantity * latestEntry.price;
+    targetEntry.estimatedTotal = targetEntry.quantity * targetEntry.price;
     
     if (brokerageFee !== undefined) {
-      latestEntry.brokerageFee = parseFloat(brokerageFee) || 0;
-      latestEntry.brokeragePct = latestEntry.estimatedTotal > 0 ? (latestEntry.brokerageFee / latestEntry.estimatedTotal) * 100 : 0;
+      targetEntry.brokerageFee = parseFloat(brokerageFee) || 0;
+      targetEntry.brokeragePct = targetEntry.estimatedTotal > 0 ? (targetEntry.brokerageFee / targetEntry.estimatedTotal) * 100 : 0;
     } else {
-      latestEntry.brokerageFee = (latestEntry.estimatedTotal * latestEntry.brokeragePct) / 100;
+      targetEntry.brokerageFee = (targetEntry.estimatedTotal * (targetEntry.brokeragePct || 0.01)) / 100;
     }
 
-    await latestEntry.save();
+    await targetEntry.save();
     
-    res.json({ message: 'Holding updated successfully', trade: latestEntry });
+    res.json({ message: 'Holding updated successfully', trade: targetEntry });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -300,7 +244,10 @@ const deleteExit = async (req, res) => {
       return res.status(400).json({ message: 'Exit ID is required' });
     }
 
-    await Exit.findByIdAndDelete(id);
+    const deleted = await Exit.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Exit record not found' });
+    }
     
     res.json({ message: 'Exit record deleted successfully' });
   } catch (error) {
@@ -399,6 +346,9 @@ const editTrade = async (req, res) => {
       updatedTrade = await Exit.findByIdAndUpdate(id, tradeData, { new: true });
     }
 
+    if (!updatedTrade) {
+      return res.status(404).json({ message: 'Trade not found after update' });
+    }
     res.json(updatedTrade);
   } catch (error) {
     res.status(500).json({ message: error.message });
