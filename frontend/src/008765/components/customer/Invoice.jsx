@@ -1038,7 +1038,7 @@ export default function Invoice() {
                                     <span className="text-slate-900">{formatIndianCurrency(summary.totalBrokerage)}</span>
                                 </div>
                             </div>
-                            <div className="mt-3 mb-1 flex justify-between items-center p-3 bg-white" style={{ border: '2px solid #000000' }}>
+                            <div className="mt-3 mb-2 flex justify-between items-center p-3 bg-white rounded" style={{ outline: '2.5px solid #000000' }}>
                                 <span className="font-bold uppercase tracking-wider text-slate-900 text-xs">Total Profit / Loss</span>
                                 <span className={`text-sm font-black whitespace-nowrap ${summary.netPnl >= 0 ? 'text-[#00B050]' : 'text-[#ef4444]'}`}>
                                     {summary.netPnl >= 0 ? formatIndianCurrency(summary.netPnl) : `-${formatIndianCurrency(Math.abs(summary.netPnl))}`}
