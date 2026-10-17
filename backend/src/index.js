@@ -43,7 +43,8 @@ const allowedOrigins = [
   "https://new-shop-g5i2.onrender.com",
   "http://localhost:3000",
   "http://localhost:4000",
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "https://supportcare.onrender.com"
 ];
 
 app.use(cors({
